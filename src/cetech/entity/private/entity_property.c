@@ -56,9 +56,10 @@ static void draw_component(ce_cdb_t0 db,
     ct_ecs_component_i0 *c = get_component_interface(type);
 
 
-    if (!c || !c->display_name) {
+    if (!c || !c->display_name || c->is_system_state) {
         return;
     }
+
 
 
     char buffer[128] = {};
@@ -176,7 +177,7 @@ static void _add_comp_popup(ce_cdb_t0 db,
         while (it.api) {
             struct ct_ecs_component_i0 *i = (it.api);
 
-            if (!i->display_name) {
+            if (!i->display_name || i->is_system_state) {
                 goto next;
             }
 

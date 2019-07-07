@@ -1,4 +1,5 @@
 
+
 #include <celib/macros.h>
 #include <celib/memory/allocator.h>
 #include <celib/fs.h>
@@ -84,7 +85,7 @@ static float draw_main_menu() {
         float w = v[0];
         float dt = ct_metrics_a0->get_float(ce_id_a0->id64("dt"));
         ct_debugui_a0->SameLine(w - 120, 0);
-        ct_debugui_a0->Text("FPS: %.0f | DT: %.0f ms", 1.0f/dt, dt*1000);
+        ct_debugui_a0->Text("FPS: %.0f | DT: %.0f ms", 1.0f / dt, dt * 1000);
 
         ct_debugui_a0->EndMainMenuBar();
     }
@@ -147,38 +148,13 @@ static void editor_task(float dt) {
 
 }
 
-
-static uint64_t task_name() {
-    return CT_EDITOR_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_DEBUGUI_TASK,
-            CT_INPUT_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_GAME_TASK,
-            CT_RENDER_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
 struct ct_kernel_task_i0 render_task = {
-        .name = task_name,
+        .name = CT_EDITOR_TASK,
         .update = editor_task,
         .init = on_init,
         .shutdown = on_shutdown,
-        .update_after = update_after,
-        .update_before = update_before,
+        .update_after = CT_KERNEL_AFTER(CT_DEBUGUI_TASK, CT_INPUT_TASK),
+        .update_before = CT_KERNEL_BEFORE(CT_GAME_TASK, CT_RENDER_TASK),
 };
 
 

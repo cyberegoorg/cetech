@@ -23,13 +23,13 @@ typedef struct game_state_t {
 struct _G {
     bool game_paused;
     game_state_t game_state;
-    ct_game_i0* game;
+    ct_game_i0 *game;
 } _G;
 
 static void game_init() {
     _G.game_state.world = ct_ecs_a0->create_world("game");
-    struct ct_game_i0 *gi =_G.game;
-    if(!gi) {
+    struct ct_game_i0 *gi = _G.game;
+    if (!gi) {
         return;
     }
 
@@ -38,7 +38,7 @@ static void game_init() {
 
 static void game_shutdown() {
     struct ct_game_i0 *gi = _G.game;
-    if(!gi) {
+    if (!gi) {
         return;
     }
 
@@ -90,7 +90,7 @@ static void _game_api_add(uint64_t name,
     if (CT_GAME_I == name) {
         ct_game_i0 *game_i = api;
 
-        if(_G.game) {
+        if (_G.game) {
             game_shutdown();
             _G.game = game_i;
             game_init();
@@ -110,26 +110,10 @@ struct ct_game_system_a0 game_system_api = {
 
 struct ct_game_system_a0 *ct_game_system_a0 = &game_system_api;
 
-
-static uint64_t task_name() {
-    return CT_GAME_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_INPUT_TASK,
-            CT_DEBUGUI_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-
 static struct ct_kernel_task_i0 game_task = {
-        .name = task_name,
+        .name = CT_GAME_TASK,
         .update = game_update,
-        .update_after = update_after,
+        .update_after = CT_KERNEL_AFTER(CT_INPUT_TASK, CT_DEBUGUI_TASK),
         .init = game_init,
         .shutdown = game_shutdown,
 };

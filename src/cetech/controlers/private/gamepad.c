@@ -220,34 +220,11 @@ static struct ct_controler_i0 ct_controlers_api = {
         .play_rumble = play_rumble,
 };
 
-static uint64_t task_name() {
-    return CT_GAMEPAD_TASK;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_INPUT_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_MACHINE_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-
 static struct ct_kernel_task_i0 gamepad_task = {
-        .name = task_name,
+        .name = CT_GAMEPAD_TASK,
         .update = update,
-        .update_before= update_before,
-        .update_after = update_after,
+        .update_before= CT_KERNEL_BEFORE(CT_INPUT_TASK),
+        .update_after = CT_KERNEL_AFTER(CT_MACHINE_TASK),
 };
 
 void CE_MODULE_LOAD(gamepad)(struct ce_api_a0 *api,

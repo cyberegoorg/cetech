@@ -833,8 +833,7 @@ static inline ce_vec4_t ce_quat_rotate_y(float _ay) {
 
 }
 
-static inline ce_vec4_t ce_quat_rotate_z(float *_result,
-                                         float _az) {
+static inline ce_vec4_t ce_quat_rotate_z(float _az) {
     const float hz = _az * 0.5f;
     const float cz = ce_fcos(hz);
     const float sz = ce_fsin(hz);

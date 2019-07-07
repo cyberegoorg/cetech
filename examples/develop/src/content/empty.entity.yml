@@ -1,0 +1,7 @@
+cdb_uid: 0xb0458fd869e7c36b
+cdb_type: entity
+name: (null)
+components:
+  cdb_type: cdb_objset
+children:
+  cdb_type: cdb_objset

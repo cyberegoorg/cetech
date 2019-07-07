@@ -32,6 +32,15 @@ extern "C" {
 #define CT_KERNEL_TASK_I \
     CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
 
+#define _KERNEL_LIST(...) (uint64_t[]){__VA_ARGS__}
+#define _KERNEL_LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))
+
+#define CT_KERNEL_BEFORE(...) \
+    ((ce_ptr_pair_t0){.ptr=&_KERNEL_LIST(__VA_ARGS__),.len=_KERNEL_LIST_SIZE(_KERNEL_LIST(__VA_ARGS__))})
+
+#define CT_KERNEL_AFTER(...) \
+    ((ce_ptr_pair_t0){.ptr=&_KERNEL_LIST(__VA_ARGS__),.len=_KERNEL_LIST_SIZE(_KERNEL_LIST(__VA_ARGS__))})
+
 typedef void (*ce_kernel_taks_update_t)(float dt);
 
 typedef void (*ce_kernel_taks_init_t)();
@@ -39,21 +48,19 @@ typedef void (*ce_kernel_taks_init_t)();
 typedef void (*ce_kernel_taks_shutdown_t)();
 
 typedef struct ct_kernel_task_i0 {
-    uint64_t (*name)();
+    uint64_t name;
+
+    ce_ptr_pair_t0 update_before;
+    ce_ptr_pair_t0 update_after;
+
+    ce_ptr_pair_t0 init_before;
+    ce_ptr_pair_t0 init_after;
 
     void (*update)(float dt);
-
-    uint64_t *(*update_before)(uint64_t *n);
-
-    uint64_t *(*update_after)(uint64_t *n);
 
     void (*init)();
 
     void (*shutdown)();
-
-    uint64_t *(*init_before)(uint64_t *n);
-
-    uint64_t *(*init_after)(uint64_t *n);
 } ct_kernel_task_i0;
 
 struct ct_kernel_a0 {

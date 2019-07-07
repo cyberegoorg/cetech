@@ -463,23 +463,10 @@ static struct ct_machine_a0 a0 = {
 
 struct ct_machine_a0 *ct_machine_a0 = &a0;
 
-static uint64_t task_name() {
-    return CT_MACHINE_TASK;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_INPUT_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
 static struct ct_kernel_task_i0 machine_task = {
-        .name = task_name,
+        .name = CT_MACHINE_TASK,
         .update = _update,
-        .update_before = update_before,
+        .update_before = CT_KERNEL_BEFORE(CT_INPUT_TASK),
 };
 
 

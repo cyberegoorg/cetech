@@ -54,11 +54,10 @@ uint64_t thread_actual_id() {
     return SDL_ThreadID();
 }
 
+#include <unistd.h>
 void thread_yield() {
-#if CE_PLATFORM_OSX
-    sched_yield();
-#elif CE_PLATFORM_LINUX
-    sched_yield();
+#if CE_PLATFORM_OSX || CE_PLATFORM_LINUX
+    usleep(0);// sched_yield();
 #else
 #error "Implement this"
 #endif

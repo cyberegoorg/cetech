@@ -166,26 +166,14 @@ static void _build_update_graph(ce_ba_graph_t *sg) {
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
-        uint64_t name = i->name();
+        uint64_t name = i->name;
 
         ce_hash_add(&_G.update_map, name,
                     (uint64_t) i->update, _G.allocator);
 
-        uint64_t before_n = 0;
-        const uint64_t *before = NULL;
-        if (i->update_before) {
-            before = i->update_before(&before_n);
-        }
-
-        uint64_t after_n = 0;
-        const uint64_t *after;
-        if (i->update_after) {
-            after = i->update_after(&after_n);
-        }
-
         ce_bag_add(sg, name,
-                   before, before_n,
-                   after, after_n,
+                   i->update_before.ptr, i->update_before.len,
+                   i->update_after.ptr, i->update_after.len,
                    _G.allocator);
 
         it = ce_api_a0->next(it);
@@ -218,7 +206,7 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
             continue;
         }
 
-        uint64_t name = i->name();
+        uint64_t name = i->name;
 
         ce_hash_add(&_G.init_map, name,
                     (uint64_t) i->init, _G.allocator);
@@ -228,21 +216,9 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
                         (uint64_t) i->shutdown, _G.allocator);
         }
 
-        uint64_t before_n = 0;
-        const uint64_t *before = NULL;
-        if (i->init_before) {
-            before = i->init_before(&before_n);
-        }
-
-        uint64_t after_n = 0;
-        const uint64_t *after;
-        if (i->init_after) {
-            after = i->init_after(&after_n);
-        }
-
         ce_bag_add(sg, name,
-                   before, before_n,
-                   after, after_n,
+                   i->init_before.ptr, i->init_before.len,
+                   i->init_after.ptr, i->init_after.len,
                    _G.allocator);
 
         it = ce_api_a0->next(it);
@@ -277,12 +253,8 @@ static void _shutdown(ce_ba_graph_t *sg) {
 static void _nop_update(float dt) {
 }
 
-static uint64_t input_task_name() {
-    return CT_INPUT_TASK;
-}
-
 static struct ct_kernel_task_i0 input_task = {
-        .name = input_task_name,
+        .name = CT_INPUT_TASK,
         .update = _nop_update,
 };
 

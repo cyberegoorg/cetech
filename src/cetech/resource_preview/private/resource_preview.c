@@ -112,7 +112,7 @@ static void set_asset(preview_instance *pi,
         }
 
         ct_ecs_e_a0->destroy_entities(pi->world, &pi->ent, 1);
-
+        //ct_ecs_a0->step(pi->world, 0);
         pi->ent.h = 0;
         pi->type = 0;
     }
@@ -239,7 +239,9 @@ static void update(float dt) {
         if (ct_ecs_c_a0->has(pi->world, pi->ent, (uint64_t[]) {ROTATION_COMPONENT}, 1)) {
             ct_rotation_c *rot_t = ct_ecs_c_a0->get_one(pi->world,
                                                         ROTATION_COMPONENT, pi->ent, true);
-            rot_t->rot = ce_vec3_add(rot_t->rot, (ce_vec3_t) {0, 1, 0});
+
+            ce_vec4_t q = ce_quat_from_euler(0, 1 * CE_DEG_TO_RAD, 0);
+            rot_t->rot = ce_quat_mul(q, rot_t->rot);
         }
 
         ct_ecs_a0->step(pi->world, dt);

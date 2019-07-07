@@ -330,39 +330,16 @@ static struct ct_debugui_a0 debugui_api = {
 
 struct ct_debugui_a0 *ct_debugui_a0 = &debugui_api;
 
-
-static uint64_t task_name() {
-    return CT_DEBUGUI_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_INPUT_TASK,
-            CT_RENDER_BEGIN_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_RENDER_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
 static void debugui_update(float dt) {
     begin();
 }
 
 static struct ct_kernel_task_i0 debugui_task = {
-        .name = task_name,
+        .name = CT_DEBUGUI_TASK,
         .update = debugui_update,
-        .update_after = update_after,
-        .update_before= update_before,
+        .update_after = CT_KERNEL_AFTER(CT_INPUT_TASK,
+                                        CT_RENDER_BEGIN_TASK),
+        .update_before= CT_KERNEL_BEFORE(CT_RENDER_TASK),
 };
 
 static const char *_get_clipboard_text(void *data) {

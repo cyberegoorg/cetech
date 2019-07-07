@@ -45,7 +45,7 @@ void render_static_mesh(ct_world_t0 world,
                         ct_ecs_ent_chunk_o0 *item,
                         uint32_t n,
                         void *_data) {
-    mesh_render_data *data = _data;
+     mesh_render_data *data = _data;
 
     ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
     ct_mesh_component *static_meshs = ct_ecs_c_a0->get_all(world, STATIC_MESH_COMPONENT, item);

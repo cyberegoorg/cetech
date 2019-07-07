@@ -296,21 +296,6 @@ static struct ct_texture_a0 texture_api = {
 
 struct ct_texture_a0 *ct_texture_a0 = &texture_api;
 
-
-static uint64_t task_name() {
-    return TEXTURE_TASK;
-}
-
-
-static uint64_t *compile_watch_update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_RENDER_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
 static void compile_watch(float dt) {
     ce_cdb_prop_ev_t0 ev = {};
 
@@ -350,9 +335,9 @@ static void compile_watch(float dt) {
 }
 
 static struct ct_kernel_task_i0 texture_compile_watch_task = {
-        .name = task_name,
+        .name = TEXTURE_TASK,
         .update = compile_watch,
-        .update_after = compile_watch_update_after,
+        .update_after = CT_KERNEL_AFTER(CT_RENDER_TASK),
 };
 
 

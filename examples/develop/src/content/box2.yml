@@ -13,5 +13,63 @@ components:
     scene: 0x3d4a26bc5ef4b90d
     node: (null)
     mesh: Mesh
+  0x1840da989e81141d:
+    cdb_uid: 0x1840da989e81141d
+    cdb_type: position
+    position:
+      cdb_uid: 0xb67854521dcb9072
+      cdb_type: 0x6112fca24c71dad
+      x: -10.000000
+      y: 5.000000
+      z: 40.000000
 children:
   cdb_type: cdb_objset
+  0xa6a54889e160cc7:
+    cdb_uid: 0xa6a54889e160cc7
+    cdb_type: entity
+    name: (null)
+    components:
+      cdb_type: cdb_objset
+      0xd61f046bc560891c:
+        cdb_uid: 0xd61f046bc560891c
+        cdb_type: local_to_world
+      0x4a326290ac160cc7:
+        cdb_uid: 0x4a326290ac160cc7
+        cdb_type: local_to_parent
+      0xa8b2a1932060891c:
+        cdb_uid: 0xa8b2a1932060891c
+        cdb_type: position
+        position:
+          cdb_uid: 0x46ea1b4c9fab0571
+          cdb_type: 0x6112fca24c71dad
+          x: 14.000001
+          y: 2.000000
+          z: 0.000000
+      0x5a880c5cf0f581c6:
+        cdb_uid: 0x5a880c5cf0f581c6
+        cdb_type: static_mesh
+        material: 0x15f21001d1
+        scene: 0x97c41c8996520208
+        node: (null)
+        mesh: SciFiHelmet
+    children:
+      cdb_type: cdb_objset
+      0x658bbd5fee819:
+        cdb_uid: 0x658bbd5fee819
+        cdb_type: entity
+        cdb_instance: 0x899cfb7b8c84a36c
+        components:
+          cdb_type: cdb_objset
+          0x9e3dd2755549646e:
+            cdb_uid: 0x9e3dd2755549646e
+            cdb_type: local_to_world
+            cdb_instance: 0xa07874d664cf1fc1
+          0x3c754c2ed493e0c3:
+            cdb_uid: 0x3c754c2ed493e0c3
+            cdb_type: static_mesh
+            cdb_instance: 0x8f3fd7c530f91115
+          0xee95525127de5d18:
+            cdb_uid: 0xee95525127de5d18
+            cdb_type: local_to_parent
+        children:
+          cdb_type: cdb_objset

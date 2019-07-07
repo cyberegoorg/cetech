@@ -256,6 +256,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                              {
                                      .type = ROTATION_COMPONENT,
                                      .data = &(ct_rotation_c) {
+                                             .rot = CE_QUAT_IDENTITY
                                      },
                              },
                              {

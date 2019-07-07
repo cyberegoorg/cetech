@@ -377,8 +377,6 @@ static void transform_system(ct_world_t0 world,
                                                                  CT_PARENT_COMPONENT),
 
                                         .write = CT_ECS_ARCHETYPE(LOCAL_TO_WORLD_COMPONENT),
-
-                                        .only_changed = true,
                                 }, rq_version,
                                 _local_to_parent, &graph);
 

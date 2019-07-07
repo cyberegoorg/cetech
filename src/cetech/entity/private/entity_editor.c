@@ -22,6 +22,12 @@
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/resource_editor/resource_editor.h>
 #include <celib/containers/array.h>
+#include <cetech/controlers/controlers.h>
+#include <cetech/controlers/keyboard.h>
+#include <celib/math/math.h>
+#include <cetech/controlers/mouse.h>
+#include <celib/log.h>
+#include <float.h>
 
 #define _G entity_editor_globals
 
@@ -37,11 +43,6 @@ typedef struct entity_editor {
 static struct _G {
     entity_editor *editors;
 } _G;
-
-
-#define _EDITOR_IDX \
-    CE_ID64_0("editor_idx", 0x1b333d78a2ccaab7ULL)
-
 
 static void draw_menu(uint64_t context_obj) {
     entity_editor *editor = (entity_editor *) context_obj;
@@ -139,6 +140,13 @@ static struct entity_editor *_new_editor() {
                                      }
                              },
                              {
+                                     .type = ROTATION_COMPONENT,
+                                     .data = &(ct_rotation_c) {
+                                             .rot = CE_QUAT_IDENTITY
+                                     }
+                             },
+
+                             {
                                      .type = LOCAL_TO_WORLD_COMPONENT,
                                      .data = &(ct_local_to_world_c) {
                                              .world = CE_MAT4_IDENTITY,
@@ -148,8 +156,8 @@ static struct entity_editor *_new_editor() {
                                      .type = CT_CAMERA_COMPONENT,
                                      .data = &(ct_camera_component) {
                                              .camera_type = CAMERA_TYPE_PERSPECTIVE,
-                                             .far = 100.0f,
-                                             .near = -1.0f,
+                                             .far = 10000.0f,
+                                             .near = 0.1f,
                                              .fov = 60.0f,
                                      }
                              },
@@ -186,6 +194,43 @@ static void update(uint64_t context_obj,
     }
 
     if (editor->mouse_hovering) {
+        ct_position_c *pos = ct_ecs_c_a0->get_one(editor->world,
+                                                  POSITION_COMPONENT,
+                                                  editor->camera_ent, true);
+
+        ct_rotation_c *rot = ct_ecs_c_a0->get_one(editor->world,
+                                                  ROTATION_COMPONENT,
+                                                  editor->camera_ent, true);
+
+        ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
+
+        float forward = kb->button_state(0, kb->button_index("w")) ? 1.0f :
+                        kb->button_state(0, kb->button_index("s")) ? -1.0f : 0.0f;
+
+        float side = kb->button_state(0, kb->button_index("d")) ? 1.0f :
+                     kb->button_state(0, kb->button_index("a")) ? -1.0f : 0.0f;
+
+        ce_vec3_t fw_dir = ce_vec3_mul_quat(CE_VEC3_UNIT_Z, rot->rot);
+        fw_dir = ce_vec3_mul_s(fw_dir, forward * 1.0f);
+
+        ce_vec3_t rg_dir = ce_vec3_mul_quat(CE_VEC3_UNIT_X, rot->rot);
+        rg_dir = ce_vec3_mul_s(rg_dir, side * 1.0f);
+
+        pos->pos = ce_vec3_add(pos->pos, ce_vec3_add(fw_dir, rg_dir));
+
+        ct_controler_i0 *mouse = ct_controlers_a0->get(CONTROLER_MOUSE);
+        if (mouse->button_state(0, mouse->button_index("left"))) {
+            ce_vec3_t axis = {};
+            mouse->axis(0, mouse->axis_index("relative"), &axis.x);
+
+            if (!ce_vec3_equal(axis, CE_VEC3_ZERO, FLT_EPSILON)) {
+//                ce_vec4_t q_x = ce_quat_rotate_x(axis.y * CE_DEG_TO_RAD);
+                ce_vec4_t q_y = ce_quat_rotate_y(-(axis.x * CE_DEG_TO_RAD));
+
+//                rot->rot = ce_quat_mul(q_x, rot->rot);
+                rot->rot = ce_quat_mul(q_y, rot->rot);
+            }
+        }
     }
 
     ct_ecs_a0->step(editor->world, dt);

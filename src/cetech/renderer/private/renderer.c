@@ -283,10 +283,10 @@ static void render(float dt) {
     double freq = s->cpuTimerFreq;
 
     ct_metrics_a0->set_float(ce_id_a0->id64("renderer.wait_submit"),
-                                 1000 * s->waitSubmit / freq);
+                             1000 * s->waitSubmit / freq);
 
     ct_metrics_a0->set_float(ce_id_a0->id64("renderer.wait_render"),
-                                 1000 * s->waitRender / freq);
+                             1000 * s->waitRender / freq);
 
     ct_metrics_a0->set_float(ce_id_a0->id64("renderer.num_draw"),
                              s->numDraw);
@@ -379,36 +379,17 @@ static struct ct_renderer_a0 rendderer_api = {
         .get_main_window = get_main_window,
 };
 
-
 struct ct_renderer_a0 *ct_renderer_a0 = &rendderer_api;
 
-static uint64_t begin_task_name() {
-    return CT_RENDER_BEGIN_TASK;
-}
-
-static uint64_t task_name() {
-    return CT_RENDER_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_RENDER_BEGIN_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-
 static struct ct_kernel_task_i0 render_begin_task = {
-        .name = begin_task_name,
+        .name = CT_RENDER_BEGIN_TASK,
         .update = render_begin,
 };
 
 static struct ct_kernel_task_i0 render_task = {
-        .name = task_name,
+        .name = CT_RENDER_TASK,
         .update = render,
-        .update_after = update_after,
+        .update_after = CT_KERNEL_AFTER(CT_RENDER_BEGIN_TASK)
 };
 
 void _render_all_viewport(ct_world_t0 w,
