@@ -94,11 +94,11 @@ void _array_swap_remove(ct_entity_t0 *ents,
     }
 }
 
-void _destroy_previous_parent2(ct_world_t0 world,
-                               struct ct_entity_t0 *entities,
-                               ct_ecs_ent_chunk_o0 *item,
-                               uint32_t n,
-                               void *_data) {
+void _destroy_child_and_prev_parent(ct_world_t0 world,
+                                    struct ct_entity_t0 *entities,
+                                    ct_ecs_ent_chunk_o0 *item,
+                                    uint32_t n,
+                                    void *_data) {
     ct_ecs_cmd_buffer_t *cmd = _data;
 
     ct_parent_c *parent = ct_ecs_c_a0->get_all(world, CT_PREVIOUS_PARENT_COMPONENT, item);
@@ -109,6 +109,7 @@ void _destroy_previous_parent2(ct_world_t0 world,
         if (child && !ce_array_size(child->child)) {
             ct_ecs_a0->buff_remove_component(cmd, world, parent[i].parent,
                                              (uint64_t[]) {CT_CHILD_COMPONENT}, 1);
+            ce_array_free(child->child, _G.alloc);
         }
 
         ct_ecs_a0->buff_remove_component(cmd, world, entities[i],
@@ -116,13 +117,11 @@ void _destroy_previous_parent2(ct_world_t0 world,
     }
 }
 
-void _destroy_previous_parent(ct_world_t0 world,
-                              struct ct_entity_t0 *entities,
-                              ct_ecs_ent_chunk_o0 *item,
-                              uint32_t n,
-                              void *_data) {
-//    ct_ecs_cmd_buffer_t *cmd = _data;
-
+void _remove_from_parent(ct_world_t0 world,
+                         struct ct_entity_t0 *entities,
+                         ct_ecs_ent_chunk_o0 *item,
+                         uint32_t n,
+                         void *_data) {
     ct_previous_parent_c *previous_parent = ct_ecs_c_a0->get_all(world,
                                                                  CT_PREVIOUS_PARENT_COMPONENT,
                                                                  item);
@@ -138,8 +137,6 @@ void _destroy_previous_parent(ct_world_t0 world,
 
         _array_swap_remove(child->child, entities[i]);
 
-//        ct_ecs_a0->buff_remove_component(cmd, world, entities[i],
-//                                         (uint64_t[]) {CT_PREVIOUS_PARENT_COMPONENT}, 1);
     }
 }
 
@@ -257,14 +254,14 @@ static void parent_system(ct_world_t0 world,
                                         .all = CT_ECS_ARCHETYPE(CT_PREVIOUS_PARENT_COMPONENT),
                                         .none = CT_ECS_ARCHETYPE(CT_PARENT_COMPONENT)
                                 }, rq_version,
-                                _destroy_previous_parent, cmd);
+                                _remove_from_parent, cmd);
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
                                         .all = CT_ECS_ARCHETYPE(CT_PREVIOUS_PARENT_COMPONENT),
                                         .none = CT_ECS_ARCHETYPE(CT_PARENT_COMPONENT),
                                 }, rq_version,
-                                _destroy_previous_parent2, cmd);
+                                _destroy_child_and_prev_parent, cmd);
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
@@ -272,7 +269,6 @@ static void parent_system(ct_world_t0 world,
                                         .none = CT_ECS_ARCHETYPE(CT_PREVIOUS_PARENT_COMPONENT)
                                 }, rq_version,
                                 _spawn_previous_parent, cmd);
-
 
 }
 
@@ -335,6 +331,7 @@ static struct ct_ecs_component_i0 child_c_api = {
         .cdb_type = CT_CHILD_COMPONENT,
         .size = sizeof(ct_child_c),
         .display_name = child_parent_display_name,
+        .is_system_state = true,
 };
 
 void CE_MODULE_LOAD(parent)(struct ce_api_a0 *api,

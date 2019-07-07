@@ -10,7 +10,9 @@
 
 #include <celib/log.h>
 #include <celib/cdb.h>
-#include "celib/module.h"
+#include <celib/module.h>
+#include <celib/containers/hash.h>
+#include <celib/containers/bagraph.h>
 
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
@@ -133,7 +135,12 @@ static void _rotation_on_spawn(ct_world_t0 world,
                                uint64_t obj,
                                void *data) {
     ct_rotation_c *c = data;
-    ce_cdb_a0->read_to(db, obj, c, sizeof(ct_rotation_c));
+    ce_vec3_t rot;
+    ce_cdb_a0->read_to(db, obj, &rot, sizeof(ce_vec3_t));
+
+    c->rot = ce_quat_from_euler(rot.x * CE_DEG_TO_RAD,
+                                rot.y * CE_DEG_TO_RAD,
+                                rot.z * CE_DEG_TO_RAD);
 }
 
 static struct ct_ecs_component_i0 rotation_c_api = {
@@ -241,16 +248,28 @@ void _trs_to_local_to_parent(ct_world_t0 world,
     ct_local_to_parent_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_PARENT_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        ce_vec3_t pos = position ? position[i].pos : CE_VEC3_ZERO;
-        ce_vec3_t rot = rotaiton ? ce_vec3_mul_s(rotaiton[i].rot, CE_DEG_TO_RAD) : CE_VEC3_ZERO;
-        ce_vec3_t scl = scale ? scale[i].scl : CE_VEC3_UNIT;
+        ce_mat4_t t = CE_MAT4_IDENTITY;
+        ce_mat4_t r = CE_MAT4_IDENTITY;
+        ce_mat4_t s = CE_MAT4_IDENTITY;
+        if (position) {
+            ce_vec3_t pos = position[i].pos;
+            ce_mat4_translate(t.m, pos.x, pos.y, pos.z);
+        }
+
+        if (rotaiton) {
+            ce_mat4_quat(r.m, rotaiton[i].rot);
+        }
+
+        if (scale) {
+            ce_vec3_t scl = scale[i].scl;
+            ce_mat4_scale(s.m, scl.x, scl.y, scl.z);
+        }
 
         ct_local_to_parent_c *t_c = &transforms[i];
 
-        ce_mat4_srt(t_c->local.m,
-                    scl.x, scl.y, scl.z,
-                    rot.x, rot.y, rot.z,
-                    pos.x, pos.y, pos.z);
+        ce_mat4_t sr;
+        ce_mat4_mul(sr.m, s.m, r.m);
+        ce_mat4_mul(t_c->local.m, sr.m, t.m);
     }
 }
 
@@ -268,16 +287,28 @@ void _trs_to_local_to_world(ct_world_t0 world,
     ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        ce_vec3_t pos = position ? position[i].pos : CE_VEC3_ZERO;
-        ce_vec3_t rot = rotaiton ? ce_vec3_mul_s(rotaiton[i].rot, CE_DEG_TO_RAD) : CE_VEC3_ZERO;
-        ce_vec3_t scl = scale ? scale[i].scl : CE_VEC3_UNIT;
+        ce_mat4_t t = CE_MAT4_IDENTITY;
+        ce_mat4_t r = CE_MAT4_IDENTITY;
+        ce_mat4_t s = CE_MAT4_IDENTITY;
+        if (position) {
+            ce_vec3_t pos = position[i].pos;
+            ce_mat4_translate(t.m, pos.x, pos.y, pos.z);
+        }
+
+        if (rotaiton) {
+            ce_mat4_quat(r.m, rotaiton[i].rot);
+        }
+
+        if (scale) {
+            ce_vec3_t scl = scale[i].scl;
+            ce_mat4_scale(s.m, scl.x, scl.y, scl.z);
+        }
 
         ct_local_to_world_c *t_c = &transforms[i];
 
-        ce_mat4_srt(t_c->world.m,
-                    scl.x, scl.y, scl.z,
-                    rot.x, rot.y, rot.z,
-                    pos.x, pos.y, pos.z);
+        ce_mat4_t sr;
+        ce_mat4_mul(sr.m, s.m, r.m);
+        ce_mat4_mul(t_c->world.m, sr.m, t.m);
     }
 }
 
@@ -286,13 +317,11 @@ void _local_to_parent(ct_world_t0 world,
                       ct_ecs_ent_chunk_o0 *item,
                       uint32_t n,
                       void *_data) {
+    ce_ba_graph_t *graph = _data;
 
-    ct_local_to_world_c *transforms = ct_ecs_c_a0->get_all(world, LOCAL_TO_WORLD_COMPONENT, item);
-    ct_local_to_parent_c *local = ct_ecs_c_a0->get_all(world, LOCAL_TO_PARENT_COMPONENT, item);
     ct_parent_c *parent = ct_ecs_c_a0->get_all(world, CT_PARENT_COMPONENT, item);
 
     for (int i = 0; i < n; ++i) {
-        ct_local_to_parent_c *l = &local[i];
         ct_entity_t0 p = parent[i].parent;
 
         ct_local_to_world_c *ltp = ct_ecs_c_a0->get_one(world, LOCAL_TO_WORLD_COMPONENT, p, false);
@@ -300,7 +329,8 @@ void _local_to_parent(ct_world_t0 world,
             continue;
         }
 
-        ce_mat4_mul(transforms[i].world.m, ltp->world.m, l->local.m);
+        ce_bag_add(graph,
+                   entities[i].h, &p.h, 1, NULL, 0, _G.alloc);
     }
 }
 
@@ -339,18 +369,46 @@ static void transform_system(ct_world_t0 world,
                          }, rq_version,
                          _trs_to_local_to_parent, NULL);
 
+    ce_ba_graph_t graph = {};
+    ct_ecs_q_a0->foreach_serial(world,
+                                (ct_ecs_query_t0) {
+                                        .all =  CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT,
+                                                                 LOCAL_TO_WORLD_COMPONENT,
+                                                                 CT_PARENT_COMPONENT),
 
+                                        .write = CT_ECS_ARCHETYPE(LOCAL_TO_WORLD_COMPONENT),
 
-    ct_ecs_q_a0->foreach(world,
-                         (ct_ecs_query_t0) {
-                                 .all =  CT_ECS_ARCHETYPE(LOCAL_TO_PARENT_COMPONENT,
-                                                          CT_PARENT_COMPONENT),
+                                        .only_changed = true,
+                                }, rq_version,
+                                _local_to_parent, &graph);
 
-                                 .write = CT_ECS_ARCHETYPE(LOCAL_TO_WORLD_COMPONENT),
+    ce_bag_build(&graph, _G.alloc);
+    uint32_t n = ce_array_size(graph.output);
+    for (int i = 0; i < n; ++i) {
+        ct_entity_t0 ent = {graph.output[i]};
 
-                                 .only_changed = true,
-                         }, rq_version,
-                         _local_to_parent, NULL);
+        ct_parent_c *parent = ct_ecs_c_a0->get_one(world, CT_PARENT_COMPONENT, ent, false);
+        if(!parent) {
+            continue;
+        }
+
+        ct_entity_t0 par_ent = parent->parent;
+
+        ct_local_to_world_c *ltp = ct_ecs_c_a0->get_one(world, LOCAL_TO_WORLD_COMPONENT, par_ent,
+                                                        false);
+        if (!ltp) {
+            continue;
+        }
+
+        ct_local_to_world_c *ltw = ct_ecs_c_a0->get_one(world, LOCAL_TO_WORLD_COMPONENT, ent,
+                                                        false);
+
+        ct_local_to_parent_c *local = ct_ecs_c_a0->get_one(world, LOCAL_TO_PARENT_COMPONENT, ent,
+                                                           false);
+
+        ce_mat4_mul(ltw->world.m, local->local.m, ltp->world.m);
+    }
+    ce_bag_free(&graph, _G.alloc);
 
 }
 
@@ -364,7 +422,6 @@ static struct ct_system_i0 transform_system_i0 = {
         .process = transform_system,
         .after = CT_ECS_AFTER(CT_PARENT_SYSTEM),
 };
-
 
 
 static const ce_cdb_prop_def_t0 local_to_world_prop[] = {
@@ -447,6 +504,9 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                             vec3_prop, CE_ARRAY_LEN(vec3_prop));
 
     ce_cdb_a0->reg_obj_type(LOCAL_TO_WORLD_COMPONENT,
+                            local_to_world_prop, CE_ARRAY_LEN(local_to_world_prop));
+
+    ce_cdb_a0->reg_obj_type(LOCAL_TO_PARENT_COMPONENT,
                             local_to_world_prop, CE_ARRAY_LEN(local_to_world_prop));
 
 }
