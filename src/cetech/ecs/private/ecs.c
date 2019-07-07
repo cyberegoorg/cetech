@@ -114,6 +114,7 @@ typedef struct world_instance_t {
     ent_chunk_t **chunk_pool_free;
 
     // Archetype
+    uint32_t *archetype_array;
     archetype_t *archetype_pool;
     uint32_t *archetype_free;
     ce_hash_t archetype_map;
@@ -302,6 +303,18 @@ void _free_archetype(world_instance_t *world,
 
     archetype->archetype_mask.mask = 0;
 
+    const uint32_t n = ce_array_size(world->archetype_array);
+    for (int i = 0; i < n; ++i) {
+        if (world->archetype_array[i] != archetype->idx) {
+            continue;
+        }
+
+        const uint32_t last_idx = n - 1;
+        world->archetype_array[i] = world->archetype_array[last_idx];
+        ce_array_pop_back(world->archetype_array);
+        break;
+    }
+
     ent_chunk_t *chunk = archetype->first;
 
     while (chunk) {
@@ -393,10 +406,11 @@ static void *get_one(ct_world_t0 world,
 void _add_to_archetype(world_instance_t *w,
                        ct_entity_t0 ent,
                        ct_archemask_t0 archetype_mask) {
+    ent_chunk_t *ch = _entity_chunk(w, ent);
 
-//    if (_entity_type(w, ent).mask == archetype_mask.mask) {
-//        return;
-//    }
+    if (ch && (ch->archetype_mask.mask == archetype_mask.mask)) {
+        return;
+    }
 
     uint64_t archetype_idx = ce_hash_lookup(&w->archetype_map, archetype_mask.mask, UINT64_MAX);
 
@@ -404,6 +418,8 @@ void _add_to_archetype(world_instance_t *w,
         archetype_t *storage = _get_new_archetype(w);
         archetype_idx = storage->idx;
         ce_hash_add(&w->archetype_map, archetype_mask.mask, archetype_idx, _G.allocator);
+
+        ce_array_push(w->archetype_array, archetype_idx, _G.allocator);
 
         bool has_system_state = false;
         uint32_t all_component_size = sizeof(ct_entity_t0);
@@ -507,7 +523,7 @@ void _add_to_archetype(world_instance_t *w,
 }
 
 void _remove_from_archetype(world_instance_t *w,
-                            struct ct_entity_t0 ent,
+                            ct_entity_t0 ent,
                             uint64_t ent_idx,
                             ent_chunk_t *chunk,
                             ct_archemask_t0 archetype) {
@@ -967,6 +983,10 @@ static void remove_components(ct_world_t0 world,
 
     archetype_t *storage = _get_archetype(w, chunk->archetype_mask);
 
+    if (!storage) {
+        return;
+    }
+
     uint32_t idx = _entity_data_idx(w, ent);
 
     if (new_type.mask) {
@@ -1093,13 +1113,13 @@ static void process_query(ct_world_t0 world,
                           void *data) {
     world_instance_t *w = get_world_instance(world);
 
-    const uint32_t type_count = ce_array_size(w->archetype_pool);
+    const uint32_t type_count = ce_array_size(w->archetype_array);
 
     ce_task_item_t0 *tasks = NULL;
     process_data_t *task_data = NULL;
 
     for (int i = 0; i < type_count; ++i) {
-        archetype_t *storage = &w->archetype_pool[i];
+        archetype_t *storage = &w->archetype_pool[w->archetype_array[i]];
 
         ent_chunk_t *chunk = storage->first;
 
@@ -1152,10 +1172,10 @@ static void process_query_serial(ct_world_t0 world,
                                  void *data) {
     world_instance_t *w = get_world_instance(world);
 
-    const uint32_t type_count = ce_array_size(w->archetype_pool);
+    const uint32_t type_count = ce_array_size(w->archetype_array);
 
     for (int i = 0; i < type_count; ++i) {
-        archetype_t *storage = &w->archetype_pool[i];
+        archetype_t *storage = &w->archetype_pool[w->archetype_array[i]];
 
         ent_chunk_t *chunk = storage->first;
 
@@ -1415,6 +1435,8 @@ static void destroy(ct_world_t0 world,
                 _move_data_from_archetype(w, ent, chunk, data_idx, chunk->archetype_mask, new_type);
             }
             _remove_from_archetype(w, ent, data_idx, chunk, chunk->archetype_mask);
+        } else {
+            CE_UNUSED(chunk);
         }
 
         if (child) {
@@ -1623,10 +1645,10 @@ static void query_collect_ents(ct_world_t0 world,
                                const ce_alloc_t0 *alloc) {
     world_instance_t *w = get_world_instance(world);
 
-    const uint32_t type_count = ce_array_size(w->archetype_pool);
+    const uint32_t type_count = ce_array_size(w->archetype_array);
 
     for (int i = 0; i < type_count; ++i) {
-        archetype_t *storage = &w->archetype_pool[i];
+        archetype_t *storage = &w->archetype_pool[w->archetype_array[i]];
 
         ent_chunk_t *chunk = storage->first;
 
@@ -1931,33 +1953,11 @@ static void _sync_task(float dt) {
     ce_array_free(ents, _G.allocator);
 }
 
-static uint64_t task_name() {
-    return CT_ECS_SYNC_TASK;
-}
-
-static uint64_t *update_after(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_EDITOR_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
-static uint64_t *update_before(uint64_t *n) {
-    static uint64_t a[] = {
-            CT_GAME_TASK,
-    };
-
-    *n = CE_ARRAY_LEN(a);
-    return a;
-}
-
 static struct ct_kernel_task_i0 ecs_sync_task = {
-        .name = task_name,
+        .name = CT_ECS_SYNC_TASK,
         .update = _sync_task,
-        .update_after = update_after,
-        .update_before = update_before,
+        .update_after = CT_KERNEL_AFTER(CT_EDITOR_TASK),
+        .update_before = CT_KERNEL_BEFORE(CT_GAME_TASK),
 };
 
 static ce_cdb_prop_def_t0 entity_prop[] = {
@@ -2030,14 +2030,18 @@ static void ecs_debuger_draw(uint64_t content,
     if (w) {
         char *str_buff = NULL;
 
-        for (int i = 0; i < ce_array_size(w->archetype_pool); ++i) {
-            archetype_t *archetype = &w->archetype_pool[i];
+        for (int i = 0; i < ce_array_size(w->archetype_array); ++i) {
+            archetype_t *archetype = &w->archetype_pool[w->archetype_array[i]];
 
             for (int j = 0; j < archetype->component_n; ++j) {
                 uint64_t component_name = archetype->name[j];
                 ct_ecs_component_i0 *ci = get_interface(component_name);
                 const char *display_name = ci->display_name ? ci->display_name() : NULL;
                 ce_buffer_printf(&str_buff, _G.allocator, "%s | ", display_name);
+            }
+
+            if (archetype->archetype_mask.mask == 0) {
+                ce_buffer_printf(&str_buff, _G.allocator, "empty");
             }
 
             ct_debugui_a0->Selectable(str_buff, false, 0, &CE_VEC2_ZERO);

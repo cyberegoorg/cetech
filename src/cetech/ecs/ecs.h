@@ -57,17 +57,17 @@ extern "C" {
 #define CT_ECS_PRESENTATION_GROUP \
     CE_ID64_0("presentation_group", 0xfba87d270fbfa0b1ULL)
 
-#define _LIST(...) (uint64_t[]){__VA_ARGS__}
-#define _LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))
+#define _ECS_LIST(...) (uint64_t[]){__VA_ARGS__}
+#define _ECS_LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))
 
 #define CT_ECS_BEFORE(...) \
-    ((ct_ptr_pair_t0){.ptr=&_LIST(__VA_ARGS__),.len=_LIST_SIZE(_LIST(__VA_ARGS__))})
+    ((ce_ptr_pair_t0){.ptr=&_ECS_LIST(__VA_ARGS__),.len=_ECS_LIST_SIZE(_ECS_LIST(__VA_ARGS__))})
 
 #define CT_ECS_AFTER(...) \
-    ((ct_ptr_pair_t0){.ptr=&_LIST(__VA_ARGS__),.len=_LIST_SIZE(_LIST(__VA_ARGS__))})
+    ((ce_ptr_pair_t0){.ptr=&_ECS_LIST(__VA_ARGS__),.len=_ECS_LIST_SIZE(_ECS_LIST(__VA_ARGS__))})
 
 #define CT_ECS_ARCHETYPE(...) \
-    ct_ecs_c_a0->combine_component(_LIST(__VA_ARGS__), _LIST_SIZE(_LIST(__VA_ARGS__)))
+    ct_ecs_c_a0->combine_component(_ECS_LIST(__VA_ARGS__), _ECS_LIST_SIZE(_ECS_LIST(__VA_ARGS__)))
 
 
 typedef struct ce_cdb_t0 ce_cdb_t0;
@@ -139,30 +139,24 @@ typedef struct ct_editor_component_i0 {
                                  float *local);
 } ct_editor_component_i0;
 
-
-typedef struct ct_ptr_pair_t0 {
-    void *ptr;
-    uint32_t len;
-} ct_ptr_pair_t0;
-
 typedef struct ct_system_i0 {
     uint64_t name;
     ct_ecs_system_fce_t *process;
 
     uint64_t group;
-    ct_ptr_pair_t0 before;
-    ct_ptr_pair_t0 after;
+    ce_ptr_pair_t0 before;
+    ce_ptr_pair_t0 after;
 } ct_system_i0;
 
 typedef struct ct_system_group_i0 {
     uint64_t name;
     uint64_t group;
-    ct_ptr_pair_t0 before;
-    ct_ptr_pair_t0 after;
+    ce_ptr_pair_t0 before;
+    ce_ptr_pair_t0 after;
 } ct_system_group_i0;
 
 struct ct_ecs_a0 {
-    ct_world_t0 (*create_world)(const char* name);
+    ct_world_t0 (*create_world)(const char *name);
 
     void (*destroy_world)(ct_world_t0 world);
 
@@ -208,7 +202,6 @@ struct ct_ecs_c_a0 {
                 ct_entity_t0 ent,
                 uint64_t *component_name,
                 uint32_t name_count);
-
 
     ct_ecs_component_i0 *(*get_interface)(uint64_t name);
 
