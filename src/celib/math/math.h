@@ -863,7 +863,11 @@ static inline ce_vec3_t ce_vec3_mul_quat(ce_vec3_t _vec,
 }
 
 // # Vec4
-
+static inline bool ce_vec4_equal(ce_vec4_t a,
+                                 ce_vec4_t b,
+                                 float epsilon) {
+    return ce_fequal_n(&a.x, &b.x, 4,  epsilon);
+}
 
 // # Mat 3
 
@@ -2051,6 +2055,11 @@ static inline void ce_mat4_proj_rev_inf_rh_fovy(float *_result,
     ce_mat4_proj_inf_impl_fovy(_result, _fovy,
                                _aspect, _near,
                                _oglNdc, Reverse, Right);
+}
+
+
+static inline float ce_normalize_degrees(float degrees) {
+    return degrees + ce_fceil( -degrees / 360.0f ) * 360.0f;
 }
 
 #ifdef __cplusplus
