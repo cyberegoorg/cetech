@@ -25,6 +25,7 @@
 #define PHYSICS3D_DESTROY_WORLD_SYSTEM \
     CE_ID64_0("destory_world3d", 0x7a0025d41f210757ULL)
 
+
 #define BULLET_WORLD_COMPONENT \
     CE_ID64_0("bullet_world", 0xabe7215aff86c8acULL)
 
@@ -67,29 +68,23 @@ struct MyDebugDrawer : public btIDebugDraw {
     int getDebugMode() const {
         return DBG_DrawWireframe
                | DBG_DrawConstraints
-               | DBG_DrawAabb
                | DBG_DrawConstraintLimits
                | DBG_FastWireframe;
     }
 };
 
 static struct _G {
-    btDefaultCollisionConfiguration *configuration;
-    btCollisionDispatcher *dispatcher;
-    btBroadphaseInterface *interf;
-    btSequentialImpulseConstraintSolver *solver;
-
     MyDebugDrawer dd;
 
     ce_alloc_t0 *allocator;
 } _G;
 
-
-typedef struct spaspawn_bullet_body_data_t {
-    ct_ecs_cmd_buffer_t *cmd;
-} spaspawn_bullet_body_data_t;
-
 typedef struct bullet_world_component {
+    btDefaultCollisionConfiguration *configuration;
+    btCollisionDispatcher *dispatcher;
+    btBroadphaseInterface *interf;
+    btSequentialImpulseConstraintSolver *solver;
+
     btDiscreteDynamicsWorld *w;
 } bullet_world_component;
 
@@ -97,20 +92,34 @@ typedef struct body_component {
     btRigidBody *body;
 } body_component;
 
+static const char *bullet_world_dispaly_name() {
+    return "Bullet world";
+}
+
 static struct ct_ecs_component_i0 bullet_world_component_i = {
         .cdb_type = BULLET_WORLD_COMPONENT,
         .size = sizeof(bullet_world_component),
         .is_system_state = true,
+        .display_name = bullet_world_dispaly_name,
 };
+
+static const char *bullet_body_dispaly_name() {
+    return "Bullet body";
+}
 
 static struct ct_ecs_component_i0 body_component_i = {
         .cdb_type = BODY_COMPONENT,
         .size = sizeof(body_component),
         .is_system_state = true,
+        .display_name = bullet_body_dispaly_name,
 };
 
 static inline btVector3 _to_bvect(ce_vec3_t v) {
     return btVector3(v.x, v.y, v.z);
+}
+
+static inline btQuaternion _to_bquat(ce_vec4_t v) {
+    return btQuaternion(v.x, v.y, v.z, v.w);
 }
 
 static inline ce_vec3_t _to_ctvect(btVector3 v) {
@@ -118,6 +127,15 @@ static inline ce_vec3_t _to_ctvect(btVector3 v) {
             .x = v.x(),
             .y = v.y(),
             .z = v.z(),
+    };
+}
+
+static inline ce_vec4_t _to_tquat(btQuaternion v) {
+    return (ce_vec4_t) {
+            .x = v.x(),
+            .y = v.y(),
+            .z = v.z(),
+            .w = v.w(),
     };
 }
 
@@ -151,7 +169,7 @@ static void _spawn_world(ct_world_t0 world,
                          ct_ecs_ent_chunk_o0 *item,
                          uint32_t n,
                          void *_data) {
-    auto data = static_cast<spaspawn_bullet_body_data_t *>(_data);
+    auto data = static_cast<ct_ecs_cmd_buffer_t *>(_data);
 
     auto *phys_world = (ct_physics_world3d_c *) ct_ecs_c_a0->get_all(world,
                                                                      PHYSICS3D_WORLD_COMPONENT,
@@ -159,18 +177,27 @@ static void _spawn_world(ct_world_t0 world,
 
 
     for (uint32_t i = 0; i < n; ++i) {
+        auto *configuration = CE_NEW(_G.allocator, btDefaultCollisionConfiguration)();
+        auto *dispatcher = CE_NEW(_G.allocator, btCollisionDispatcher)(configuration);
+        auto *interf = CE_NEW(_G.allocator, btDbvtBroadphase)();
+        auto *solver = CE_NEW(_G.allocator, btSequentialImpulseConstraintSolver)();
+
         bullet_world_component bw = {
-                .w = CE_NEW(_G.allocator, btDiscreteDynamicsWorld)(_G.dispatcher,
-                                                                   _G.interf,
-                                                                   _G.solver,
-                                                                   _G.configuration)
+                .configuration = configuration,
+                .dispatcher = dispatcher,
+                .interf = interf,
+                .solver = solver,
+                .w = CE_NEW(_G.allocator, btDiscreteDynamicsWorld)(dispatcher,
+                                                                   interf,
+                                                                   solver,
+                                                                   configuration)
         };
 
         bw.w->setDebugDrawer(&_G.dd);
 
         bw.w->setGravity(_to_bvect(phys_world[i].gravity));
 
-        ct_ecs_a0->buff_add_component(data->cmd, world, ent[i],
+        ct_ecs_a0->buff_add_component(data, world, ent[i],
                                       CE_ARR_ARG(((ct_component_pair_t0[]) {
                                               {
                                                       .type = BULLET_WORLD_COMPONENT,
@@ -185,8 +212,6 @@ static void _spawn_world_system(ct_world_t0 world,
                                 float dt,
                                 uint32_t rq_version,
                                 ct_ecs_cmd_buffer_t *cmd) {
-    spaspawn_bullet_body_data_t data = {.cmd=cmd};
-
     ct_physics_world3d_c *w = _get_world(world);
 
     if (!w) {
@@ -198,7 +223,7 @@ static void _spawn_world_system(ct_world_t0 world,
                                         .all = CT_ECS_ARCHETYPE(PHYSICS3D_WORLD_COMPONENT),
                                         .none = CT_ECS_ARCHETYPE(BULLET_WORLD_COMPONENT),
                                 }, rq_version,
-                                _spawn_world, &data);
+                                _spawn_world, cmd);
 }
 
 static btCollisionShape *_create_shape(const ct_collider3d_c *collider) {
@@ -217,12 +242,12 @@ static void _spawn_dynamic_body(struct ct_world_t0 world,
                                 ct_ecs_ent_chunk_o0 *item,
                                 uint32_t n,
                                 void *_data) {
-    auto *data = static_cast<spaspawn_bullet_body_data_t *>(_data);
+    auto *data = static_cast<ct_ecs_cmd_buffer_t *>(_data);
 
     bullet_world_component *w = _get_bworld(world);
 
     auto *position = (ct_position_c *) ct_ecs_c_a0->get_all(world, POSITION_COMPONENT, item);
-//    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
+    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
     auto *velocity = (ct_velocity3d_c *) ct_ecs_c_a0->get_all(world, VELOCITY3D_COMPONENT, item);
     auto *mass = (ct_mass3d_c *) ct_ecs_c_a0->get_all(world, MASS3D_COMPONENT, item);
     auto *collider = (ct_collider3d_c *) ct_ecs_c_a0->get_all(world, COLLIDER3D_COMPONENT, item);
@@ -234,19 +259,22 @@ static void _spawn_dynamic_body(struct ct_world_t0 world,
         btTransform startTransform;
         startTransform.setIdentity();
         startTransform.setOrigin(_to_bvect(pos));
+        startTransform.setRotation(_to_bquat(rotation[i].rot));
 
         auto *shape = _create_shape(col);
+        btVector3 inertia;
+        shape->calculateLocalInertia(mass[i].mass, inertia);
+
         auto *myMotionState = CE_NEW(_G.allocator, btDefaultMotionState)(startTransform);
-        auto *body = CE_NEW(_G.allocator, btRigidBody)(mass->mass, myMotionState, shape);
+        auto *body = CE_NEW(_G.allocator, btRigidBody)(mass[i].mass, myMotionState, shape, inertia);
 
         body->setAngularVelocity(_to_bvect(velocity[i].angular));
         body->setLinearVelocity(_to_bvect(velocity[i].linear));
 
         body_component result_body = {.body=body};
-
         w->w->addRigidBody(body);
 
-        ct_ecs_a0->buff_add_component(data->cmd, world, ent[i],
+        ct_ecs_a0->buff_add_component(data, world, ent[i],
                                       CE_ARR_ARG(((ct_component_pair_t0[]) {
                                               {
                                                       .type = BODY_COMPONENT,
@@ -261,12 +289,12 @@ static void _spawn_static_body(struct ct_world_t0 world,
                                ct_ecs_ent_chunk_o0 *item,
                                uint32_t n,
                                void *_data) {
-    auto *data = static_cast<spaspawn_bullet_body_data_t *>(_data);
+    auto *data = static_cast<ct_ecs_cmd_buffer_t *>(_data);
 
     bullet_world_component *w = _get_bworld(world);
 
     auto *position = (ct_position_c *) ct_ecs_c_a0->get_all(world, POSITION_COMPONENT, item);
-//    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
+    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
     auto *collider = (ct_collider3d_c *) ct_ecs_c_a0->get_all(world, COLLIDER3D_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
@@ -276,6 +304,7 @@ static void _spawn_static_body(struct ct_world_t0 world,
         btTransform startTransform;
         startTransform.setIdentity();
         startTransform.setOrigin(_to_bvect(pos));
+        startTransform.setRotation(_to_bquat(rotation[i].rot));
 
         auto *shape = _create_shape(col);
         auto *myMotionState = CE_NEW(_G.allocator, btDefaultMotionState)(startTransform);
@@ -285,7 +314,7 @@ static void _spawn_static_body(struct ct_world_t0 world,
 
         w->w->addRigidBody(body);
 
-        ct_ecs_a0->buff_add_component(data->cmd, world, ent[i],
+        ct_ecs_a0->buff_add_component(data, world, ent[i],
                                       CE_ARR_ARG(((ct_component_pair_t0[]) {
                                               {
                                                       .type = BODY_COMPONENT,
@@ -301,7 +330,7 @@ static void _transform_change(struct ct_world_t0 world,
                               uint32_t n,
                               void *data) {
     auto *position = (ct_position_c *) ct_ecs_c_a0->get_all(world, POSITION_COMPONENT, item);
-//    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
+    auto *rotation = (ct_rotation_c *) ct_ecs_c_a0->get_all(world, ROTATION_COMPONENT, item);
     auto *body = (body_component *) ct_ecs_c_a0->get_all(world, BODY_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
@@ -317,9 +346,15 @@ static void _transform_change(struct ct_world_t0 world,
             change = true;
         }
 
+        if (!ce_vec4_equal(rotation[i].rot, _to_tquat(transform.getRotation()), FLT_EPSILON)) {
+            change = true;
+        }
+
+
         if (change) {
             auto t = b2body->getCenterOfMassTransform();
             t.setOrigin(_to_bvect(pos3));
+            t.setRotation(_to_bquat(rotation[i].rot));
             b2body->setCenterOfMassTransform(t);
 
             b2body->activate(true);
@@ -372,6 +407,7 @@ static void _collider_change(struct ct_world_t0 world,
                              void *data) {
     auto *collider = (ct_collider3d_c *) ct_ecs_c_a0->get_all(world, COLLIDER3D_COMPONENT, item);
     auto *body = (body_component *) ct_ecs_c_a0->get_all(world, BODY_COMPONENT, item);
+    auto *mass = (ct_mass3d_c *) ct_ecs_c_a0->get_all(world, MASS3D_COMPONENT, item);
 
     for (uint32_t i = 0; i < n; ++i) {
         btRigidBody *rbody = body[i].body;
@@ -387,7 +423,7 @@ static void _collider_change(struct ct_world_t0 world,
                     btBoxShape *s = (btBoxShape *) shape;
                     ce_vec3_t half = _to_ctvect(s->getHalfExtentsWithMargin());
                     if (!ce_vec3_equal(half, col->shape.box.half_size, FLT_EPSILON)) {
-                        delete s;
+                        CE_DELETE(_G.allocator, s);
                         new_shape = _create_shape(col);
                     }
                 } else {
@@ -401,7 +437,7 @@ static void _collider_change(struct ct_world_t0 world,
                     auto *s = (btSphereShape *) shape;
                     float radius = s->getRadius();
                     if (!ce_fequal(radius, col->shape.sphere.radius, FLT_EPSILON)) {
-                        delete s;
+                        CE_DELETE(_G.allocator, s);
                         new_shape = _create_shape(col);
                     }
                 } else {
@@ -413,6 +449,14 @@ static void _collider_change(struct ct_world_t0 world,
 
         if (new_shape) {
             rbody->setCollisionShape(new_shape);
+
+            if (mass) {
+                btVector3 inertia;
+                new_shape->calculateLocalInertia(mass[i].mass, inertia);
+                rbody->setMassProps(mass[i].mass, inertia);
+                rbody->updateInertiaTensor();
+            }
+
         }
     }
 }
@@ -430,13 +474,13 @@ static void _write_back(ct_world_t0 world,
 
     for (uint32_t i = 0; i < n; ++i) {
         btRigidBody *b2body = body[i].body;
-        ce_vec3_t *rot = &rotation[i].rot;
+        ce_vec4_t *rot = &rotation[i].rot;
 
         btTransform transform = b2body->getWorldTransform();
 
         position[i].pos = _to_ctvect(transform.getOrigin());
 
-        transform.getRotation().getEulerZYX(rot->z, rot->y, rot->x);
+        *rot = _to_tquat(transform.getRotation());
 
         velocity[i].linear = _to_ctvect(b2body->getLinearVelocity());
         velocity[i].angular = _to_ctvect(b2body->getAngularVelocity());
@@ -448,7 +492,7 @@ static void _destroy_all_body(struct ct_world_t0 world,
                               ct_ecs_ent_chunk_o0 *item,
                               uint32_t n,
                               void *_data) {
-    auto *data = (spaspawn_bullet_body_data_t *) _data;
+    auto *data = (ct_ecs_cmd_buffer_t *) _data;
 
     bullet_world_component *w = _get_bworld(world);
 
@@ -466,7 +510,7 @@ static void _destroy_all_body(struct ct_world_t0 world,
         CE_DELETE(_G.allocator, mstate);
         CE_DELETE(_G.allocator, b2body);
 
-        ct_ecs_a0->buff_remove_component(data->cmd, world, ent[i],
+        ct_ecs_a0->buff_remove_component(data, world, ent[i],
                                          (uint64_t[]) {BODY_COMPONENT}, 1);
     }
 }
@@ -476,7 +520,7 @@ static void _destroy_world(struct ct_world_t0 world,
                            ct_ecs_ent_chunk_o0 *item,
                            uint32_t n,
                            void *_data) {
-    auto *data = (spaspawn_bullet_body_data_t *) _data;
+    auto *data = (ct_ecs_cmd_buffer_t *) _data;
 
     auto *b_world = (bullet_world_component *) ct_ecs_c_a0->get_all(world, BULLET_WORLD_COMPONENT,
                                                                     item);
@@ -489,18 +533,22 @@ static void _destroy_world(struct ct_world_t0 world,
 
         btDynamicsWorld *w = b_world[i].w;
         CE_DELETE(_G.allocator, w);
-        ct_ecs_a0->buff_remove_component(data->cmd, world, ent[i],
+
+        CE_DELETE(_G.allocator, b_world[i].configuration);
+        CE_DELETE(_G.allocator, b_world[i].dispatcher);
+        CE_DELETE(_G.allocator, b_world[i].interf);
+        CE_DELETE(_G.allocator, b_world[i].solver);
+
+        ct_ecs_a0->buff_remove_component(data, world, ent[i],
                                          (uint64_t[]) {BULLET_WORLD_COMPONENT}, 1);
     }
 }
 
-static void physics3d_system(ct_world_t0 world,
-                             float dt,
-                             uint32_t rq_version,
-                             ct_ecs_cmd_buffer_t *cmd) {
-
-    spaspawn_bullet_body_data_t data = {.cmd=cmd};
-
+static void _spawn_dynamic_body_system(ct_world_t0 world,
+                                       float dt,
+                                       uint32_t rq_version,
+                                       ct_ecs_cmd_buffer_t *cmd) {
+//    return;
     ct_physics_world3d_c *w = _get_world(world);
 
     if (!w) {
@@ -523,7 +571,25 @@ static void physics3d_system(ct_world_t0 world,
 
                                         .none = CT_ECS_ARCHETYPE(BODY_COMPONENT),
                                 }, rq_version,
-                                _spawn_dynamic_body, &data);
+                                _spawn_dynamic_body, cmd);
+}
+
+static void _spawn_static_body_system(ct_world_t0 world,
+                                      float dt,
+                                      uint32_t rq_version,
+                                      ct_ecs_cmd_buffer_t *cmd) {
+//    return;
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
@@ -535,17 +601,52 @@ static void physics3d_system(ct_world_t0 world,
                                                                  VELOCITY3D_COMPONENT,
                                                                  MASS3D_COMPONENT),
                                 }, rq_version,
-                                _spawn_static_body, &data);
+                                _spawn_static_body, cmd);
+}
+
+static void _collider_change_system(ct_world_t0 world,
+                                    float dt,
+                                    uint32_t rq_version,
+                                    ct_ecs_cmd_buffer_t *cmd) {
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
                                         .all = CT_ECS_ARCHETYPE(COLLIDER3D_COMPONENT,
                                                                 BODY_COMPONENT),
+                                        .any = CT_ECS_ARCHETYPE(MASS3D_COMPONENT),
                                         .write = CT_ECS_ARCHETYPE(BODY_COMPONENT),
                                         .only_changed = true,
                                 }, rq_version,
-                                _collider_change, &data);
+                                _collider_change, cmd);
 
+}
+
+static void _transform_change_system(ct_world_t0 world,
+                                     float dt,
+                                     uint32_t rq_version,
+                                     ct_ecs_cmd_buffer_t *cmd) {
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
@@ -557,7 +658,25 @@ static void physics3d_system(ct_world_t0 world,
 
                                         .only_changed = true,
                                 }, rq_version,
-                                _transform_change, &data);
+                                _transform_change, cmd);
+
+}
+
+static void _velocity_change_system(ct_world_t0 world,
+                                    float dt,
+                                    uint32_t rq_version,
+                                    ct_ecs_cmd_buffer_t *cmd) {
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
@@ -566,9 +685,24 @@ static void physics3d_system(ct_world_t0 world,
                                         .write = CT_ECS_ARCHETYPE(BODY_COMPONENT),
                                         .only_changed = true,
                                 }, rq_version,
-                                _velocity_change, &data);
+                                _velocity_change, cmd);
+}
 
-    //
+static void physics3d_system(ct_world_t0 world,
+                             float dt,
+                             uint32_t rq_version,
+                             ct_ecs_cmd_buffer_t *cmd) {
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ce_vec3_t g = _to_ctvect(bw->w->getGravity());
 
@@ -577,8 +711,23 @@ static void physics3d_system(ct_world_t0 world,
     }
 
     bw->w->stepSimulation(dt);
+}
 
-    //
+static void _write_back_system(ct_world_t0 world,
+                               float dt,
+                               uint32_t rq_version,
+                               ct_ecs_cmd_buffer_t *cmd) {
+    ct_physics_world3d_c *w = _get_world(world);
+
+    if (!w) {
+        return;
+    }
+
+    bullet_world_component *bw = _get_bworld(world);
+
+    if (!bw) {
+        return;
+    }
 
     ct_ecs_q_a0->foreach(world,
                          (ct_ecs_query_t0) {
@@ -598,15 +747,32 @@ static void _destroy_world_system(ct_world_t0 world,
                                   float dt,
                                   uint32_t rq_version,
                                   ct_ecs_cmd_buffer_t *cmd) {
-
-    spaspawn_bullet_body_data_t data = {.cmd=cmd};
     ct_ecs_q_a0->foreach_serial(world,
                                 (ct_ecs_query_t0) {
                                         .all = CT_ECS_ARCHETYPE(BULLET_WORLD_COMPONENT),
                                         .none = CT_ECS_ARCHETYPE(PHYSICS3D_WORLD_COMPONENT),
                                 }, rq_version,
-                                _destroy_world, &data);
+                                _destroy_world, cmd);
 }
+
+#define PHYSICS3D_SPAWN_DYNAMIC_BODY_SYSTEM \
+    CE_ID64_0("physics3d_spawn_dynamic_body_system", 0x778703b33420ddbcULL)
+
+#define PHYSICS3D_SPAWN_STATIC_BODY_SYSTEM \
+    CE_ID64_0("physics3d_spawn_static_body_system", 0x1bd3c5c5e8d78c9bULL)
+
+#define PHYSICS3D_COLLIDER_CHANGE_SYSTEM \
+    CE_ID64_0("physics3d_collider_change_system", 0x7575560b86a65afdULL)
+
+#define PHYSICS3D_TRANSFORM_CHANGE_SYSTEM \
+    CE_ID64_0("physics3d_transform_change_system", 0x32e9940ea17e8976ULL)
+
+#define PHYSICS3D_VELOCITY_CHANGE_SYSTEM \
+    CE_ID64_0("physics3d_velocity_change_system", 0xe766f3c72dde4906ULL)
+
+#define PHYSICS3D_WRITE_BACK_SYSTEM \
+    CE_ID64_0("physics3d_write_back_system", 0x6c2fc680d4b2fa80ULL)
+
 
 static struct ct_system_i0 physics3d_spawn_world_system_i = {
         .name = PHYSICS3D_SPAWN_WORLD_SYSTEM,
@@ -614,17 +780,59 @@ static struct ct_system_i0 physics3d_spawn_world_system_i = {
         .process = _spawn_world_system,
 };
 
+static struct ct_system_i0 physics3d_spawn_dynamic_body_system_i = {
+        .name = PHYSICS3D_SPAWN_DYNAMIC_BODY_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_SPAWN_WORLD_SYSTEM),
+        .process = _spawn_dynamic_body_system,
+};
+
+static struct ct_system_i0 physics3d_spawn_static_body_system_i = {
+        .name = PHYSICS3D_SPAWN_STATIC_BODY_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_SPAWN_DYNAMIC_BODY_SYSTEM),
+        .process = _spawn_static_body_system,
+};
+
+static struct ct_system_i0 physics3d_collider_change_system_i = {
+        .name = PHYSICS3D_COLLIDER_CHANGE_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_SPAWN_STATIC_BODY_SYSTEM),
+        .process = _collider_change_system,
+};
+
+static struct ct_system_i0 physics3d_transform_change_system_i = {
+        .name = PHYSICS3D_TRANSFORM_CHANGE_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_COLLIDER_CHANGE_SYSTEM),
+        .process = _transform_change_system,
+};
+
+static struct ct_system_i0 physics3d_velocity_change_system_i = {
+        .name = PHYSICS3D_VELOCITY_CHANGE_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_TRANSFORM_CHANGE_SYSTEM),
+        .process = _velocity_change_system,
+};
+
 static struct ct_system_i0 physics3d_system_i = {
         .name = PHYSICS3D_SYSTEM,
         .group = PHYSICS3D_GROUP,
-        .after = CT_ECS_AFTER(PHYSICS3D_SPAWN_WORLD_SYSTEM),
+        .after = CT_ECS_AFTER(PHYSICS3D_VELOCITY_CHANGE_SYSTEM),
         .process = physics3d_system,
+};
+
+static struct ct_system_i0 physics3d_write_back_system_i = {
+        .name = PHYSICS3D_WRITE_BACK_SYSTEM,
+        .group = PHYSICS3D_GROUP,
+        .after = CT_ECS_AFTER(PHYSICS3D_SYSTEM),
+        .process = _write_back_system,
 };
 
 static struct ct_system_i0 physics3d_destroy_world_system_i = {
         .name = PHYSICS3D_DESTROY_WORLD_SYSTEM,
         .group = PHYSICS3D_GROUP,
-        .after = CT_ECS_AFTER(PHYSICS3D_SYSTEM),
+        .after = CT_ECS_AFTER(PHYSICS3D_WRITE_BACK_SYSTEM),
         .process = _destroy_world_system,
 };
 
@@ -659,11 +867,6 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    _G.configuration = CE_NEW(_G.allocator, btDefaultCollisionConfiguration)();
-    _G.dispatcher = CE_NEW(_G.allocator, btCollisionDispatcher)(_G.configuration);
-    _G.interf = CE_NEW(_G.allocator, btDbvtBroadphase)();
-    _G.solver = CE_NEW(_G.allocator, btSequentialImpulseConstraintSolver)();
-
     api->add_impl(CT_ECS_SYSTEM_I,
                   &physics3d_spawn_world_system_i, sizeof(physics3d_spawn_world_system_i));
 
@@ -672,6 +875,31 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_SYSTEM_I,
                   &physics3d_system_i, sizeof(physics3d_system_i));
+
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_spawn_dynamic_body_system_i,
+                  sizeof(physics3d_spawn_dynamic_body_system_i));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_spawn_static_body_system_i,
+                  sizeof(physics3d_spawn_static_body_system_i));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_collider_change_system_i,
+                  sizeof(physics3d_collider_change_system_i));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_transform_change_system_i,
+                  sizeof(physics3d_transform_change_system_i));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_write_back_system_i,
+                  sizeof(physics3d_write_back_system_i));
+
+    api->add_impl(CT_ECS_SYSTEM_I,
+                  &physics3d_velocity_change_system_i,
+                  sizeof(physics3d_velocity_change_system_i));
 
     api->add_impl(CT_ECS_COMPONENT_I,
                   &bullet_world_component_i, sizeof(bullet_world_component_i));
@@ -686,10 +914,6 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
 void CE_MODULE_UNLOAD(physics_bullet)(struct ce_api_a0 *api,
                                       int reload) {
 
-    CE_DELETE(_G.allocator, _G.configuration);
-    CE_DELETE(_G.allocator, _G.dispatcher);
-    CE_DELETE(_G.allocator, _G.interf);
-    CE_DELETE(_G.allocator, _G.solver);
 
     _G = (struct _G) {};
 }
