@@ -59,12 +59,7 @@ static void get_project_view(ce_mat4_t world,
     }
 
     ce_mat4_t w = CE_MAT4_IDENTITY;
-    ce_mat4_move(w.m, world.m);
-
-    w.m[12] *= -1.0f;
-    w.m[13] *= -1.0f;
-    w.m[14] *= -1.0f;
-
+    ce_mat4_inverse(w.m, world.m);
     ce_mat4_move(view, w.m);
 }
 
