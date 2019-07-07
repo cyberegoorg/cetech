@@ -231,7 +231,6 @@ ent_chunk_t *_get_new_chunk(world_instance_t *world) {
 
     ce_log_a0->debug(LOG_WHERE, "Allocate new chunk from pool");
 
-
     ent_chunk_t *chunk = ce_array_back(world->chunk_pool_free);
     ce_array_pop_back(world->chunk_pool_free);
 
@@ -243,7 +242,6 @@ ent_chunk_t *_get_new_chunk(world_instance_t *world) {
 void _free_chunk(world_instance_t *world,
                  ent_chunk_t *chunk) {
     ce_array_clean(chunk->version);
-
     ce_array_push(world->chunk_pool_free, chunk, _G.allocator);
 }
 
@@ -472,6 +470,9 @@ void _add_to_archetype(world_instance_t *w,
         chunk->archetype_idx = storage->idx;
         chunk->archetype_mask = storage->archetype_mask;
         ce_array_resize(chunk->version, storage->component_n, _G.allocator);
+        for (int j = 0; j < storage->component_n; ++j) {
+            chunk->version[j] = w->global_system_version;
+        }
         storage->first = chunk;
     }
 
@@ -490,6 +491,9 @@ void _add_to_archetype(world_instance_t *w,
             new->archetype_mask = storage->archetype_mask;
             new->archetype_idx = storage->idx;
             ce_array_resize(new->version, storage->component_n, _G.allocator);
+            for (int j = 0; j < storage->component_n; ++j) {
+                chunk->version[j] = w->global_system_version;
+            }
 
             new->next = chunk;
             chunk->next = NULL;
@@ -509,6 +513,8 @@ void _add_to_archetype(world_instance_t *w,
     entity[ent_data_idx] = ent;
 
     for (int i = 0; i < storage->component_n; ++i) {
+        chunk->version[i] = w->global_system_version;
+
         uint32_t size = storage->size[i];
         if (!size) {
             continue;
@@ -567,6 +573,8 @@ void _remove_from_archetype(world_instance_t *w,
     entity[entity_data_idx] = last_ent;
 
     for (int i = 0; i < storage->component_n; ++i) {
+        chunk->version[i] = w->global_system_version;
+
         void *data = _get_component_array(storage, chunk, i);
 
         if (!data) {
@@ -1069,38 +1077,54 @@ static bool _can_run_query_on_archetype(ct_archemask_t0 mask,
 
 static bool chunk_changed(uint32_t version,
                           uint32_t rq_version) {
-    return (version >= rq_version);
+    if (!rq_version) {
+        return true;
+    }
+
+    return (int32_t)(version - rq_version) > 0;
 }
 
 static bool _need_process_chunk(archetype_t *storage,
                                 ent_chunk_t *chunk,
                                 const ct_ecs_query_t0 *query,
                                 uint64_t rq_version,
-                                uint64_t global_version) {
+                                world_instance_t *w) {
     uint32_t ent_n = chunk->ent_n;
 
     if (!ent_n) {
         return false;
     }
 
-    bool chunk_comp_changed = false;
+    ct_archemask_t0 used_components = _archetype_add(query->all, query->any);
+
+    if (query->only_changed) {
+        bool chunk_comp_changed = false;
+        for (int j = 0; j < storage->component_n; ++j) {
+            uint64_t comp_name = storage->name[j];
+            ct_archemask_t0 comp_mask = component_mask(comp_name);
+
+            if (!_archetype_any(used_components, comp_mask)) {
+                continue;
+            }
+
+            if (_archetype_none(query->write, comp_mask)) {
+                chunk_comp_changed |= chunk_changed(chunk->version[j], rq_version);
+            }
+        }
+
+        if (!chunk_comp_changed) {
+            return false;
+        }
+    }
+
+    // Update version for write component.
     for (int j = 0; j < storage->component_n; ++j) {
         uint64_t comp_name = storage->name[j];
         ct_archemask_t0 comp_mask = component_mask(comp_name);
 
-        // Check change if need
-        if (query->only_changed && _archetype_none(query->write, comp_mask)) {
-            chunk_comp_changed |= chunk_changed(chunk->version[j], rq_version);
-        }
-
-        // Update version for write component.
         if (_archetype_any(query->write, comp_mask)) {
-            chunk->version[j] = global_version;
+            chunk->version[j] = rq_version;
         }
-    }
-
-    if (query->only_changed && !chunk_comp_changed) {
-        return false;
     }
 
     return true;
@@ -1128,8 +1152,7 @@ static void process_query(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version,
-                                     w->global_system_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version, w)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1184,8 +1207,7 @@ static void process_query_serial(ct_world_t0 world,
         }
 
         while (chunk) {
-            if (!_need_process_chunk(storage, chunk, &query, rq_version,
-                                     w->global_system_version)) {
+            if (!_need_process_chunk(storage, chunk, &query, rq_version, w)) {
                 chunk = chunk->next;
                 continue;
             }
@@ -1329,6 +1351,9 @@ static void _process_group(ct_world_t0 world,
             ce_mpmc_queue_t0 *buff = &_G.cmd_buf_pool[cmd_buf_idx];
 
             w->global_system_version++;
+            if (w->global_system_version == 0) {
+                w->global_system_version++;
+            }
 
             uint32_t rq_version = ce_hash_lookup(&w->last_system_version, outputs[i], 0);
 
