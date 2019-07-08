@@ -3,4 +3,10 @@ src/cetech/debugui/private/bgfx_imgui/** linguist-vendored=true
 src/cetech/debugui/private/iconfontheaders/** linguist-vendored=true
 src/cetech/debugui/private/ocornut-imgui/** linguist-vendored=true
 src/cetech/debugui/private/ocornut-imgui/bgfx_utils.h linguist-vendored=true
-src/cetech/debugdraw/private/debugdraw/** linguist-vendored=true
+src/cetech/debugdraw/private/debugdraw/bgfx_debugdraw/** linguist-vendored=true
+
+*.material linguist-language=YAML
+*.texture linguist-language=YAML
+*.shader linguist-language=YAML
+*.entity linguist-language=YAML
+*.scene linguist-language=YAML

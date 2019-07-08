@@ -293,6 +293,9 @@ static const char *name() {
     return "material";
 }
 
+static bool compilator(ce_cdb_t0 db, uint64_t obj){
+    return true;
+}
 
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
@@ -300,7 +303,8 @@ static struct ct_resource_i0 ct_resource_api = {
         .display_icon = display_icon,
         .online = online,
         .offline = offline,
-        .get_interface = get_interface
+        .get_interface = get_interface,
+        .compilator = compilator
 };
 
 

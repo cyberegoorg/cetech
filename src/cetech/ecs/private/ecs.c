@@ -1522,11 +1522,16 @@ static const char *name() {
     return "entity";
 }
 
+static bool compilator(ce_cdb_t0 db, uint64_t obj){
+    return true;
+}
+
 static struct ct_resource_i0 ct_resource_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .get_interface = get_resource_interface,
+        .compilator = compilator,
 };
 
 //==============================================================================
@@ -1546,14 +1551,18 @@ static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
     }
 
     ce_cdb_t0 db = ce_cdb_a0->db();
-    world_instance_t *w = get_world_instance(world);
 
     uint64_t entity_obj = name;
+    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(db, entity_obj);
+    if(!ent_reader) {
+        return (ct_entity_t0) {0};
+    }
+
+    world_instance_t *w = get_world_instance(world);
 
     ct_entity_t0 root_ent;
     create_entities_objs(world, &root_ent, 1, &entity_obj);
 
-    const ce_cdb_obj_o0 *ent_reader = ce_cdb_a0->read(db, entity_obj);
 
     uint64_t components_n = ce_cdb_a0->read_objset_num(ent_reader, ENTITY_COMPONENTS);
     uint64_t components_keys[components_n];

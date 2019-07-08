@@ -38,7 +38,6 @@ typedef struct ct_resource_id_t0 {
     uint64_t uid;
 } ct_resource_id_t0;
 
-
 typedef bool (*ct_resource_compilator_t)(ce_cdb_t0 db,
                                          uint64_t obj);
 

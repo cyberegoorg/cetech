@@ -160,6 +160,15 @@ void _compile_files(char **files,
 
     for (uint32_t i = 0; i < files_count; ++i) {
         const char *filename = files[i];
+
+        const char* type_str = ce_os_path_a0->extension(filename);
+        uint64_t type = ce_id_a0->id64(type_str);
+
+        if(!_find_compilator(type)) {
+            ce_log_a0->warning(LOG_WHERE, "Unsupported type: %s", type_str);
+            continue;
+        }
+
         int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
         ct_resourcedb_a0->put_file(filename, mtime);
 
@@ -229,7 +238,7 @@ char *resource_compiler_get_build_dir(ce_alloc_t0 *a,
 void resource_compiler_compile_all() {
     uint32_t start_ticks = ce_os_time_a0->ticks();
 
-    const char *glob_patern = "**.yml";
+    const char *glob_patern = "**.*";
     char **files = NULL;
     uint32_t files_count = 0;
 

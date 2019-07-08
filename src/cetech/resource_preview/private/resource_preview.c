@@ -112,7 +112,7 @@ static void set_asset(preview_instance *pi,
         }
 
         ct_ecs_e_a0->destroy_entities(pi->world, &pi->ent, 1);
-        //ct_ecs_a0->step(pi->world, 0);
+        ct_ecs_a0->step(pi->world, 0);
         pi->ent.h = 0;
         pi->type = 0;
     }
@@ -127,6 +127,7 @@ static void set_asset(preview_instance *pi,
         if (i) {
             if (i->load) {
                 pi->ent = i->load(obj, pi->world);
+                ct_ecs_a0->step(pi->world, 0);
             }
         }
     }

@@ -205,7 +205,7 @@ static void _create_from_modal(const char *modal_id) {
             if (new_res) {
                 char filename[256] = {};
                 snprintf(filename, CE_ARRAY_LEN(filename),
-                         "%s.%s.yml", modal_buffer_name, modal_buffer_type);
+                         "%s.%s", modal_buffer_name, modal_buffer_type);
 
                 ct_resource_id_t0 rid = {.uid = new_res};
 
@@ -294,7 +294,7 @@ static void _create_from_modal(const char *modal_id) {
                                               ImGuiSelectableFlags_DontClosePopups);
 
             struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
-            if (ct_debugui_a0->IsItemHovered(0)) {
+            if (ct_debugui_a0->IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
 
                 ct_debugui_a0->BeginTooltip();
                 ct_resource_preview_a0->resource_tooltip(r, path, (ce_vec2_t) {256, 256});
