@@ -61,9 +61,6 @@ static void init_decl() {
 }
 
 
-
-
-
 static void output_pass_on_setup(void *inst,
                                  struct ct_rg_builder_t0 *builder) {
 
@@ -78,7 +75,6 @@ static void output_pass_on_setup(void *inst,
     builder->read(builder, _COLOR);
     builder->add_pass(builder, inst, 0);
 }
-
 
 static void output_pass_on_pass(void *inst,
                                 uint8_t viewid,
@@ -104,7 +100,11 @@ static void output_pass_on_pass(void *inst,
 
     ct_gfx_a0->bgfx_set_view_transform(viewid, NULL, proj);
 
-    uint64_t copy_material = 0xe27880f9fbb28b8d;
+    static uint64_t copy_material = 0;
+    if(!copy_material){
+        copy_material = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(),
+                                                (ce_cdb_uuid_t0) {0xe27880f9fbb28b8d});
+    }
 
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, _COLOR);

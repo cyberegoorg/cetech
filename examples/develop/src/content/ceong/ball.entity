@@ -1,64 +1,64 @@
-cdb_uid: 0xa395900c2bc44ce8
+cdb_uuid: 0xa395900c2bc44ce8
 cdb_type: entity
 name: ball
 components:
   cdb_type: cdb_objset
   0x67f9896de60ec93d:
-    cdb_uid: 0x67f9896de60ec93d
+    cdb_uuid: 0x67f9896de60ec93d
     cdb_type: local_to_world
   0x2fef2a3fb338ba91:
-    cdb_uid: 0x2fef2a3fb338ba91
+    cdb_uuid: 0x2fef2a3fb338ba91
     cdb_type: ball
   0x50c5dbcdff5e53dd:
-    cdb_uid: 0x50c5dbcdff5e53dd
+    cdb_uuid: 0x50c5dbcdff5e53dd
     cdb_type: rectangle
     half_size:
-      cdb_uid: 0x3e54243cc5e58e2c
+      cdb_uuid: 0x3e54243cc5e58e2c
       cdb_type: vec2_t
       x: 8.000000
       y: 8.000000
   0x491391859e06cf70:
-    cdb_uid: 0x491391859e06cf70
+    cdb_uuid: 0x491391859e06cf70
     cdb_type: rectangle_renderer
     material: 0xbfb6c2d7354678ec
   0x77cce97732314df:
-    cdb_uid: 0x77cce97732314df
+    cdb_uuid: 0x77cce97732314df
     cdb_type: collider2d
     shape:
-      cdb_uid: 0xa5b44850f26d9134
+      cdb_uuid: 0xa5b44850f26d9134
       cdb_type: collider2d_shape_rectangle
       half_size:
-        cdb_uid: 0x43ebc20a71b80d89
+        cdb_uuid: 0x43ebc20a71b80d89
         cdb_type: vec2_t
         x: 8.000000
         y: 8.000000
   0xe6034d6b95e1fedd:
-    cdb_uid: 0xe6034d6b95e1fedd
+    cdb_uuid: 0xe6034d6b95e1fedd
     cdb_type: velocity2d
     linear:
-      cdb_uid: 0x3dba11a16a2c7b32
+      cdb_uuid: 0x3dba11a16a2c7b32
       cdb_type: vec2_t
       x: 0.000000
       y: 0.000000
     angular: 0.000000
   0x44578d189fcada2f:
-    cdb_uid: 0x44578d189fcada2f
+    cdb_uuid: 0x44578d189fcada2f
     cdb_type: mass2d
     mass: 1.000000
   0xda344e1adb89c42d:
-    cdb_uid: 0xda344e1adb89c42d
+    cdb_uuid: 0xda344e1adb89c42d
     cdb_type: position
     position:
-      cdb_uid: 0x786bc7d45ad44082
+      cdb_uuid: 0x786bc7d45ad44082
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000
       z: 0.000000
   0x6d6a27f667b3b581:
-    cdb_uid: 0x6d6a27f667b3b581
+    cdb_uuid: 0x6d6a27f667b3b581
     cdb_type: rotation
     rotation:
-      cdb_uid: 0xba1a1afe6fe31d6
+      cdb_uuid: 0xba1a1afe6fe31d6
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000

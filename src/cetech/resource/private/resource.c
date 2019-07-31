@@ -70,57 +70,14 @@ static struct ct_resource_i0 *get_resource_interface(uint64_t type) {
     return (ct_resource_i0 *) ce_hash_lookup(&_G.type_map, type, 0);
 }
 
-
-static bool load(ce_cdb_t0 db,
-                 const uint64_t *names,
-                 size_t count,
-                 int force) {
-    uint32_t start_ticks = ce_os_time_a0->ticks();
-
-
-    for (uint32_t i = 0; i < count; ++i) {
-        const uint64_t asset_name = names[i];
-
-        ct_resource_id_t0 rid = {.uid = asset_name};
-
-        if (!ct_resourcedb_a0->obj_exist(rid)) {
-            ce_log_a0->error(LOG_WHERE, "Obj 0x%llx does not exist in DB", rid.uid);
-            return false;
-        };
-
-        if (!ct_resourcedb_a0->load_cdb_file(db, rid, asset_name, _G.allocator)) {
-            ce_log_a0->warning(LOG_WHERE, "Could not load resource 0x%llx", rid.uid);
-            continue;
-        }
-
-        uint64_t type = ce_cdb_a0->obj_type(db, asset_name);
-
-        struct ct_resource_i0 *resource_i = get_resource_interface(type);
-
-        if (!resource_i) {
-            continue;
-        }
-
-        if (resource_i->online) {
-            resource_i->online(db, asset_name);
-        }
-    }
-
-    uint32_t now_ticks = ce_os_time_a0->ticks();
-    uint32_t dt = now_ticks - start_ticks;
-    ce_log_a0->debug(LOG_WHERE, "load time %f for %zu resource", dt * 0.001, count);
-
-    return true;
-}
-
 void unload(ce_cdb_t0 db,
             const uint64_t *names,
             size_t count) {
 
     for (uint32_t i = 0; i < count; ++i) {
         if (1) {// TODO: ref counting
-            struct ct_resource_id_t0 rid = (ct_resource_id_t0) {
-                    .uid = names[i],
+            struct ce_cdb_uuid_t0 rid = (ce_cdb_uuid_t0) {
+                    .id = names[i],
             };
 
             uint64_t type = ct_resourcedb_a0->get_resource_type(rid);
@@ -130,19 +87,56 @@ void unload(ce_cdb_t0 db,
                 continue;
             }
 
-            ce_log_a0->debug(LOG_WHERE, "Unload resource 0x%llx", rid.uid);
+            char uuid_str[64] = {};
+            ce_uuid64_to_string(uuid_str, CE_ARRAY_LEN(uuid_str), &(ce_uuid64_t0){rid.id});
+
+            ce_log_a0->debug(LOG_WHERE, "Unload resource %s", uuid_str);
 
 
             if (resource_i->offline) {
-                resource_i->offline(db, rid.uid);
+                resource_i->offline(db, rid.id);
             }
         }
     }
 }
 
-static bool cdb_loader(ce_cdb_t0 db,
-                       uint64_t uid) {
-    return load(db, &uid, 1, 0);
+static uint64_t cdb_loader(ce_cdb_t0 db,
+                           ce_cdb_uuid_t0 uuid) {
+    uint32_t start_ticks = ce_os_time_a0->ticks();
+
+    ce_cdb_uuid_t0 rid = ct_resourcedb_a0->get_resource_root(uuid);
+    char uuid_str[64] = {};
+    ce_uuid64_to_string(uuid_str, CE_ARRAY_LEN(uuid_str), &(ce_uuid64_t0){rid.id});
+
+    if (!ct_resourcedb_a0->obj_exist(rid)) {
+        ce_log_a0->error(LOG_WHERE, "Obj %s does not exist in DB", uuid_str);
+        return false;
+    }
+
+    uint64_t obj = ct_resourcedb_a0->load_cdb_file(db, rid, _G.allocator);
+
+    if (!obj) {
+        ce_log_a0->warning(LOG_WHERE, "Could not load resource %s", uuid_str);
+        return 0;
+    }
+
+    uint64_t type = ce_cdb_a0->obj_type(db, obj);
+
+    struct ct_resource_i0 *resource_i = get_resource_interface(type);
+
+    if (!resource_i) {
+        return 0;
+    }
+
+    if (resource_i->online) {
+        resource_i->online(db, obj);
+    }
+
+    uint32_t now_ticks = ce_os_time_a0->ticks();
+    uint32_t dt = now_ticks - start_ticks;
+    ce_log_a0->debug(LOG_WHERE, "load time %f for resource", dt * 0.001);
+
+    return obj;
 }
 
 static bool dump_recursive(const char *filename,
@@ -193,7 +187,7 @@ static bool save_to_db(uint64_t uid) {
 static bool save(uint64_t uid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
 
-    ct_resource_id_t0 r = {.uid=root};
+    ce_cdb_uuid_t0 r = {.id=root};
     char filename[256] = {};
     bool exist = ct_resourcedb_a0->get_resource_filename(r,
                                                          filename,
@@ -201,7 +195,7 @@ static bool save(uint64_t uid) {
 
     if (exist) {
         char *buf = NULL;
-        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uid, 0);
+        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uuid, 0);
 
         struct ce_vio_t0 *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
         f->vt->write(f->inst, buf, ce_buffer_size(buf), 1);

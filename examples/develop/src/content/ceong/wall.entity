@@ -1,48 +1,48 @@
-cdb_uid: 0x78ea792503e07fe1
+cdb_uuid: 0x78ea792503e07fe1
 cdb_type: entity
 name: wall
 components:
   cdb_type: cdb_objset
   0xba9d9aceb9b23685:
-    cdb_uid: 0xba9d9aceb9b23685
+    cdb_uuid: 0xba9d9aceb9b23685
     cdb_type: local_to_world
   0x234ccf9915dc27d9:
-    cdb_uid: 0x234ccf9915dc27d9
+    cdb_uuid: 0x234ccf9915dc27d9
     cdb_type: rectangle
     half_size:
-      cdb_uid: 0xdc8736e7511d3ddb
+      cdb_uuid: 0xdc8736e7511d3ddb
       cdb_type: vec2_t
       x: 0.000000
       y: 0.000000
   0x4d94b1607106cf70:
-    cdb_uid: 0x4d94b1607106cf70
+    cdb_uuid: 0x4d94b1607106cf70
     cdb_type: rectangle_renderer
     material: 0xbfb6c2d7354678ec
   0xe07151026e6882e9:
-    cdb_uid: 0xe07151026e6882e9
+    cdb_uuid: 0xe07151026e6882e9
     cdb_type: collider2d
     shape:
-      cdb_uid: 0x7ea8cabbedb2ff3e
+      cdb_uuid: 0x7ea8cabbedb2ff3e
       cdb_type: collider2d_shape_rectangle
       half_size:
-        cdb_uid: 0x1ce044756cfd7b93
+        cdb_uuid: 0x1ce044756cfd7b93
         cdb_type: vec2_t
         x: 0.000000
         y: 0.000000
   0xa4cbbde2fd5b7ad1:
-    cdb_uid: 0xa4cbbde2fd5b7ad1
+    cdb_uuid: 0xa4cbbde2fd5b7ad1
     cdb_type: position
     position:
-      cdb_uid: 0x4303379c7ca5f726
+      cdb_uuid: 0x4303379c7ca5f726
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000
       z: 0.000000
   0xd570be37c2445623:
-    cdb_uid: 0xd570be37c2445623
+    cdb_uuid: 0xd570be37c2445623
     cdb_type: rotation
     rotation:
-      cdb_uid: 0x73a837f1418ed278
+      cdb_uuid: 0x73a837f1418ed278
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000

@@ -44,8 +44,8 @@ static struct _G {
     char current_dir[512];
 
     uint64_t selected_file;
-    ct_resource_id_t0 selected_asset;
-    ct_resource_id_t0 edit_asset;
+    ce_cdb_uuid_t0 selected_asset;
+    ce_cdb_uuid_t0 edit_asset;
 
     const char *root;
     bool visible;
@@ -70,7 +70,8 @@ static void _broadcast_edit() {
 }
 
 static void _broadcast_selected(uint64_t context) {
-    uint64_t obj = _G.selected_asset.uid;
+    ce_cdb_uuid_t0 obj_uid = _G.selected_asset;
+    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), obj_uid);
     ct_selected_object_a0->set_selected_object(context, obj);
 }
 
@@ -187,9 +188,9 @@ static void _create_from_modal(const char *modal_id) {
             uint64_t new_res = 0;
 
             if (modal_buffer_from[0]) {
-                ct_resource_id_t0 uid = ct_resourcedb_a0->get_file_resource(modal_buffer_from);
-                if (uid.uid) {
-                    new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(), uid.uid);
+                ce_cdb_uuid_t0 uuid = ct_resourcedb_a0->get_file_resource(modal_buffer_from);
+                if (uuid.id) {
+                    new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(), uuid.id);
                 }
             } else {
                 uint64_t type = ce_id_a0->id64(modal_buffer_type);
@@ -207,7 +208,7 @@ static void _create_from_modal(const char *modal_id) {
                 snprintf(filename, CE_ARRAY_LEN(filename),
                          "%s.%s", modal_buffer_name, modal_buffer_type);
 
-                ct_resource_id_t0 rid = {.uid = new_res};
+                ce_cdb_uuid_t0 rid = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), new_res);
 
                 ct_resourcedb_a0->put_file(filename, 0);
 
@@ -262,9 +263,9 @@ static void _create_from_modal(const char *modal_id) {
             }
 
 
-            ct_resource_id_t0 rid = ct_resourcedb_a0->get_file_resource(path);
+            ce_cdb_uuid_t0 rid = ct_resourcedb_a0->get_file_resource(path);
 
-            uint64_t resource_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), rid.uid);
+            uint64_t resource_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), rid.id);
 
             ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
 
@@ -293,7 +294,7 @@ static void _create_from_modal(const char *modal_id) {
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_DontClosePopups);
 
-            struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
+            struct ce_cdb_uuid_t0 r = ct_resourcedb_a0->get_file_resource(name);
             if (ct_debugui_a0->IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
 
                 ct_debugui_a0->BeginTooltip();
@@ -487,7 +488,7 @@ static void ui_resource_list(uint64_t context) {
                 continue;
             }
 
-            ct_resource_id_t0 resourceid = ct_resourcedb_a0->get_file_resource(path);
+            ce_cdb_uuid_t0 resourceid = ct_resourcedb_a0->get_file_resource(path);
 
             char label[128];
 
@@ -527,8 +528,10 @@ static void ui_resource_list(uint64_t context) {
             if (ct_debugui_a0->BeginDragDropSource(DebugUIDragDropFlags_SourceAllowNullID)) {
                 ct_resource_preview_a0->resource_tooltip(resourceid, path, (ce_vec2_t) {128, 128});
 
+                uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resourceid);
+
                 ct_debugui_a0->SetDragDropPayload("asset",
-                                                  &resourceid.uid,
+                                                  &obj,
                                                   sizeof(uint64_t),
                                                   DebugUICond_Once);
                 ct_debugui_a0->EndDragDropSource();
@@ -542,7 +545,7 @@ static void ui_resource_list(uint64_t context) {
 static void on_debugui(uint64_t content,
                        uint64_t context,
                        uint64_t selected_object) {
-    _G.edit_asset.uid = 0;
+    _G.edit_asset.id = 0;
     ui_resource_list(context);
 }
 
@@ -576,7 +579,7 @@ static struct ct_dock_i0 dock_api = {
 
 
 static uint64_t edited() {
-    return _G.edit_asset.uid;
+    return _G.edit_asset.id;
 }
 
 static struct ct_resource_browser_a0 resource_browser_api = {

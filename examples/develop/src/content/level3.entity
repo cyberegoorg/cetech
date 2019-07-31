@@ -1,13 +1,13 @@
-cdb_uid: 0x167f1d061cd00168
+cdb_uuid: 0x167f1d061cd00168
 cdb_type: entity
 name: (null)
 components:
   cdb_type: cdb_objset
   0x77b6a6172a69ef6f:
-    cdb_uid: 0x77b6a6172a69ef6f
+    cdb_uuid: 0x77b6a6172a69ef6f
     cdb_type: physics_world3d
     gravity:
-      cdb_uid: 0xcf6d6a4cfeb46bc4
+      cdb_uuid: 0xcf6d6a4cfeb46bc4
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: -9.000000
@@ -15,56 +15,56 @@ components:
 children:
   cdb_type: cdb_objset
   0x3c50b54c2b3697c8:
-    cdb_uid: 0x3c50b54c2b3697c8
+    cdb_uuid: 0x3c50b54c2b3697c8
     cdb_type: entity
     name: (null)
     components:
       cdb_type: cdb_objset
       0x8b986a8bd581141d:
-        cdb_uid: 0x8b986a8bd581141d
+        cdb_uuid: 0x8b986a8bd581141d
         cdb_type: position
         position:
-          cdb_uid: 0x29cfe44554cb9072
+          cdb_uuid: 0x29cfe44554cb9072
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: 5.000000
           z: 36.000000
       0x4541908910160cc7:
-        cdb_uid: 0x4541908910160cc7
+        cdb_uuid: 0x4541908910160cc7
         cdb_type: rotation
         rotation:
-          cdb_uid: 0xe3790a428f60891c
+          cdb_uuid: 0xe3790a428f60891c
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: 0.000000
           z: 0.000000
       0xbe620ce5b0ab0571:
-        cdb_uid: 0xbe620ce5b0ab0571
+        cdb_uuid: 0xbe620ce5b0ab0571
         cdb_type: velocity3d
         linear:
-          cdb_uid: 0xf9e8af2f1e50a7f8
+          cdb_uuid: 0xf9e8af2f1e50a7f8
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: 0.000000
           z: 0.000000
         angular:
-          cdb_uid: 0x982028e89d9b244d
+          cdb_uuid: 0x982028e89d9b244d
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: 0.000000
           z: 0.000000
       0xf4c260bb2a3ffe1b:
-        cdb_uid: 0xf4c260bb2a3ffe1b
+        cdb_uuid: 0xf4c260bb2a3ffe1b
         cdb_type: mass3d
         mass: 1.000000
       0xdb0f48169e8a7a70:
-        cdb_uid: 0xdb0f48169e8a7a70
+        cdb_uuid: 0xdb0f48169e8a7a70
         cdb_type: collider3d
         shape:
-          cdb_uid: 0x7946c1d01dd4f6c5
+          cdb_uuid: 0x7946c1d01dd4f6c5
           cdb_type: collider3d_box
           half_size:
-            cdb_uid: 0x177e3b899d1f731a
+            cdb_uuid: 0x177e3b899d1f731a
             cdb_type: 0x6112fca24c71dad
             x: 1.000000
             y: 5.000000
@@ -72,37 +72,37 @@ children:
     children:
       cdb_type: cdb_objset
   0x2dbe5916e181141d:
-    cdb_uid: 0x2dbe5916e181141d
+    cdb_uuid: 0x2dbe5916e181141d
     cdb_type: entity
     name: (null)
     components:
       cdb_type: cdb_objset
       0x8029c6e3ebcb9072:
-        cdb_uid: 0x8029c6e3ebcb9072
+        cdb_uuid: 0x8029c6e3ebcb9072
         cdb_type: collider3d
         shape:
-          cdb_uid: 0x1e61409d6b160cc7
+          cdb_uuid: 0x1e61409d6b160cc7
           cdb_type: collider3d_box
           half_size:
-            cdb_uid: 0xbc98ba56ea60891c
+            cdb_uuid: 0xbc98ba56ea60891c
             cdb_type: 0x6112fca24c71dad
             x: 100.000000
             y: 1.000000
             z: 100.000000
       0xcaeb54fe71ab0571:
-        cdb_uid: 0xcaeb54fe71ab0571
+        cdb_uuid: 0xcaeb54fe71ab0571
         cdb_type: position
         position:
-          cdb_uid: 0x6922ceb7f0f581c6
+          cdb_uuid: 0x6922ceb7f0f581c6
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: -11.000001
           z: 45.000004
       0xb2038b70803ffe1b:
-        cdb_uid: 0xb2038b70803ffe1b
+        cdb_uuid: 0xb2038b70803ffe1b
         cdb_type: rotation
         rotation:
-          cdb_uid: 0x503b0529ff8a7a70
+          cdb_uuid: 0x503b0529ff8a7a70
           cdb_type: 0x6112fca24c71dad
           x: 0.000000
           y: 0.000000

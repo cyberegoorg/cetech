@@ -57,15 +57,15 @@ static void _add(uint64_t selected_obj) {
 
 
 void item_btns(uint64_t context,
-               uint64_t uid) {
+               uint64_t uuid) {
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
-            "##add_%llu", uid);
+            "##add_%llu", uuid);
 
     bool add = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     if (add) {
-        _add(uid);
+        _add(uuid);
     }
 
     ct_debugui_a0->SameLine(0, 4);
@@ -73,13 +73,13 @@ void item_btns(uint64_t context,
              ICON_FA_PLUS
                      " "
                      ICON_FA_FOLDER_OPEN
-                     "##add_from%llu", uid);
+                     "##add_from%llu", uuid);
 
 
     bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     char modal_id[128] = {'\0'};
-    sprintf(modal_id, "select...##select_resource_%llu", uid);
+    sprintf(modal_id, "select...##select_resource_%llu", uuid);
 
     uint64_t new_value = 0;
 
@@ -94,17 +94,17 @@ void item_btns(uint64_t context,
     }
 
     if (changed && new_value) {
-        _spawn_to(new_value, uid, count);
+        _spawn_to(new_value, uuid, count);
     }
 
-    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), uid);
+    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), uuid);
 
     if (parent) {
         ct_debugui_a0->SameLine(0, 4);
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
-                "##minus_%llu", uid);
+                "##minus_%llu", uuid);
         if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uid);
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uuid);
             ct_selected_object_a0->set_selected_object(context, parent);
         }
     }
@@ -140,18 +140,18 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     char name[128] = {0};
-    uint64_t uid = obj;
+    uint64_t uuid = obj;
     const char *ent_name = ce_cdb_a0->read_str(reader, ENTITY_NAME, NULL);
     if (ent_name) {
         strcpy(name, ent_name);
     } else {
-        snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uid);
+        snprintf(name, CE_ARRAY_LEN(name), "0x%llx", uuid);
     }
 
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label),
              (ICON_FA_CUBE
-                     " ""%s##%llu"), name, uid);
+                     " ""%s##%llu"), name, uuid);
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
         new_selected_object = obj;

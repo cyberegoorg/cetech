@@ -15,7 +15,7 @@ extern "C" {
 #define CT_PROPERTY_EDITOR_I \
     CE_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)
 
-typedef struct ct_resource_id_t0 ct_resource_id_t0;
+typedef struct ce_cdb_uuid_t0 ct_resource_id_t0;
 
 typedef struct ct_property_editor_i0 {
     uint64_t (*cdb_type)();

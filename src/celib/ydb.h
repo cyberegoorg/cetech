@@ -16,7 +16,7 @@ typedef struct ce_vio_t0 ce_vio_t0;
 typedef struct ce_alloc_t0 ce_alloc_t0;
 typedef struct ce_cdb_t0 ce_cdb_t0;
 typedef struct cnode_t cnode_t;
-
+typedef struct ce_cdb_uuid_t0 ce_cdb_uuid_t0;
 
 struct ce_ydb_a0 {
     uint64_t (*get_obj)(const char *path);
@@ -25,16 +25,16 @@ struct ce_ydb_a0 {
                         cnode_t **cnodes);
 
 
-    void (*create_root_obj)(cnode_t *cnodes,
-                            ce_cdb_t0 tmp_db);
+    uint64_t (*create_root_obj)(cnode_t *cnodes,
+                                ce_cdb_t0 tmp_db);
 
     void (*dump_cnodes)(ce_cdb_t0 db,
                         cnode_t *cnodes,
                         char **outputs);
 
-    uint64_t (*cnodes_from_vio)(ce_vio_t0 *vio,
-                                cnode_t **nodes,
-                                ce_alloc_t0 *alloc);
+    ce_cdb_uuid_t0 (*cnodes_from_vio)(ce_vio_t0 *vio,
+                                      cnode_t **nodes,
+                                      ce_alloc_t0 *alloc);
 };
 
 CE_MODULE(ce_ydb_a0);

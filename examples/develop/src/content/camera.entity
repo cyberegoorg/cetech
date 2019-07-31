@@ -1,20 +1,20 @@
-cdb_uid: 0x57899875c4457313
+cdb_uuid: 0x57899875c4457313
 cdb_type: entity
 name: (null)
 components:
   cdb_type: cdb_objset
   0x1ea4d40ad3a179e1:
-    cdb_uid: 0x1ea4d40ad3a179e1
+    cdb_uuid: 0x1ea4d40ad3a179e1
     cdb_type: local_to_world
   0xd72994c74e847f5b:
-    cdb_uid: 0xd72994c74e847f5b
+    cdb_uuid: 0xd72994c74e847f5b
     cdb_type: camera
     camera_type: perspective
     near: 0.100000
     far: 1000.000000
     fov: 60.000000
   0x33a940d4bee3e3c:
-    cdb_uid: 0x33a940d4bee3e3c
+    cdb_uuid: 0x33a940d4bee3e3c
     cdb_type: viewport
 children:
   cdb_type: cdb_objset

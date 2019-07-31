@@ -99,7 +99,7 @@ static bool prop_revert_btn(uint64_t _obj,
 
 
                     char res_name[128] = {0};;
-                    if (ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {ref},
+                    if (ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {ref},
                                                                 CE_ARR_ARG(res_name))) {
                         offset += snprintf(v_str + offset,
                                            CE_ARRAY_LEN(v_str) - offset,
@@ -603,7 +603,7 @@ static bool resource_select_modal(const char *modal_id,
 
             bool selected = ct_debugui_a0->Selectable(name, false, 0, &CE_VEC2_ZERO);
 
-            struct ct_resource_id_t0 r = ct_resourcedb_a0->get_file_resource(name);
+            struct ce_cdb_uuid_t0 r = ct_resourcedb_a0->get_file_resource(name);
 
             if (ct_debugui_a0->IsItemHovered(0)) {
 
@@ -613,7 +613,8 @@ static bool resource_select_modal(const char *modal_id,
             }
 
             if (selected) {
-                *selected_resource = r.uid;
+                uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), r);
+                *selected_resource = obj;
                 changed = true;
 
                 modal_buffer[0] = '\0';
@@ -621,8 +622,7 @@ static bool resource_select_modal(const char *modal_id,
             }
         }
 
-        ct_resourcedb_a0->clean_resource_list(resources,
-                                              ce_memory_a0->system);
+        ct_resourcedb_a0->clean_resource_list(resources, ce_memory_a0->system);
         ct_debugui_a0->EndPopup();
     }
 
@@ -677,10 +677,10 @@ static void ui_resource(uint64_t obj,
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    uint64_t uid = ce_cdb_a0->read_ref(reader, prop, 0);
-
+    uint64_t ref_obj = ce_cdb_a0->read_ref(reader, prop, 0);
+    ce_cdb_uuid_t0 ref_obj_uid = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), ref_obj);
     char buffer[128] = {'\0'};
-    ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {uid}, buffer,
+    ct_resourcedb_a0->get_resource_filename(ref_obj_uid, buffer,
                                             CE_ARRAY_LEN(buffer));
 
     char labelid[128] = {'\0'};
@@ -715,7 +715,7 @@ static void ui_resource(uint64_t obj,
     sprintf(labelid, ICON_FA_ARROW_UP
             "##%sprop_open_select_resource_%d", label, i);
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
-        ct_selected_object_a0->set_selected_object(context, uid);
+        ct_selected_object_a0->set_selected_object(context, ref_obj);
     };
 
     ct_debugui_a0->SameLine(0, 2);

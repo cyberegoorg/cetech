@@ -11,36 +11,35 @@ extern "C" {
 #define CT_BUILDDB_API \
    CE_ID64_0("ct_resourcedb_a0", 0xc81a8d961ebf878ULL)
 
-typedef struct ct_resource_id_t0 ct_resource_id_t0;
+typedef struct ce_cdb_uuid_t0 ct_resource_id_t0;
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
 struct ct_resourcedb_a0 {
     void (*put_file)(const char *filename,
                      time_t mtime);
 
-    void (*put_resource)(ct_resource_id_t0 rid,
+    void (*put_resource)(ce_cdb_uuid_t0 rid,
                          const char *type,
                          const char *filename,
                          bool file_resource);
 
-    void (*put_resource_blob)(ct_resource_id_t0 rid,
+    void (*put_resource_blob)(ce_cdb_uuid_t0 rid,
                               const char *data,
                               uint64_t size);
 
-    bool (*load_cdb_file)(ce_cdb_t0 db,
-                          ct_resource_id_t0 resource,
-                          uint64_t object,
-                          ce_alloc_t0 *allocator);
+    uint64_t (*load_cdb_file)(ce_cdb_t0 db,
+                              ce_cdb_uuid_t0 resource,
+                              ce_alloc_t0 *allocator);
 
-    bool (*obj_exist)(ct_resource_id_t0 resource);
+    bool (*obj_exist)(ce_cdb_uuid_t0 resource);
 
-    uint64_t (*get_resource_type)(ct_resource_id_t0 resource);
+    uint64_t (*get_resource_type)(ce_cdb_uuid_t0 resource);
 
-    bool (*get_resource_filename)(ct_resource_id_t0 resource,
+    bool (*get_resource_filename)(ce_cdb_uuid_t0 resource,
                                   char *filename,
                                   size_t max_len);
 
-    ct_resource_id_t0 (*get_file_resource)(const char *filename);
+    ce_cdb_uuid_t0 (*get_file_resource)(const char *filename);
 
     int (*list_resource_from_dirs)(const char *dir,
                                    char ***filename,

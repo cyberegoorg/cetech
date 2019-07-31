@@ -1,16 +1,16 @@
-cdb_uid: 0xe27880f9fbb28b8d
+cdb_uuid: 0xe27880f9fbb28b8d
 cdb_type: "material"
 layers:
   cdb_type: cdb_objset
   0x2b41c78abb6dbba9:
-    cdb_uid: "0x2b41c78abb6dbba9"
+    cdb_uuid: "0x2b41c78abb6dbba9"
     cdb_type: material_layer
 
     name: default
     shader: "0xd693a02d1669a559"
 
     render_state:
-      cdb_uid: "0x1280ea4b02aee59a"
+      cdb_uuid: "0x1280ea4b02aee59a"
       cdb_type: render_state
 
       rgb_write: true
@@ -23,6 +23,6 @@ layers:
     variables:
       cdb_type: cdb_objset
       0x945f5b924d402d13:
-        cdb_uid: "0x945f5b924d402d13"
+        cdb_uuid: "0x945f5b924d402d13"
         cdb_type: material_variable_texture_handler
         name: s_input_texture

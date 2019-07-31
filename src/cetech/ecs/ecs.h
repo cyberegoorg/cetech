@@ -72,7 +72,6 @@ extern "C" {
 
 typedef struct ce_cdb_t0 ce_cdb_t0;
 
-typedef struct ct_resource_id_t0 ct_resource_id_t0;
 typedef struct ct_ecs_ent_chunk_o0 ct_ecs_ent_chunk_o0;
 typedef struct ct_ecs_cmd_buffer_t ct_ecs_cmd_buffer_t;
 

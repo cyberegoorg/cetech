@@ -249,19 +249,20 @@ static void update(float dt) {
     }
 }
 
-void set_background_resource(ct_resource_id_t0 resource) {
-    set_asset(_G.baground, resource.uid);
+void set_background_resource(ce_cdb_uuid_t0 resource) {
+    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resource);
+    set_asset(_G.baground, obj);
 }
 
 void draw_background_texture(ce_vec2_t size) {
     _draw_preview(_G.baground, size);
 }
 
-
-static void resource_tooltip(ct_resource_id_t0 resourceid,
+static void resource_tooltip(ce_cdb_uuid_t0 resourceid,
                              const char *path,
                              ce_vec2_t size) {
     ct_debugui_a0->Text("%s", path);
+
 
     uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
 
@@ -273,7 +274,7 @@ static void resource_tooltip(ct_resource_id_t0 resourceid,
 
     ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
 
-    uint64_t obj = resourceid.uid;
+    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resourceid);
 
     if (ai) {
         if (ai->tooltip) {
@@ -335,9 +336,9 @@ static uint64_t open(uint64_t dock) {
                              }
                      })));
 
-    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-    ce_cdb_a0->set_ptr(w, PROP_DOCK_DATA, pi);
-    ce_cdb_a0->write_commit(w);
+//    ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
+//    ce_cdb_a0->set_ptr(w, PROP_DOCK_DATA, pi);
+//    ce_cdb_a0->write_commit(w);
 
     return (uint64_t) pi;
 }

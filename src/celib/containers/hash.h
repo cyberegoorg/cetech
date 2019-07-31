@@ -56,7 +56,6 @@ extern "C" {
 // - *values* - values [array](array.md.html)
 typedef struct ce_hash_t {
     uint32_t n;
-    float lf;
     uint64_t *keys;
     uint64_t *values;
 } ce_hash_t;
@@ -66,7 +65,6 @@ typedef struct ce_hash_t {
 static inline void ce_hash_clean(ce_hash_t *hash) {
     memset(hash->keys, 255, sizeof(uint64_t) * hash->n);
     hash->n = 0;
-    hash->lf = 0;
 
     ce_array_clean(hash->keys);
     ce_array_clean(hash->values);
@@ -78,7 +76,6 @@ static inline void ce_hash_free(ce_hash_t *hash,
     ce_array_free(hash->keys, allocator);
     ce_array_free(hash->values, allocator);
     hash->n = 0;
-    hash->lf = 0;
 }
 
 static inline uint32_t _ce_hash_find_slot(const struct ce_hash_t *hash,
@@ -157,9 +154,9 @@ static inline void ce_hash_add(ce_hash_t *hash,
 
     begin:
     idx = _ce_hash_find_slot(hash, k);
-    if ((hash->lf >= 0.7) || ((hash->keys[idx] != EMPTY_SLOT) &&
-                              (hash->keys[idx] != DELETE_SLOT) &&
-                              (hash->keys[idx] != k))) {
+    if (((hash->keys[idx] != EMPTY_SLOT) &&
+         (hash->keys[idx] != DELETE_SLOT) &&
+         (hash->keys[idx] != k))) {
         uint32_t new_size = hash->n * 2;
 
         struct ce_hash_t new_hash = {.n = new_size};
@@ -187,8 +184,6 @@ static inline void ce_hash_add(ce_hash_t *hash,
 
     hash->values[idx] = value;
     hash->keys[idx] = k;
-
-    hash->lf += 1.0f / hash->n;
 }
 
 static inline void ce_hash_remove(ce_hash_t *hash,

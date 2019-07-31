@@ -1,14 +1,14 @@
-cdb_uid: 0xbfb6c2d7354678ec
+cdb_uuid: 0xbfb6c2d7354678ec
 cdb_type: material
 layers:
   cdb_type: cdb_objset
   0x9b2e443e0dddcda9:
-    cdb_uid: 0x9b2e443e0dddcda9
+    cdb_uuid: 0x9b2e443e0dddcda9
     cdb_type: material_layer
     name: gbuffer
     shader: 0x340f387f64db7196
     render_state:
-      cdb_uid: 0x78ccc53d72122492
+      cdb_uuid: 0x78ccc53d72122492
       cdb_type: render_state
       rgb_write: true
       alpha_write: true
@@ -19,7 +19,7 @@ layers:
     variables:
       cdb_type: cdb_objset
       0x3e8302bae4fce294:
-        cdb_uid: 0x3e8302bae4fce294
+        cdb_uuid: 0x3e8302bae4fce294
         cdb_type: material_variable_color
         name: color
         x: 1.000000

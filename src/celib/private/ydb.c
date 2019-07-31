@@ -14,6 +14,7 @@
 #include <celib/cdb.h>
 #include <celib/os/thread.h>
 #include <celib/os/vio.h>
+#include <celib/uuid64.h>
 
 #include <cetech/resource/resource.h>
 
@@ -39,7 +40,7 @@ typedef struct node_value {
         float f;
         uint64_t ui;
         char *string;
-        uint64_t *child;
+        ce_cdb_uuid_t0 uuid;
     };
 } node_value;
 
@@ -50,12 +51,22 @@ static struct _G {
 
 
 static bool _is_ref(const char *str) {
-    return (str[0] == '0') && (str[1] == 'x');
+    ce_uuid64_t0 uuid;
+    if(!ce_uuid64_try_parse(&uuid, str)) {
+        return (str[0] == '0') && (str[1] == 'x');
+    }
+
+    return true;
 }
 
-static uint64_t _uid_from_str(const char *str) {
-    uint64_t v = strtoul(str, NULL, 0);
-    return v;
+static ce_cdb_uuid_t0 _uid_from_str(const char *str) {
+    ce_uuid64_t0 uuid;
+    if(!ce_uuid64_try_parse(&uuid, str)) {
+        uint64_t v = strtoul(str, NULL, 0);
+        return (ce_cdb_uuid_t0){.id=v};
+    }
+
+    return *((ce_cdb_uuid_t0*)(&uuid));
 }
 
 static void type_value_from_scalar(const uint8_t *scalar,
@@ -98,9 +109,9 @@ static void type_value_from_scalar(const uint8_t *scalar,
         }
 
     } else if (_is_ref(scalar_str)) {
-        uint64_t uid = _uid_from_str(scalar_str);
+        ce_cdb_uuid_t0 uuid = _uid_from_str(scalar_str);
         *type = NODE_REF;
-        *vallue = (node_value) {.ui = uid};
+        *vallue = (node_value) {.uuid = uuid};
         return;
     }
 
@@ -125,9 +136,9 @@ static uint32_t _push_cnode(cnode_t **nodes,
     return idx;
 }
 
-uint64_t cnodes_from_vio(ce_vio_t0 *vio,
-                         cnode_t **cnodes,
-                         struct ce_alloc_t0 *alloc) {
+ce_cdb_uuid_t0 cnodes_from_vio(ce_vio_t0 *vio,
+                               cnode_t **cnodes,
+                               struct ce_alloc_t0 *alloc) {
 
     parent_stack_state *parent_stack = NULL;
     uint32_t parent_stack_top;
@@ -144,7 +155,7 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
         ce_log_a0->error(LOG_WHERE, "Failed to initialize parser");
         yaml_parser_delete(&parser);
 
-        return 0;
+        return (ce_cdb_uuid_t0){};
     }
 
     yaml_parser_set_input_string(&parser, source_data, vio->vt->size(vio->inst));
@@ -161,7 +172,7 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
             yaml_event_delete(&event);
             yaml_parser_delete(&parser);
 
-            return 0;
+            return (ce_cdb_uuid_t0){};
         }
 
         struct parent_stack_state state = {};
@@ -236,8 +247,8 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                             .type = CNODE_OBJSET_END
                     });
                 } else {
-                    if (!cnode->obj.uid) {
-                        cnode->obj.uid = ce_cdb_a0->gen_uid(ce_cdb_a0->db());
+                    if (!cnode->obj.uuid.id) {
+                        cnode->obj.uuid = ce_cdb_a0->gen_uid(ce_cdb_a0->db());
                     }
                     _push_cnode(cnodes, (cnode_t) {
                             .type = CNODE_OBJ_END,
@@ -303,8 +314,8 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                                 uint32_t cnode_idx = parent_stack[parent_stack_top - 1].cnode_idx;
                                 cnode_t *cnode = &(*cnodes)[cnode_idx];
 
-                                uint64_t uid = _uid_from_str(value.string);
-                                cnode->obj.uid = uid;
+                                ce_cdb_uuid_t0 uuid = _uid_from_str(value.string);
+                                cnode->obj.uuid = uuid;
                             } else if (key == CDB_TYPE_PROP) {
                                 uint32_t cnode_idx = parent_stack[parent_stack_top - 1].cnode_idx;
                                 cnode_t *cnode = &(*cnodes)[cnode_idx];
@@ -312,7 +323,7 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                                 uint64_t type = 0;
 
                                 if (_is_ref(value.string)) {
-                                    type = _uid_from_str(value.string);
+                                    type = _uid_from_str(value.string).id;
                                 } else {
                                     type = ce_id_a0->id64(value.string);
                                 }
@@ -327,15 +338,15 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
                                 uint32_t cnode_idx = parent_stack[parent_stack_top - 1].cnode_idx;
                                 cnode_t *cnode = &(*cnodes)[cnode_idx];
 
-                                uint64_t uid = _uid_from_str(value.string);
-                                cnode->obj.instance_of = uid;
+                                ce_cdb_uuid_t0 uuid = _uid_from_str(value.string);
+                                cnode->obj.instance_of = uuid;
                             } else if (_is_ref(value.string)) {
-                                uint64_t uid = _uid_from_str(value.string);
+                                ce_cdb_uuid_t0 uuid = _uid_from_str(value.string);
 
                                 _push_cnode(cnodes, (cnode_t) {
                                         .type = CNODE_REF,
                                         .key = key,
-                                        .value.ref = uid,
+                                        .uuid = uuid,
                                 });
 
                             } else {
@@ -391,7 +402,7 @@ uint64_t cnodes_from_vio(ce_vio_t0 *vio,
     yaml_event_delete(&event);
     yaml_parser_delete(&parser);
 
-    return (*cnodes)[0].obj.uid;
+    return (*cnodes)[0].obj.uuid;
 }
 
 void _log_cnodes(cnode_t *cnodes) {
@@ -437,9 +448,9 @@ void _log_cnodes(cnode_t *cnodes) {
                     ce_log_a0->debug(LOG_WHERE, "key: %s", ce_id_a0->str_from_id64(node.key));
                 }
 
-                ce_log_a0->debug(LOG_WHERE, "id: %llx", node.obj.uid);
-                if (node.obj.instance_of) {
-                    ce_log_a0->debug(LOG_WHERE, "inst: %llx", node.obj.instance_of);
+                ce_log_a0->debug(LOG_WHERE, "id: %llx", node.obj.uuid.id);
+                if (node.obj.instance_of.id) {
+                    ce_log_a0->debug(LOG_WHERE, "inst: %llx", node.obj.instance_of.id);
                 }
             }
                 break;
@@ -460,8 +471,8 @@ void _log_cnodes(cnode_t *cnodes) {
     }
 }
 
-void _create_root_obj(cnode_t *cnodes,
-                      ce_cdb_t0 tmp_db) {
+uint64_t _create_root_obj(cnode_t *cnodes,
+                          ce_cdb_t0 tmp_db) {
 
 //    _log_cnodes(cnodes);
 
@@ -494,7 +505,9 @@ void _create_root_obj(cnode_t *cnodes,
                 break;
             case CNODE_REF: {
                 struct state_t *state = &states[state_top];
-                ce_cdb_a0->set_ref(state->writer, node.key, node.value.ref);
+                uint64_t obj_ref = ce_cdb_a0->obj_from_uid(tmp_db, node.uuid);
+
+                ce_cdb_a0->set_ref(state->writer, node.key, obj_ref);
             }
                 break;
             case CNODE_STRING: {
@@ -509,15 +522,18 @@ void _create_root_obj(cnode_t *cnodes,
                 break;
             case CNODE_OBJ_BEGIN: {
                 uint64_t obj;
-                uint64_t uid = node.obj.uid;
-                if (!uid) {
-                    uid = ce_cdb_a0->gen_uid(tmp_db);
+                ce_cdb_uuid_t0 uuid = node.obj.uuid;
+                if (!uuid.id) {
+                    uuid = ce_cdb_a0->gen_uid(tmp_db);
                 }
 
-                if (node.obj.instance_of) {
-                    obj = ce_cdb_a0->create_from_uid(tmp_db, node.obj.instance_of, uid);
+                if (node.obj.instance_of.id) {
+                    CE_ASSERT(LOG_WHERE, node.obj.instance_of.id != uuid.id);
+
+                    uint64_t from_obj = ce_cdb_a0->obj_from_uid(tmp_db, node.obj.instance_of);
+                    obj = ce_cdb_a0->create_from_uid(tmp_db, from_obj, uuid);
                 } else {
-                    obj = ce_cdb_a0->create_object_uid(tmp_db, uid, node.obj.type, true);
+                    obj = ce_cdb_a0->create_object_uid(tmp_db, uuid, node.obj.type, true);
                 }
 
                 struct state_t *state = &states[state_top];
@@ -559,6 +575,8 @@ void _create_root_obj(cnode_t *cnodes,
                 break;
         }
     }
+
+    return ce_cdb_a0->obj_from_uid(tmp_db, cnodes[0].obj.uuid);
 }
 
 uint64_t load_obj(const char *path,
@@ -576,23 +594,23 @@ uint64_t load_obj(const char *path,
         return 0;
     }
 
-    uint64_t obj = cnodes_from_vio(f, cnodes, _G.allocator);
+    ce_cdb_uuid_t0 uuid = cnodes_from_vio(f, cnodes, _G.allocator);
     ce_fs_a0->close(f);
 
-    if (!obj) {
+    if (!uuid.id) {
         ce_log_a0->error(LOG_WHERE, "Could not load file %s", path);
         return 0;
     }
 
-    return obj;
+    return uuid.id;
 }
 
 uint64_t get_obj(const char *path) {
     uint64_t path_key = ce_id_a0->id64(path);
 
     cnode_t *cnodes = NULL;
-    uint64_t obj = load_obj(path, &cnodes, path_key);
-    _create_root_obj(cnodes, ce_cdb_a0->db());
+    load_obj(path, &cnodes, path_key);
+    uint64_t obj = _create_root_obj(cnodes, ce_cdb_a0->db());
 
     ce_array_free(cnodes, _G.allocator);
     return obj;

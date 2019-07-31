@@ -32,7 +32,10 @@
 
 
 void init(ct_world_t0 world) {
-    uint64_t boot_ent = ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
+    ce_cdb_uuid_t0 boot_ent_uid =  {.id=0xf44b05ff3bdfc99e};//ce_config_a0->read_uint(CONFIG_BOOT_ENT, 0);
+
+    uint64_t boot_ent  = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), boot_ent_uid);
+
     ct_ecs_e_a0->spawn_entity(world, boot_ent);
 
     ct_entity_t0 camera;

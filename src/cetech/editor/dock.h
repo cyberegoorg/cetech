@@ -14,8 +14,8 @@ extern "C" {
 #define CT_DOCK_I \
     CE_ID64_0("ct_dock_i0", 0x3a3181c12a9e109fULL)
 
-#define PROP_DOCK_DATA \
-    CE_ID64_0("dock_data", 0x944132def1f8c765ULL)
+//#define PROP_DOCK_DATA \
+//    CE_ID64_0("dock_data", 0x944132def1f8c765ULL)
 
 #define DOCKS_LAYOUT_TYPE \
     CE_ID64_0("docks_layout", 0x7336aa61594d9ff9ULL)

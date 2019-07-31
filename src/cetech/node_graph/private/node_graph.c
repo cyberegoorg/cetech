@@ -119,7 +119,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     }
 
     char name[128] = {0};
-    uint64_t uid = top_level_obj;
+    uint64_t uuid = top_level_obj;
     snprintf(name, CE_ARRAY_LEN(name), "Nodes");
 
     bool selected = selected_obj == nodes;
@@ -132,7 +132,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
 
     snprintf(label, CE_ARRAY_LEN(label),
              (ICON_FA_CUBE
-                     " ""%s##nodes_%llu"), name, uid);
+                     " ""%s##nodes_%llu"), name, uuid);
     const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
     if (ct_debugui_a0->IsItemClicked(0)) {
         new_selected_object = nodes;
@@ -147,8 +147,8 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     bool add = ct_debugui_a0->Button(label, &CE_VEC2_ZERO);
 
     char modal_id[128] = {'\0'};
-    sprintf(modal_id, "select...##select_node_%llu", uid);
-    ct_node_graph_editor_a0->add_node_modal(modal_id, uid);
+    sprintf(modal_id, "select...##select_node_%llu", uuid);
+    ct_node_graph_editor_a0->add_node_modal(modal_id, uuid);
 
     if (add) {
         ct_debugui_a0->OpenPopup(modal_id);

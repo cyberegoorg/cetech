@@ -32,6 +32,11 @@ extern "C" {
     CE_ID64_0("obj_destroy", 0x5669bedb7db786e4ULL)
 
 typedef struct ce_alloc_t0 ce_alloc_t0;
+typedef struct ce_uuid64_t0 ce_uuid64_t0;
+
+typedef struct ce_cdb_uuid_t0 {
+    uint64_t id;
+} ce_cdb_uuid_t0;
 
 typedef enum ce_cdb_type_e0 {
     CE_CDB_TYPE_NONE = 0,
@@ -127,9 +132,9 @@ typedef struct cnode_t {
 //    uint32_t parent_idx;
     union {
         struct {
-            uint64_t uid;
+            ce_cdb_uuid_t0 uuid;
             uint64_t type;
-            uint64_t instance_of;
+            ce_cdb_uuid_t0 instance_of;
         } obj;
 
         struct {
@@ -137,12 +142,14 @@ typedef struct cnode_t {
             uint64_t size;
         } blob;
 
+        ce_cdb_uuid_t0 uuid;
+
         ce_cdb_value_u0 value;
     };
 } cnode_t;
 
-typedef bool (*ct_cdb_obj_loader_t0)(ce_cdb_t0 db,
-                                     uint64_t uid);
+typedef uint64_t (*ct_cdb_obj_loader_t0)(ce_cdb_t0 db,
+                                         ce_cdb_uuid_t0 uuid);
 
 typedef struct ce_cdb_prop_def_t0 {
     const char *name;
@@ -173,13 +180,13 @@ struct ce_cdb_a0 {
 
     const ce_cdb_type_def_t0 *(*obj_type_def)(uint64_t type);
 
-    uint64_t (*gen_uid)(ce_cdb_t0 db);
+    ce_cdb_uuid_t0 (*gen_uid)(ce_cdb_t0 db);
 
     uint64_t (*create_object)(ce_cdb_t0 db,
                               uint64_t type);
 
     uint64_t (*create_object_uid)(ce_cdb_t0 db,
-                                  uint64_t uid,
+                                  ce_cdb_uuid_t0 uuid,
                                   uint64_t type,
                                   bool init);
 
@@ -188,13 +195,7 @@ struct ce_cdb_a0 {
 
     uint64_t (*create_from_uid)(ce_cdb_t0 db,
                                 uint64_t from,
-                                uint64_t uid);
-
-
-    void (*set_instance_of)(ce_cdb_t0 db,
-                            uint64_t from,
-                            uint64_t to);
-
+                                ce_cdb_uuid_t0 uuid);
 
     void (*destroy_object)(ce_cdb_t0 db,
                            uint64_t obj);
@@ -386,6 +387,11 @@ struct ce_cdb_a0 {
                         uint64_t property,
                         uint64_t *objs);
 
+    uint64_t (*obj_from_uid)(ce_cdb_t0 db,
+                             ce_cdb_uuid_t0 uuid);
+
+    ce_cdb_uuid_t0 (*obj_uid)(ce_cdb_t0 db,
+                              uint64_t obj);
 };
 
 CE_MODULE(ce_cdb_a0);

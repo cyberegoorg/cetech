@@ -273,8 +273,8 @@ static struct ct_resource_i0 ct_resource_api = {
 // Interface
 //==============================================================================
 bgfx_texture_handle_t texture_get(uint64_t name) {
-    ct_resource_id_t0 rid = {.uid = name};
-    uint64_t obj = rid.uid;
+    ce_cdb_uuid_t0 rid = {.id = name};
+    uint64_t obj = rid.id;
 
     if (!obj) {
         return (bgfx_texture_handle_t) {.idx = UINT16_MAX};

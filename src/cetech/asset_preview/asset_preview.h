@@ -34,7 +34,7 @@ typedef struct ct_resource_preview_i0 {
 
 
 struct ct_resource_preview_a0 {
-    void (*resource_tooltip)(ct_resource_id_t0 resourceid,
+    void (*resource_tooltip)(ce_cdb_uuid_t0 resourceid,
                              const char *path,
                              ce_vec2_t size);
 };

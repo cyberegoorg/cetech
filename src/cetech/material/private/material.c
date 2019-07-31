@@ -313,11 +313,11 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 
 static uint64_t create(uint64_t name) {
-    ct_resource_id_t0 rid = (ct_resource_id_t0) {
-            .uid = name,
+    ce_cdb_uuid_t0 rid = (ce_cdb_uuid_t0) {
+            .id = name,
     };
 
-    uint64_t object = rid.uid;
+    uint64_t object = rid.id;
     return object;
 }
 

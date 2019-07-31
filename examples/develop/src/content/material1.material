@@ -1,16 +1,16 @@
-cdb_uid: "0x24c9413e88ebaaa8"
+cdb_uuid: "0x24c9413e88ebaaa8"
 cdb_type: material
 
 layers:
   cdb_type: cdb_objset
   0x9b2e443e0dddcdd9:
-    cdb_uid: "0x9b2e443e0dddcdd9"
+    cdb_uuid: "0x9b2e443e0dddcdd9"
     cdb_type: material_layer
     name: gbuffer
     shader: "0x7ecb3362fa2b019c"
 
     render_state:
-      cdb_uid: "0x78ccc53d72122491"
+      cdb_uuid: "0x78ccc53d72122491"
       cdb_type: render_state
       rgb_write: true
       alpha_write: true
@@ -23,13 +23,13 @@ layers:
       cdb_type: cdb_objset
 
       0xf81a1ce60b9ba9e8:
-        cdb_uid: "0xf81a1ce60b9ba9e8"
+        cdb_uuid: "0xf81a1ce60b9ba9e8"
         name: u_texColor
         cdb_type: material_variable_texture
         value: "0xe918b8b9d6e08e45"
 
       0x3e8302bae4fce293:
-        cdb_uid: "0x3e8302bae4fce293"
+        cdb_uuid: "0x3e8302bae4fce293"
         name: u_vec4
         cdb_type: material_variable_color
         x: 1.000000
@@ -38,7 +38,7 @@ layers:
         w: 1.000000
 
       0xe66d5daf1a451dbf:
-        cdb_uid: "0xe66d5daf1a451dbf"
+        cdb_uuid: "0xe66d5daf1a451dbf"
         name: u_vec42
         cdb_type: material_variable_vec4
         x: 1.000000

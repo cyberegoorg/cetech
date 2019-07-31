@@ -1,54 +1,54 @@
-cdb_uid: 0x564c98159cba3052
+cdb_uuid: 0x564c98159cba3052
 cdb_type: entity
 name: pad
 components:
   cdb_type: cdb_objset
   0x23bdfb43b317794d:
-    cdb_uid: 0x23bdfb43b317794d
+    cdb_uuid: 0x23bdfb43b317794d
     cdb_type: local_to_world
   0xab4d4f3310f34c87:
-    cdb_uid: 0xab4d4f3310f34c87
+    cdb_uuid: 0xab4d4f3310f34c87
     cdb_type: rectangle
     half_size:
-      cdb_uid: 0x5f7fadfbe2d7cfd1
+      cdb_uuid: 0x5f7fadfbe2d7cfd1
       cdb_type: vec2_t
       x: 8.000000
       y: 32.000000
   0xfab273448e38044e:
-    cdb_uid: 0xfab273448e38044e
+    cdb_uuid: 0xfab273448e38044e
     cdb_type: player_input
     move: 0.000000
     move_speed: 15000.000000
     shoot_dir:
-      cdb_uid: 0x719961fd4c6882e9
+      cdb_uuid: 0x719961fd4c6882e9
       cdb_type: vec2_t
       x: 0.000000
       y: 0.000000
   0x505912ebe0a8d032:
-    cdb_uid: 0x505912ebe0a8d032
+    cdb_uuid: 0x505912ebe0a8d032
     cdb_type: pad
   0xe51bd0700c2bb279:
-    cdb_uid: 0xe51bd0700c2bb279
+    cdb_uuid: 0xe51bd0700c2bb279
     cdb_type: rectangle_renderer
     material: 0xbfb6c2d7354678ec
   0xb74649a9c69bc81a:
-    cdb_uid: 0xb74649a9c69bc81a
+    cdb_uuid: 0xb74649a9c69bc81a
     cdb_type: gamepad_controller
     gamepad_id: 0.000000
   0x7263f2ec38dda6d5:
-    cdb_uid: 0x7263f2ec38dda6d5
+    cdb_uuid: 0x7263f2ec38dda6d5
     cdb_type: position
     position:
-      cdb_uid: 0x109b6ca5b828232a
+      cdb_uuid: 0x109b6ca5b828232a
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000
       z: 0.000000
   0x3047d1ad599c90d3:
-    cdb_uid: 0x3047d1ad599c90d3
+    cdb_uuid: 0x3047d1ad599c90d3
     cdb_type: rotation
     rotation:
-      cdb_uid: 0xce7f4b66d8e70d28
+      cdb_uuid: 0xce7f4b66d8e70d28
       cdb_type: 0x6112fca24c71dad
       x: 0.000000
       y: 0.000000

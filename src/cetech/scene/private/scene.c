@@ -159,6 +159,9 @@ static struct ct_entity_t0 load(uint64_t resource,
             }
     })));
 
+    uint64_t material = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(),
+                                                (ce_cdb_uuid_t0) {0x24c9413e88ebaaa8});
+
     for (int i = 0; i < items_count; ++i) {
         const char *geom = &items[i * 128];
 
@@ -185,7 +188,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                                  {
                                          .type = STATIC_MESH_COMPONENT,
                                          .data = &(ct_mesh_component) {
-                                                 .material = 0x24c9413e88ebaaa8,
+                                                 .material = material,
                                                  .scene = resource,
                                                  .mesh = ce_id_a0->id64(geom)
                                          }
@@ -232,11 +235,11 @@ static struct ct_resource_i0 ct_resource_api = {
 // Interface
 //==============================================================================
 static uint64_t resource_data(uint64_t name) {
-    ct_resource_id_t0 rid = (ct_resource_id_t0) {
-            .uid = name,
+    ce_cdb_uuid_t0 rid = (ce_cdb_uuid_t0) {
+            .id = name,
     };
 
-    return rid.uid;
+    return rid.id;
 }
 
 
@@ -422,7 +425,8 @@ static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
 
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
-                          uint64_t context,const char *filter) {
+                          uint64_t context,
+                          const char *filter) {
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
     uint64_t import = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
 
@@ -430,7 +434,7 @@ static void draw_property(ce_cdb_t0 db,
         return;
     }
 
-    ct_editor_ui_a0->prop_filename(import, "Input",  filter,SCENE_INPUT_PROP, "gltf", 0);
+    ct_editor_ui_a0->prop_filename(import, "Input", filter, SCENE_INPUT_PROP, "gltf", 0);
 }
 
 static struct ct_property_editor_i0 property_editor_api = {

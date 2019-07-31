@@ -213,7 +213,7 @@ static void on_debugui(uint64_t content,
         ct_editor_ui_a0->ui_prop_body(obj);
         const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-        if (ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {obj},
+        if (ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {obj},
                                                     buffer,
                                                     CE_ARRAY_LEN(buffer))) {
 
@@ -232,7 +232,7 @@ static void on_debugui(uint64_t content,
         uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
         if (instance_of) {
             char name[128] = {0};
-            ct_resourcedb_a0->get_resource_filename((ct_resource_id_t0) {instance_of},
+            ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {instance_of},
                                                     buffer,
                                                     CE_ARRAY_LEN(buffer));
 
