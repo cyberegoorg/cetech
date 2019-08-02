@@ -1,7 +1,7 @@
 #include <celib/cdb.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/transform/transform.h>
-#include <celib/ydb.h>
+#include <celib/yaml_cdb.h>
 #include <cetech/camera/camera.h>
 
 #include <celib/memory/allocator.h>
@@ -153,8 +153,8 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
 

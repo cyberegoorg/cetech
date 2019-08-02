@@ -298,7 +298,7 @@ static void cetech_kernel_start() {
         _build_update_graph(&_G.updateg);
         _update(&_G.updateg, dt);
 
-        ce_cdb_a0->gc();
+        ce_cdb_a0->tick();
 
         ct_metrics_a0->end();
     }

@@ -15,7 +15,7 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/macros.h>
-#include <celib/ydb.h>
+#include <celib/yaml_cdb.h>
 #include <celib/os/vio.h>
 #include <celib/containers/hash.h>
 
@@ -140,8 +140,8 @@ static int load_from_yaml_file(ce_cdb_t0 db,
     ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
 
     cnode_t *nodes = NULL;
-    ce_ydb_a0->cnodes_from_vio(f, &nodes, alloc);
-    uint64_t obj = ce_ydb_a0->create_root_obj(nodes, db);
+    ce_yaml_cdb_a0->cnodes_from_vio(f, &nodes, alloc);
+    uint64_t obj = ce_cdb_a0->create_root_obj(nodes, db);
     ce_os_vio_a0->close(f);
     ce_array_free(nodes, alloc);
 

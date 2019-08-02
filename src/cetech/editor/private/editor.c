@@ -4,7 +4,7 @@
 #include <celib/memory/allocator.h>
 #include <celib/fs.h>
 
-#include <celib/ydb.h>
+#include <celib/yaml_cdb.h>
 #include "celib/id.h"
 #include "celib/memory/memory.h"
 #include "celib/api.h"
@@ -168,7 +168,7 @@ void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ce_fs_a0);
-    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_action_manager_a0);
     CE_INIT_API(api, ce_module_a0);
     CE_INIT_API(api, ct_rg_a0);

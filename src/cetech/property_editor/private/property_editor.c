@@ -25,6 +25,7 @@
 #include <celib/log.h>
 #include <celib/containers/buffer.h>
 #include <cetech/resource/resourcedb.h>
+#include <celib/yaml_cdb.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -205,7 +206,7 @@ static void on_debugui(uint64_t content,
     if (open && obj) {
         if (ct_debugui_a0->Button("DDD", &CE_VEC2_ZERO)) {
             char *buffer = NULL;
-            ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
+            ce_yaml_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
             ce_log_a0->debug("DDD", "%s", buffer);
             ce_buffer_free(buffer, ce_memory_a0->system);
         }

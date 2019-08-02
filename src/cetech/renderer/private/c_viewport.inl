@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include <cetech/editor/editor_ui.h>
-#include <celib/ydb.h>
+#include <celib/yaml_cdb.h>
 #include <celib/math/math.h>
 
 // component

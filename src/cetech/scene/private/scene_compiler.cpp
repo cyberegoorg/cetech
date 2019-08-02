@@ -4,7 +4,7 @@
 
 #include <celib/memory/allocator.h>
 #include <celib/os/path.h>
-#include <celib/ydb.h>
+#include <celib/yaml_cdb.h>
 #include <celib/containers/array.h>
 #include "celib/id.h"
 #include "celib/memory/memory.h"
@@ -155,8 +155,8 @@ extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_resource_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ce_ydb_a0);
-    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
     _G = (struct _G) {.allocator=ce_memory_a0->system};

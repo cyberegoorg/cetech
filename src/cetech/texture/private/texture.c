@@ -42,7 +42,6 @@
 #define _G TextureResourceGlobals
 struct _G {
     ce_alloc_t0 *allocator;
-    ct_cdb_ev_queue_o0 *changed_obj_queue;
 } _G;
 
 typedef struct ct_texture_obj_t {
@@ -297,12 +296,15 @@ static struct ct_texture_a0 texture_api = {
 struct ct_texture_a0 *ct_texture_a0 = &texture_api;
 
 static void compile_watch(float dt) {
-    ce_cdb_prop_ev_t0 ev = {};
-
     uint64_t *to_compile_obj = NULL;
     ce_hash_t obj_set = {};
 
-    while (ce_cdb_a0->pop_objs_events(_G.changed_obj_queue, &ev)) {
+    uint32_t changes_n = 0;
+    const ce_cdb_prop_ev_t0 *objs_evs = ce_cdb_a0->objs_changes(ce_cdb_a0->db(), &changes_n);
+
+    for (uint32_t i = 0; i < changes_n; ++i) {
+        ce_cdb_prop_ev_t0 ev = objs_evs[i];
+
         if (ce_cdb_a0->obj_type(ce_cdb_a0->db(), ev.obj) != TEXTURE_TYPE) {
             continue;
         }
@@ -354,7 +356,6 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,
-            .changed_obj_queue = ce_cdb_a0->new_objs_listener(ce_cdb_a0->db()),
     };
 
     CE_UNUSED(reload);

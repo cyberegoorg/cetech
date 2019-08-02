@@ -195,7 +195,7 @@ static bool save(uint64_t uid) {
 
     if (exist) {
         char *buf = NULL;
-        ce_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uuid, 0);
+        ce_yaml_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uuid, 0);
 
         struct ce_vio_t0 *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
         f->vt->write(f->inst, buf, ce_buffer_size(buf), 1);

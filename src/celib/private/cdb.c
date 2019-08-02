@@ -87,11 +87,6 @@ typedef struct type_storage_t {
     atomic_uint_fast32_t pool_n;
 } type_storage_t;
 
-typedef struct listener_pack_t {
-    ce_mpmc_queue_t0 *queues;
-    atomic_uint_fast16_t n;
-} listener_pack_t;
-
 typedef struct object_t {
     uint32_t idx;
     ce_cdb_uuid_t0 uuid;
@@ -117,9 +112,6 @@ typedef struct object_t {
     uint32_t typed_obj_idx;
     uint32_t typed_writer_idx;
     type_storage_t *storage;
-
-    //events
-    listener_pack_t obj_listeners;
 } object_t;
 
 
@@ -128,6 +120,10 @@ typedef struct set_t {
     uint64_t *objs;
 } set_t;
 
+typedef struct change_buffer_t {
+    ce_cdb_ev_t0 *db_change;
+    struct ce_cdb_prop_ev_t0 *objs_change;
+} change_buffer_t;
 
 typedef struct db_t {
     uint32_t used;
@@ -175,8 +171,8 @@ typedef struct db_t {
     type_storage_t *type_storage;
 
     // chnaged_queues
-    listener_pack_t chnaged_objs;
-    listener_pack_t obj_listeners;
+    change_buffer_t change_buffers[2];
+    uint8_t change_buffers_active;
 } db_t;
 
 typedef struct type_defs_t {
@@ -208,34 +204,9 @@ static object_t **_get_uid_objid(db_t *db,
 #endif
 }
 
-
-// U/ID
-// ce_cdb_uuid_t0 _next_uid(uint64_t epoch_offset,
-//                          uint16_t session) {
-//    static atomic_ushort g_seq;
-//    union {
-//        uint64_t ui;
-//        struct {
-//            uint64_t seq:16;
-//            uint64_t session:8; //8
-//            uint64_t timestamp:40;
-//        };
-//    } id = {.ui = 0};
-//
-//    id.timestamp = ce_os_time_a0->timestamp_ms() - epoch_offset;
-//    id.session = session;
-//    id.seq = atomic_fetch_add(&g_seq, 1) + 1;
-//
-////    ce_log_a0->debug(LOG_WHERE, "New UID 0x%llx", id.ui);
-//
-//    return (ce_cdb_uuid_t0) {id.ui * 11400714819323198549UL};
-//}
-
 static ce_cdb_uuid_t0 _gen_uid() {
     ce_uuid64_t0 uuid = ce_uuid64_generate();
-    return *(ce_cdb_uuid_t0*)(&uuid);
-
-//    return _next_uid(1547316500ULL, 1);
+    return *(ce_cdb_uuid_t0 *) (&uuid);
 }
 
 static ce_cdb_uuid_t0 gen_uid(ce_cdb_t0 db) {
@@ -305,7 +276,7 @@ object_t **_get_objectid_from_uid(db_t *db,
 
     if (!_uid_loaded(db, uuid)) {
         char uuid_str[64] = {};
-        ce_uuid64_to_string(uuid_str, CE_ARRAY_LEN(uuid_str), &(ce_uuid64_t0){uuid.id});
+        ce_uuid64_to_string(uuid_str, CE_ARRAY_LEN(uuid_str), &(ce_uuid64_t0) {uuid.id});
 
         ce_log_a0->debug(LOG_WHERE, "Loading obj with uuid = %s.", uuid_str);
 
@@ -327,45 +298,18 @@ uint64_t objectid_from_uid(ce_cdb_t0 _db,
     return (uint64_t) _get_objectid_from_uid(db, uuid);
 }
 
-
 // events
-void _init_listener_pack(listener_pack_t *pack) {
-    pack->queues = virt_alloc(sizeof(ce_mpmc_queue_t0) * MAX_EVENTS_LISTENER);
+void _push_db_change_event(db_t *db,
+                           void *event) {
+    ce_array_push(db->change_buffers[db->change_buffers_active].db_change,
+                  *(ce_cdb_ev_t0 *) event, _G.allocator);
 }
 
-ce_mpmc_queue_t0 *_new_listener(listener_pack_t *pack,
-                                uint32_t queue_size,
-                                size_t item_size) {
-    uint32_t idx = atomic_fetch_add(&pack->n, 1);
-    ce_mpmc_queue_t0 *q = &pack->queues[idx];
-    ce_mpmc_init(q, queue_size, item_size, _G.allocator);
-    return q;
+void _push_objs_event(db_t *db,
+                      void *event) {
+    ce_array_push(db->change_buffers[db->change_buffers_active].objs_change,
+                  *(ce_cdb_prop_ev_t0 *) event, _G.allocator);
 }
-
-static void _push_event(listener_pack_t *pack,
-                        void *event) {
-    uint32_t n = pack->n;
-    for (int i = 0; i < n; ++i) {
-        ce_mpmc_queue_t0 *q = &pack->queues[i];
-        ce_mpmc_enqueue(q, event);
-    }
-}
-
-ce_mpmc_queue_t0 *_new_changed_obj_events_listener(db_t *db) {
-    return _new_listener(&db->chnaged_objs, MAX_QUEUE_SIZE, sizeof(ce_cdb_ev_t0));
-}
-
-
-ce_mpmc_queue_t0 *_new_obj_events_listener(db_t *db) {
-    return _new_listener(&db->obj_listeners, MAX_QUEUE_SIZE, sizeof(ce_cdb_prop_ev_t0));
-}
-
-ce_mpmc_queue_t0 *_new_obj_events_listener2(db_t *db,
-                                            uint64_t _obj) {
-    object_t *obj = _get_object_from_id(db, _obj);
-    return _new_listener(&obj->obj_listeners, 64, sizeof(ce_cdb_prop_ev_t0));
-}
-
 
 // objid
 object_t **_new_obj_id(db_t *db) {
@@ -685,8 +629,8 @@ static void _add_changed_obj(db_t *db_inst,
     };
 }
 
-static void _add_change(object_t *obj,
-                        ce_cdb_prop_ev_t0 ev) {
+static void _push_change_event(object_t *obj,
+                               ce_cdb_prop_ev_t0 ev) {
     ce_array_push(obj->changed, ev, _G.allocator);
 }
 
@@ -720,7 +664,6 @@ static struct object_t *_object_clone(db_t *db,
     new_obj->id = obj->id;
     new_obj->flags = obj->flags;
     new_obj->type = obj->type;
-    new_obj->obj_listeners = obj->obj_listeners;
 
     new_obj->storage = obj->storage;
     new_obj->uuid = obj->uuid;
@@ -774,11 +717,9 @@ static struct ce_cdb_t0 create_db(uint64_t max_objects) {
 
     struct db_t *db = &_G.dbs[idx];
 
+    init_objects(&db->objects);
 
-    _init_listener_pack(&db->obj_listeners);
-    _init_listener_pack(&db->chnaged_objs);
-
-    ce_mpmc_init(&db->free_objects, 4096, sizeof(object_t *), _G.allocator);
+//    ce_mpmc_init(&db->free_objects, 4096, sizeof(object_t *), _G.allocator);
     ce_mpmc_init(&db->to_free_objects, 4096, sizeof(object_t *), _G.allocator);
 
     // create set with idx == 0
@@ -906,7 +847,7 @@ uint64_t _create_from_uid(ce_cdb_t0 db,
                           uint64_t from,
                           ce_cdb_uuid_t0 uuid,
                           bool load) {
-//    CE_ASSERT(LOG_WHERE, from != uuid);
+
     db_t *db_inst = &_G.dbs[db.idx];
 
     object_t *from_obj = _get_object_from_id(db_inst, from);
@@ -1041,8 +982,7 @@ static void _add_obj_to_destroy_list(db_t *db_inst,
                 .obj_type  = obj->type,
         };
 
-        _push_event(&db_inst->chnaged_objs, &ev);
-
+        _push_db_change_event(db_inst, &ev);
     }
 
     uint64_t idx = atomic_fetch_add(&db_inst->to_free_objects_uid_n, 1);
@@ -1150,6 +1090,7 @@ static void _gc_db() {
         db_inst->used = false;
     }
     ce_array_clean(_G.to_free_db);
+
 }
 
 static void _typed_gc() {
@@ -1175,7 +1116,13 @@ static void _typed_gc() {
     }
 }
 
-static void gc() {
+static void _spaw_change_buffers(db_t *db_inst) {
+    db_inst->change_buffers_active = !db_inst->change_buffers_active;
+    ce_array_clean(db_inst->change_buffers[db_inst->change_buffers_active].db_change);
+    ce_array_clean(db_inst->change_buffers[db_inst->change_buffers_active].objs_change);
+}
+
+static void tick() {
     _gc_db();
 
     const uint32_t db_n = ce_array_size(_G.dbs);
@@ -1230,7 +1177,6 @@ static void gc() {
 
         db_inst->to_free_objects_uid_n = 0;
 
-
         struct object_t *to_free_obj = 0;
         while (ce_mpmc_dequeue(&db_inst->to_free_objects, &to_free_obj)) {
             ce_array_clean(to_free_obj->instances);
@@ -1241,11 +1187,12 @@ static void gc() {
             *to_free_obj = (object_t) {
                     .instances = to_free_obj->instances,
                     .changed = to_free_obj->changed,
-                    .obj_listeners = to_free_obj->obj_listeners,
             };
 
             ce_mpmc_enqueue(&db_inst->free_objects, &to_free_obj);
         }
+
+        _spaw_change_buffers(db_inst);
 
     }
 
@@ -1530,8 +1477,7 @@ static void write_commit(ce_cdb_obj_o0 *_writer) {
 
     uint32_t ch_n = ce_array_size(writer->changed);
     for (int i = 0; i < ch_n; ++i) {
-        _push_event(&db->obj_listeners, &writer->changed[i]);
-        _push_event(&writer->obj_listeners, &writer->changed[i]);
+        _push_objs_event(db, &writer->changed[i]);
     }
 
     ce_array_clean(writer->changed);
@@ -1561,7 +1507,7 @@ static bool write_try_commit(ce_cdb_obj_o0 *_writer) {
         uint32_t ch_n = ce_array_size(writer->changed);
 
         for (int i = 0; i < ch_n; ++i) {
-            _push_event(&db->obj_listeners, &writer->changed[i]);
+            _push_objs_event(db, &writer->changed[i]);
         }
     }
 
@@ -1594,7 +1540,7 @@ static void _set_float(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop = property,
                 .ev_type = CE_CDB_PROP_CHANGE_EVENT,
@@ -1626,7 +1572,7 @@ static void _set_bool(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type = CE_CDB_PROP_CHANGE_EVENT,
@@ -1664,7 +1610,7 @@ static void _set_string(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type =CE_CDB_PROP_CHANGE_EVENT,
@@ -1697,7 +1643,7 @@ static void _set_uint64(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type = CE_CDB_PROP_CHANGE_EVENT,
@@ -1728,7 +1674,7 @@ static void _set_ptr(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type =CE_CDB_PROP_CHANGE_EVENT,
@@ -1761,7 +1707,7 @@ static void _set_ref(ce_cdb_obj_o0 *_writer,
     }
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type = CE_CDB_PROP_CHANGE_EVENT,
@@ -1799,7 +1745,7 @@ void _set_subobject(ce_cdb_obj_o0 *_writer,
     value_ptr->subobj = subobject;
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop = property,
                 .ev_type = CE_CDB_PROP_CHANGE_EVENT,
@@ -1918,7 +1864,7 @@ void _set_blob(ce_cdb_obj_o0 *_writer,
     };
 
     if (log_event) {
-        _add_change(writer, (ce_cdb_prop_ev_t0) {
+        _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                 .obj = writer->orig_obj,
                 .prop=property,
                 .ev_type =CE_CDB_PROP_CHANGE_EVENT,
@@ -1970,7 +1916,7 @@ void _add_obj(ce_cdb_obj_o0 *_writer,
             _add_to_set(db, value_ptr->set, obj);
 
             if (log_event) {
-                _add_change(writer, (ce_cdb_prop_ev_t0) {
+                _push_change_event(writer, (ce_cdb_prop_ev_t0) {
                         .obj = writer->orig_obj,
                         .prop=property,
                         .ev_type =CE_CDB_OBJSET_ADD_EVENT,
@@ -2010,7 +1956,7 @@ void _remove_obj(ce_cdb_obj_o0 *_writer,
 
     _remove_from_set(db, set_idx, obj);
 
-    _add_change(writer, (ce_cdb_prop_ev_t0) {
+    _push_change_event(writer, (ce_cdb_prop_ev_t0) {
             .obj = writer->orig_obj,
             .prop=property,
             .ev_type = CE_CDB_OBJSET_REMOVE_EVENT,
@@ -2501,7 +2447,7 @@ void move_objset_obj(ce_cdb_obj_o0 *from_w,
         subobj->key = prop;
     }
 
-    _add_change(writer, (ce_cdb_prop_ev_t0) {
+    _push_change_event(writer, (ce_cdb_prop_ev_t0) {
             .obj = writer->orig_obj,
             .prop=prop,
             .ev_type = CE_CDB_PROP_MOVE_EVENT,
@@ -2534,8 +2480,9 @@ static void dump_str(ce_cdb_t0 _db,
 
     _push_space(buffer, level);
 
-    char uuid_buffer[64] ={};
-    ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer), (const ce_uuid64_t0 *) &from_obj->uuid);
+    char uuid_buffer[64] = {};
+    ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer),
+                        (const ce_uuid64_t0 *) &from_obj->uuid);
 
     ce_buffer_printf(buffer, _G.allocator, "cdb_uuid: %s\n", uuid_buffer);
 
@@ -2557,7 +2504,8 @@ static void dump_str(ce_cdb_t0 _db,
 
         _push_space(buffer, level);
 
-        ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer), (const ce_uuid64_t0 *) &instance_of_obj->uuid);
+        ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer),
+                            (const ce_uuid64_t0 *) &instance_of_obj->uuid);
 
         ce_buffer_printf(buffer, _G.allocator, "cdb_instance: %s\n", uuid_buffer);
     }
@@ -2666,7 +2614,8 @@ static void dump_str(ce_cdb_t0 _db,
                 uint64_t ref = ce_cdb_a0->read_ref(r, key, 0);
                 ce_cdb_uuid_t0 ref_uid = obj_uid(_db, ref);
 
-                ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer), (const ce_uuid64_t0 *) &ref_uid);
+                ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer),
+                                    (const ce_uuid64_t0 *) &ref_uid);
 
                 ce_buffer_printf(buffer, _G.allocator, " %s\n", uuid_buffer);
             }
@@ -2691,7 +2640,6 @@ void log_obj(const char *where,
     dump_str(db, &buffer, obj, 0);
     ce_log_a0->debug(where, "%s", buffer);
     ce_buffer_free(buffer, ce_memory_a0->system);
-
 }
 
 static uint64_t find_root(ce_cdb_t0 _db,
@@ -2803,42 +2751,6 @@ static void _dispatch_instances(ce_cdb_t0 db,
         write_commit(w);
     }
 }
-
-ct_cdb_ev_queue_o0 *add_changed_obj_listener(ce_cdb_t0 _db) {
-    db_t *db = _get_db(_db);
-    return (ct_cdb_ev_queue_o0 *) _new_changed_obj_events_listener(db);
-}
-
-bool pop_changed_obj(ct_cdb_ev_queue_o0 *q,
-                     ce_cdb_ev_t0 *ev) {
-    ce_mpmc_queue_t0 *qq = (ce_mpmc_queue_t0 *) q;
-    return ce_mpmc_dequeue(qq, ev);
-}
-
-ct_cdb_ev_queue_o0 *new_objs_listener(ce_cdb_t0 _db) {
-    db_t *db = _get_db(_db);
-    return (ct_cdb_ev_queue_o0 *) _new_obj_events_listener(db);
-}
-
-ct_cdb_ev_queue_o0 *new_obj_listener(ce_cdb_t0 _db,
-                                     uint64_t _obj) {
-    db_t *db = _get_db(_db);
-    return (ct_cdb_ev_queue_o0 *) _new_obj_events_listener2(db, _obj);
-}
-
-bool pop_objs_events(ct_cdb_ev_queue_o0 *q,
-                     ce_cdb_prop_ev_t0 *ev) {
-    ce_mpmc_queue_t0 *qq = (ce_mpmc_queue_t0 *) q;
-    return ce_mpmc_dequeue(qq, ev);
-}
-
-
-bool pop_obj_events(ct_cdb_ev_queue_o0 *q,
-                    ce_cdb_prop_ev_t0 *ev) {
-    ce_mpmc_queue_t0 *qq = (ce_mpmc_queue_t0 *) q;
-    return ce_mpmc_dequeue(qq, ev);
-}
-
 
 uint64_t read_instance_of(const ce_cdb_obj_o0 *reader) {
     object_t *obj = _get_object_from_o(reader);
@@ -3030,6 +2942,203 @@ void _init_from_defs(ce_cdb_t0 db,
     }
 }
 
+uint64_t _create_root_obj(const cnode_t *cnodes,
+                          ce_cdb_t0 tmp_db) {
+
+//    _log_cnodes(cnodes);
+
+    struct state_t {
+        uint32_t node_idx;
+        cnode_e type;
+        ce_cdb_obj_o0 *writer;
+    } *states = NULL;
+
+    uint32_t cnodes_n = ce_array_size(cnodes);
+    for (int j = 0; j < cnodes_n; ++j) {
+        cnode_t node = cnodes[j];
+
+        uint32_t state_top = ce_array_size(states) - 1;
+
+        switch (node.type) {
+            default:
+            case CNODE_INVALID: {
+            }
+                break;
+            case CNODE_FLOAT: {
+                struct state_t *state = &states[state_top];
+                ce_cdb_a0->set_float(state->writer, node.key, node.value.f);
+            }
+                break;
+            case CNODE_UINT: {
+                struct state_t *state = &states[state_top];
+                ce_cdb_a0->set_uint64(state->writer, node.key, node.value.uint64);
+            }
+                break;
+            case CNODE_REF: {
+                struct state_t *state = &states[state_top];
+                uint64_t obj_ref = ce_cdb_a0->obj_from_uid(tmp_db, node.uuid);
+
+                ce_cdb_a0->set_ref(state->writer, node.key, obj_ref);
+            }
+                break;
+            case CNODE_STRING: {
+                struct state_t *state = &states[state_top];
+                ce_cdb_a0->set_str(state->writer, node.key, node.value.str);
+            }
+                break;
+            case CNODE_BOOL: {
+                struct state_t *state = &states[state_top];
+                ce_cdb_a0->set_bool(state->writer, node.key, node.value.b);
+            }
+                break;
+            case CNODE_OBJ_BEGIN: {
+                uint64_t obj;
+                ce_cdb_uuid_t0 uuid = node.obj.uuid;
+                if (!uuid.id) {
+                    uuid = ce_cdb_a0->gen_uid(tmp_db);
+                }
+
+                if (node.obj.instance_of.id) {
+                    CE_ASSERT(LOG_WHERE, node.obj.instance_of.id != uuid.id);
+
+                    uint64_t from_obj = ce_cdb_a0->obj_from_uid(tmp_db, node.obj.instance_of);
+                    obj = ce_cdb_a0->create_from_uid(tmp_db, from_obj, uuid);
+                } else {
+                    obj = ce_cdb_a0->create_object_uid(tmp_db, uuid, node.obj.type, true);
+                }
+
+                struct state_t *state = &states[state_top];
+                if (state->type == CNODE_OBJSET) {
+                    struct state_t *parent_state = &states[state_top - 1];
+                    ce_cdb_a0->objset_add_obj(parent_state->writer,
+                                              cnodes[state->node_idx].key, obj);
+                } else if (node.key) {
+                    ce_cdb_a0->set_subobject(state->writer, node.key, obj);
+                }
+
+                struct state_t new_state = {
+                        .type = CNODE_OBJ_BEGIN,
+                        .writer = ce_cdb_a0->write_begin(tmp_db, obj),
+                        .node_idx = j,
+                };
+                ce_array_push(states, new_state, _G.allocator);
+            }
+                break;
+            case CNODE_OBJ_END: {
+                struct state_t *state = &states[state_top];
+
+                ce_cdb_a0->write_commit(state->writer);
+                ce_array_pop_back(states);
+            }
+                break;
+            case CNODE_OBJSET: {
+                struct state_t state = {
+                        .type = CNODE_OBJSET,
+                        .node_idx = j,
+                };
+
+                ce_array_push(states, state, _G.allocator);
+            }
+                break;
+            case CNODE_OBJSET_END: {
+                ce_array_pop_back(states);
+            }
+                break;
+        }
+    }
+
+    return ce_cdb_a0->obj_from_uid(tmp_db, cnodes[0].obj.uuid);
+}
+
+void _dump_cnodes(const cnode_t *cnodes,
+                  char **outputs) {
+
+    char *str_buffer = NULL;
+    char *blob_buffer = NULL;
+    cnode_t *nodes = NULL;
+
+    uint64_t n = ce_array_size(cnodes);
+    for (int i = 0; i < n; ++i) {
+        cnode_t node = cnodes[i];
+
+        switch (node.type) {
+            default:
+            case CNODE_INVALID: {
+            }
+                break;
+
+            case CNODE_FLOAT:
+            case CNODE_UINT:
+            case CNODE_REF:
+            case CNODE_BOOL:
+            case CNODE_OBJSET:
+            case CNODE_OBJSET_END:
+            case CNODE_OBJ_BEGIN:
+            case CNODE_OBJ_END: {
+                ce_array_push(nodes, node, _G.allocator);
+            }
+                break;
+
+            case CNODE_STRING: {
+                uint64_t stroffset = ce_array_size(str_buffer);
+
+                if (node.value.str) {
+                    ce_array_push_n(str_buffer,
+                                    node.value.str, strlen(node.value.str) + 1, _G.allocator);
+                }
+
+                node.value.uint64 = stroffset;
+                ce_array_push(nodes, node, _G.allocator);
+
+            }
+                break;
+            case CNODE_BLOB: {
+                uint64_t bloboffset = ce_array_size(blob_buffer);
+
+                if (node.blob.data) {
+                    ce_array_push_n(blob_buffer, node.blob.data, node.blob.size, _G.allocator);
+                }
+
+                node.value.uint64 = bloboffset;
+
+                ce_array_push(nodes, node, _G.allocator);
+
+            }
+                break;
+        }
+    }
+
+    cdb_binobj_header header = {
+            .version = 0,
+            .blob_buffer_size = ce_array_size(blob_buffer),
+            .string_buffer_size = ce_array_size(str_buffer),
+            .node_count = ce_array_size(nodes),
+    };
+
+    ce_array_push_n(*outputs, (char *) &header, sizeof(cdb_binobj_header), _G.allocator);
+    ce_array_push_n(*outputs, (char *) nodes, sizeof(cnode_t) * header.node_count, _G.allocator);
+    ce_array_push_n(*outputs, (char *) str_buffer, header.string_buffer_size, _G.allocator);
+    ce_array_push_n(*outputs, (char *) blob_buffer, header.blob_buffer_size, _G.allocator);
+}
+
+
+const ce_cdb_ev_t0 *_changes(ce_cdb_t0 _db,
+                             uint32_t *n) {
+    db_t *db = _get_db(_db);
+
+    change_buffer_t *buffer = &db->change_buffers[!db->change_buffers_active];
+    *n = ce_array_size(buffer->db_change);
+    return buffer->db_change;
+}
+
+const ce_cdb_prop_ev_t0 *_objs_changes(ce_cdb_t0 _db,
+                                       uint32_t *n) {
+    db_t *db = _get_db(_db);
+
+    change_buffer_t *buffer = &db->change_buffers[!db->change_buffers_active];
+    *n = ce_array_size(buffer->objs_change);
+    return buffer->objs_change;
+}
 
 static struct ce_cdb_a0 cdb_api = {
         .create_db = create_db,
@@ -3041,7 +3150,6 @@ static struct ce_cdb_a0 cdb_api = {
         .set_loader = set_loader,
         .db  = global_db,
         .obj_type = type,
-        .set_type = set_type,
         .move_obj = move,
         .move_objset_obj = move_objset_obj,
 
@@ -3051,9 +3159,8 @@ static struct ce_cdb_a0 cdb_api = {
         .create_from_uid = create_from_uid,
         .destroy_object = destroy_object,
 
-        .gc = gc,
+        .tick = tick,
 
-        .dump_str = dump_str,
         .log_obj = log_obj,
         .dump = dump,
         .load = load,
@@ -3071,12 +3178,7 @@ static struct ce_cdb_a0 cdb_api = {
         .read = reader,
         .read_to = read_to,
         .read_instance_of = read_instance_of,
-        .new_changed_obj_listener = add_changed_obj_listener,
-        .pop_changed_obj = pop_changed_obj,
-        .new_objs_listener = new_objs_listener,
-        .pop_objs_events = pop_objs_events,
-        .new_obj_listener = new_obj_listener,
-        .pop_obj_events = pop_obj_events,
+
         .read_float = read_float,
         .read_bool = read_bool,
         .read_str = read_string,
@@ -3106,6 +3208,10 @@ static struct ce_cdb_a0 cdb_api = {
 
         .obj_from_uid = objectid_from_uid,
         .obj_uid = obj_uid,
+        .create_root_obj = _create_root_obj,
+        .dump_cnodes = _dump_cnodes,
+        .changes = _changes,
+        .objs_changes = _objs_changes,
 };
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;

@@ -107,7 +107,7 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_rg_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_game_system_a0);
-    CE_INIT_API(api, ce_ydb_a0);
+    CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_editor_ui_a0);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_config_a0);

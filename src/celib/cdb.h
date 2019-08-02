@@ -56,7 +56,6 @@ typedef enum ce_cdb_prop_flag_e0 {
     CE_CDB_PROP_FLAG_UNPACK = 1 << 0,
 } ce_cdb_flag_e0;
 
-typedef struct ct_cdb_ev_queue_o0 ct_cdb_ev_queue_o0;
 typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
 
 typedef struct ce_cdb_t0 {
@@ -129,7 +128,6 @@ typedef struct cnode_t {
     cnode_e type;
 
     uint64_t key;
-//    uint32_t parent_idx;
     union {
         struct {
             ce_cdb_uuid_t0 uuid;
@@ -203,10 +201,6 @@ struct ce_cdb_a0 {
     uint64_t (*obj_type)(ce_cdb_t0 db,
                          uint64_t obj);
 
-    void (*set_type)(ce_cdb_t0 db,
-                     uint64_t obj,
-                     uint64_t type);
-
     //
     void (*move_obj)(ce_cdb_t0 db,
                      uint64_t from_obj,
@@ -219,14 +213,16 @@ struct ce_cdb_a0 {
 
     //
 
-    void (*gc)();
+    const ce_cdb_ev_t0 *(*changes)(ce_cdb_t0 db,
+                                   uint32_t *n);
 
+    const ce_cdb_prop_ev_t0 *(*objs_changes)(ce_cdb_t0 db,
+                                             uint32_t *n);
     //
 
-    void (*dump_str)(ce_cdb_t0 db,
-                     char **buffer,
-                     uint64_t obj,
-                     uint32_t level);
+    void (*tick)();
+
+    //
 
     void (*log_obj)(const char *where,
                     ce_cdb_t0 db,
@@ -318,23 +314,6 @@ struct ce_cdb_a0 {
                               uint64_t property,
                               uint64_t obj);
 
-    ct_cdb_ev_queue_o0 *(*new_changed_obj_listener)(ce_cdb_t0 db);
-
-    bool (*pop_changed_obj)(ct_cdb_ev_queue_o0 *q,
-                            ce_cdb_ev_t0 *ev);
-
-    ct_cdb_ev_queue_o0 *(*new_objs_listener)(ce_cdb_t0 db);
-
-    bool (*pop_objs_events)(ct_cdb_ev_queue_o0 *q,
-                            ce_cdb_prop_ev_t0 *ev);
-
-    ct_cdb_ev_queue_o0 *(*new_obj_listener)(ce_cdb_t0 db,
-                                            uint64_t obj);
-
-    bool (*pop_obj_events)(ct_cdb_ev_queue_o0 *q,
-                           ce_cdb_prop_ev_t0 *ev);
-
-
     // READ
     const ce_cdb_obj_o0 *(*read)(ce_cdb_t0 db,
                                  uint64_t object);
@@ -345,7 +324,6 @@ struct ce_cdb_a0 {
                         size_t max_size);
 
     uint64_t (*read_instance_of)(const ce_cdb_obj_o0 *reader);
-
 
     float (*read_float)(const ce_cdb_obj_o0 *reader,
                         uint64_t property,
@@ -392,6 +370,14 @@ struct ce_cdb_a0 {
 
     ce_cdb_uuid_t0 (*obj_uid)(ce_cdb_t0 db,
                               uint64_t obj);
+
+    uint64_t (*create_root_obj)(const cnode_t *cnodes,
+                                ce_cdb_t0 tmp_db);
+
+    void (*dump_cnodes)(const cnode_t *cnodes,
+                        char **outputs);
+
+
 };
 
 CE_MODULE(ce_cdb_a0);

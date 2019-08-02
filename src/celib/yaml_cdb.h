@@ -10,7 +10,7 @@ extern "C" {
 #include <stdbool.h>
 
 #define CE_YDB_API \
-    CE_ID64_0("ce_ydb_a0", 0xf5be4873d4ac8920ULL)
+    CE_ID64_0("ce_yaml_cdb_a0", 0xe00524e73f978a88ULL)
 
 typedef struct ce_vio_t0 ce_vio_t0;
 typedef struct ce_alloc_t0 ce_alloc_t0;
@@ -18,26 +18,20 @@ typedef struct ce_cdb_t0 ce_cdb_t0;
 typedef struct cnode_t cnode_t;
 typedef struct ce_cdb_uuid_t0 ce_cdb_uuid_t0;
 
-struct ce_ydb_a0 {
+struct ce_yaml_cdb_a0 {
     uint64_t (*get_obj)(const char *path);
 
-    void (*read_cnodes)(const char *path,
-                        cnode_t **cnodes);
-
-
-    uint64_t (*create_root_obj)(cnode_t *cnodes,
-                                ce_cdb_t0 tmp_db);
-
-    void (*dump_cnodes)(ce_cdb_t0 db,
-                        cnode_t *cnodes,
-                        char **outputs);
+    void (*dump_str)(ce_cdb_t0 db,
+                     char **buffer,
+                     uint64_t obj,
+                     uint32_t level);
 
     ce_cdb_uuid_t0 (*cnodes_from_vio)(ce_vio_t0 *vio,
                                       cnode_t **nodes,
                                       ce_alloc_t0 *alloc);
 };
 
-CE_MODULE(ce_ydb_a0);
+CE_MODULE(ce_yaml_cdb_a0);
 
 #ifdef __cplusplus
 };
