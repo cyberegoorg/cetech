@@ -52,8 +52,8 @@ struct ce_os_path_a0 {
     // - path Path
     // - out Out basename
     // - size
-    void (*basename)(const char *path,
-                     char *out);
+    void (*basename)(char *out,
+                     const char *path);
 
     void (*dir)(char *out,
                 const char *path);

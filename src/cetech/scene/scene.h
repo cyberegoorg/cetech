@@ -10,6 +10,9 @@ extern "C" {
 #define CT_SCENE_API \
     CE_ID64_0("ct_scene_a0", 0x2ee97ac6b2e2386eULL)
 
+#define CT_SCENE_IMPORT_GROUP \
+    CE_ID64_0("ct_scene_import_group", 0x982b598a4659806dULL)
+
 #define SCENE_TYPE \
     CE_ID64_0("scene", 0x9d0a795bfe818d19ULL)
 

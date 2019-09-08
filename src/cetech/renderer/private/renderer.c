@@ -25,7 +25,6 @@
 #include <cetech/camera/camera.h>
 
 #include "bgfx/c99/bgfx.h"
-#include "bgfx/c99/platform.h"
 
 #include <cetech/debugui/debugui.h>
 #include "cetech/render_graph/render_graph.h"

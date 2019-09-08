@@ -15,8 +15,7 @@ extern "C" {
     CE_ID64_0("ct_gfx_a0", 0x945b4a9e424eaecULL)
 
 struct ct_gfx_a0 {
-    void (*bgfx_vertex_decl_begin)(bgfx_vertex_decl_t *_decl,
-                                   bgfx_renderer_type_t _renderer);
+    void (*bgfx_vertex_decl_begin)(bgfx_vertex_decl_t* _this, bgfx_renderer_type_t _rendererType);
 
     void (*bgfx_vertex_decl_add)(bgfx_vertex_decl_t *_decl,
                                  bgfx_attrib_t _attrib,

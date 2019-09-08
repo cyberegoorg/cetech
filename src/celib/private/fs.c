@@ -123,7 +123,7 @@ static bool exist_dir(const char *full_path) {
     return ce_os_path_a0->is_dir(path_buffer);
 }
 
-static bool exist(const char *full_path) {
+static bool _exist(const char *full_path) {
     ce_vio_t0 *f = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
     if (f != NULL) {
         ce_os_vio_a0->close(f);
@@ -148,7 +148,7 @@ static char *get_full_path(uint64_t root,
         ce_os_path_a0->join(&fullpath, allocator, 2, mp->root_path,
                             filename);
 
-        if (((!test_dir) && exist(fullpath)) ||
+        if (((!test_dir) && _exist(fullpath)) ||
             (test_dir && exist_dir(fullpath))) {
             return fullpath;
         }
@@ -177,6 +177,19 @@ static struct ce_vio_t0 *open(uint64_t root,
     return file;
 }
 
+static bool exist(uint64_t root,
+                  const char *path) {
+    char *full_path = get_full_path(root, _G.allocator, path, false);
+    ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
+
+    if (file) {
+        file->vt->close(file->inst);
+        return true;
+    }
+
+    return false;
+}
+
 static void close(ce_vio_t0 *file) {
     ce_os_vio_a0->close(file);
 }
@@ -188,7 +201,7 @@ static int create_directory(uint64_t root,
     char *full_path = get_full_path(root, _G.allocator, path, true);
 
     int ret = ce_os_path_a0->make_path(full_path);
-    CE_FREE(_G.allocator, full_path);
+//    CE_FREE(_G.allocator, full_path);
 
     return ret;
 }
@@ -382,6 +395,7 @@ static struct ce_fs_a0 _api = {
         .create_directory = create_directory,
         .file_mtime = get_file_mtime,
         .get_full_path = _get_full_path,
+        .exist = exist,
 };
 
 

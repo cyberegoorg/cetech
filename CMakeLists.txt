@@ -81,7 +81,7 @@ set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
         src/cetech/resource/private/resource.c
-        src/cetech/resource/private/resource_compiler.c
+        src/cetech/asset_io/private/asset_io.c
         src/cetech/kernel/private/kernel.c
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
         src/cetech/debugui/private/ocornut-imgui/imgui.cpp
@@ -116,8 +116,8 @@ set(SOURCE_FILES
         src/cetech/resource_editor/private/resource_editor.c
         src/cetech/entity/private/entity_property.c
         src/cetech/explorer/private/explorer.c
-        src/cetech/resource_preview/private/resource_preview.c
-        src/cetech/resource_browser/private/resource_browser.cpp
+        src/cetech/asset_preview/private/asset_preview.c
+        src/cetech/asset_browser/private/asset_browser.cpp
         src/cetech/editor/private/editor.c
         src/cetech/property_editor/private/property_editor.c
         src/cetech/log_view/private/log_view.cpp

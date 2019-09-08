@@ -20,7 +20,9 @@
 
 #include <cetech/kernel/kernel.h>
 #include <cetech/resource/resourcedb.h>
-#include <cetech/resource/resource_compiler.h>
+#include <cetech/asset_io/asset_io.h>
+#include <celib/uuid64.h>
+#include <celib/yaml_cdb.h>
 
 
 #include "../resource.h"
@@ -57,7 +59,7 @@ struct _G {
 
 static void _resource_api_add(uint64_t name,
                               void *api) {
-    if(name == CT_RESOURCE_I) {
+    if (name == CT_RESOURCE_I) {
         ct_resource_i0 *ct_resource_i = api;
         CE_ASSERT(LOG_WHERE, ct_resource_i->name);
 
@@ -139,53 +141,8 @@ static uint64_t cdb_loader(ce_cdb_t0 db,
     return obj;
 }
 
-static bool dump_recursive(const char *filename,
-                           uint64_t obj) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    const uint64_t k_n = ce_cdb_a0->prop_count(r);
-    const uint64_t *ks = ce_cdb_a0->prop_keys(r);
-
-    char *output = NULL;
-    ce_cdb_a0->dump(ce_cdb_a0->db(),
-                    obj, &output, _G.allocator);
-
-    ct_resource_id_t0 rid = {.uid=obj};
-    ct_resourcedb_a0->put_resource_blob(rid,
-                                        output,
-                                        ce_array_size(output));
-    ce_buffer_free(output, _G.allocator);
-
-    for (int i = 0; i < k_n; ++i) {
-        uint64_t k = ks[i];
-        if (ce_cdb_a0->prop_type(r, k) != CE_CDB_TYPE_SUBOBJECT) {
-            continue;
-        }
-        uint64_t subobj = ce_cdb_a0->read_subobject(r, k, 0);
-        dump_recursive(filename, subobj);
-    }
-
-    return true;
-}
-
-static bool save_to_db(uint64_t uid) {
-    uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
-
-    ct_resource_id_t0 r = {.uid=root};
-    char filename[256] = {};
-    bool exist = ct_resourcedb_a0->get_resource_filename(r,
-                                                         filename,
-                                                         CE_ARRAY_LEN(filename));
-
-    if (exist) {
-        dump_recursive(filename, root);
-        return true;
-    }
-
-    return false;
-}
-
-static bool save(uint64_t uid) {
-    uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uid);
+static bool save(uint64_t uuid) {
+    uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uuid);
 
     ce_cdb_uuid_t0 r = {.id=root};
     char filename[256] = {};
@@ -211,8 +168,7 @@ static bool save(uint64_t uid) {
 static struct ct_resource_a0 resource_api = {
         .get_interface = get_resource_interface,
         .cdb_loader = cdb_loader,
-        .save = save,
-        .save_to_db = save_to_db,
+        .save = save
 };
 
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;

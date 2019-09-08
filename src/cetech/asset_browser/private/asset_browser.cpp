@@ -15,7 +15,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/resource_browser/resource_browser.h>
+#include <cetech/asset_browser/asset_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
 #include <cetech/resource/resource.h>
 #include <cetech/editor/editor.h>
@@ -23,9 +23,9 @@
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/resource/resourcedb.h>
-#include <cetech/resource/resource_compiler.h>
+#include <cetech/asset_io/asset_io.h>
 #include <cetech/editor/selcted_object.h>
 
 #include <cetech/editor/editor_ui.h>
@@ -211,18 +211,8 @@ static void _create_from_modal(const char *modal_id) {
                 ce_cdb_uuid_t0 rid = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), new_res);
 
                 ct_resourcedb_a0->put_file(filename, 0);
-
-                ct_resourcedb_a0->put_resource(rid, modal_buffer_type,
-                                               filename, true);
-
-                char *output = NULL;
-                ce_cdb_a0->dump(ce_cdb_a0->db(), new_res, &output, _G.allocator);
-                ct_resourcedb_a0->put_resource_blob((ct_resource_id_t0) {.uid=new_res},
-                                                    output,
-                                                    ce_array_size(output));
-
-                ce_buffer_free(output, _G.allocator);
-
+                ct_resourcedb_a0->put_resource(rid, modal_buffer_type, filename);
+                ct_resourcedb_a0->put_obj(ce_cdb_a0->db(), new_res, _G.allocator);
                 ct_resource_a0->save(new_res);
 
                 _G.need_reaload = true;
@@ -569,7 +559,7 @@ static void on_draw_menu(uint64_t content,
 }
 
 static struct ct_dock_i0 dock_api = {
-        .type = RESOURCE_BROWSER,
+        .type = ASSET_BROWSER,
         .ui_flags = dock_flags,
         .display_title = dock_title,
         .name = name,
@@ -614,7 +604,7 @@ void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
     };
 
     set_current_dir("");
-    ct_dock_a0->create_dock(RESOURCE_BROWSER, true);
+    ct_dock_a0->create_dock(ASSET_BROWSER, true);
 
     _G.visible = true;
 }

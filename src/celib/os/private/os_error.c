@@ -79,7 +79,6 @@ void stacktrace_free(char *st) {
     CE_FREE(a, st);
 }
 
-
 void ct_error_assert(const char *where,
                      const char *condition,
                      const char *filename,

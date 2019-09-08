@@ -78,7 +78,7 @@ static void _get_module_name(const char *path,
     const char *filename = ce_os_path_a0->filename(path);
 
     char tmp[128];
-    ce_os_path_a0->basename(filename, tmp);
+    ce_os_path_a0->basename(tmp, filename);
 
     const char *name = strchr(tmp, '_');
     if (NULL == name) {

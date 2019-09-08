@@ -237,7 +237,7 @@ static void update(uint64_t context_obj,
 }
 
 uint64_t cdb_type() {
-    return ENTITY_RESOURCE_ID;
+    return ENTITY_TYPE;
 }
 
 const char *display_icon() {

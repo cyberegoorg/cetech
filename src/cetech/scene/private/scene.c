@@ -17,7 +17,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/static_mesh.h>
 #include <cetech/editor/editor_ui.h>
@@ -211,10 +211,6 @@ static void *get_interface(uint64_t name_hash) {
     return NULL;
 }
 
-
-bool scene_compiler(ce_cdb_t0 db,
-                    uint64_t obj);
-
 static const char *name() {
     return "scene";
 }
@@ -226,7 +222,7 @@ static struct ct_resource_i0 ct_resource_api = {
         .display_icon = display_icon,
         .online = online,
         .offline = offline,
-        .compilator = scene_compiler,
+//        .compilator = scene_compiler,
         .get_interface = get_interface,
 };
 

@@ -32,8 +32,8 @@ static void _spawn_to(uint64_t from,
     uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), from);
     uint64_t selecled_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), to);
 
-    if ((ENTITY_RESOURCE_ID == asset_type) &&
-        (ENTITY_RESOURCE_ID == selecled_type)) {
+    if ((ENTITY_TYPE == asset_type) &&
+        (ENTITY_TYPE == selecled_type)) {
 
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), to);
         for (int i = 0; i < n; ++i) {
@@ -47,7 +47,7 @@ static void _spawn_to(uint64_t from,
 static void _add(uint64_t selected_obj) {
 //    for (int i = 0; i < 10; ++i) {
     uint64_t entity_obj;
-    entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_RESOURCE_ID);
+    entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_TYPE);
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), selected_obj);
     ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, entity_obj);
     ce_cdb_a0->write_commit(w);
@@ -57,15 +57,15 @@ static void _add(uint64_t selected_obj) {
 
 
 void item_btns(uint64_t context,
-               uint64_t uuid) {
+               uint64_t obj) {
     char label[128] = {0};
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
-            "##add_%llu", uuid);
+            "##add_%llu", obj);
 
     bool add = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     if (add) {
-        _add(uuid);
+        _add(obj);
     }
 
     ct_debugui_a0->SameLine(0, 4);
@@ -73,20 +73,20 @@ void item_btns(uint64_t context,
              ICON_FA_PLUS
                      " "
                      ICON_FA_FOLDER_OPEN
-                     "##add_from%llu", uuid);
+                     "##add_from%llu", obj);
 
 
     bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     char modal_id[128] = {'\0'};
-    sprintf(modal_id, "select...##select_resource_%llu", uuid);
+    sprintf(modal_id, "select...##select_resource_%llu", obj);
 
     uint64_t new_value = 0;
 
     static uint32_t count = 1;
     bool changed = ct_editor_ui_a0->resource_select_modal(modal_id,
-                                                          uid,
-                                                          ENTITY_RESOURCE_ID,
+                                                          obj,
+                                                          ENTITY_TYPE,
                                                           &new_value,
                                                           &count);
     if (add_from) {
@@ -94,17 +94,17 @@ void item_btns(uint64_t context,
     }
 
     if (changed && new_value) {
-        _spawn_to(new_value, uuid, count);
+        _spawn_to(new_value, obj, count);
     }
 
-    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), uuid);
+    uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
 
     if (parent) {
         ct_debugui_a0->SameLine(0, 4);
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
-                "##minus_%llu", uuid);
+                "##minus_%llu", obj);
         if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), uuid);
+            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
             ct_selected_object_a0->set_selected_object(context, parent);
         }
     }
@@ -279,13 +279,13 @@ static void draw_menu(uint64_t selected_obj,
 
     uint64_t type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), selected_obj);
 
-    if (type == ENTITY_RESOURCE_ID) {
+    if (type == ENTITY_TYPE) {
         item_btns(context, selected_obj);
     }
 }
 
 static uint64_t cdb_type() {
-    return ENTITY_RESOURCE_ID;
+    return ENTITY_TYPE;
 }
 
 static uint64_t draw_ui(uint64_t top_level_obj,

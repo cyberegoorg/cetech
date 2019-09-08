@@ -404,6 +404,10 @@ static void transform_system(ct_world_t0 world,
         ct_local_to_parent_c *local = ct_ecs_c_a0->get_one(world, LOCAL_TO_PARENT_COMPONENT, ent,
                                                            false);
 
+        if(!local) {
+            continue;
+        }
+
         ce_mat4_mul(ltw->world.m, local->local.m, ltp->world.m);
     }
     ce_bag_free(&graph, _G.alloc);
@@ -430,12 +434,6 @@ static const ce_cdb_prop_def_t0 vec3_prop[] = {
         {.name = "y", .type = CE_CDB_TYPE_FLOAT},
         {.name = "z", .type = CE_CDB_TYPE_FLOAT},
 };
-
-//static const ce_cdb_prop_def_t0 scale_prop[] = {
-//        {.name = "x", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
-//        {.name = "y", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
-//        {.name = "z", .type = CE_CDB_TYPE_FLOAT, .value.f = 1.0f},
-//};
 
 static const ce_cdb_prop_def_t0 vec2_prop[] = {
         {.name = "x", .type = CE_CDB_TYPE_FLOAT},

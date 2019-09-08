@@ -36,9 +36,7 @@
 #define LOG_WHERE "cdb"
 
 #define MAX_OBJECTS 1000000000ULL
-#define MAX_OBJECTS_PER_TYPE 1000000ULL
-#define MAX_EVENTS_LISTENER 1024
-#define MAX_QUEUE_SIZE 1024 * 64
+#define MAX_OBJECTS_PER_TYPE MAX_OBJECTS
 
 #define UID_HASHMAP
 
@@ -114,6 +112,15 @@ typedef struct object_t {
     type_storage_t *storage;
 } object_t;
 
+typedef union object_item_t {
+    object_t obj;
+    uint32_t next;
+} object_item_t;
+
+typedef struct object_data_t {
+    object_item_t *objects;
+    atomic_ullong object_used;
+} object_data_t;
 
 typedef struct set_t {
     ce_hash_t set;
@@ -141,11 +148,8 @@ typedef struct db_t {
     atomic_ullong to_free_objects_uid_n;
 
     // objects
-    object_t *object_pool;
-    ce_mpmc_queue_t0 free_objects;
+    object_data_t objects;
     ce_mpmc_queue_t0 to_free_objects;
-
-    atomic_ullong object_pool_n;
 
     // objects id
     object_t **object_id_pool;
@@ -177,6 +181,7 @@ typedef struct db_t {
 
 typedef struct type_defs_t {
     ce_hash_t def_map;
+    uint64_t *type;
     ce_cdb_type_def_t0 *defs;
 } type_defs_t;
 
@@ -451,7 +456,6 @@ type_storage_t *_get_or_create_storage(db_t *db,
 
         uint32_t type_size = _type_obj_size(defs);
 
-
         *storage = (type_storage_t) {
                 .type =  type,
                 .pool = virt_alloc(type_size * MAX_OBJECTS_PER_TYPE),
@@ -538,7 +542,7 @@ uint64_t _clone_typed_object(type_storage_t *storage,
 ce_cdb_value_u0 *_get_prop_value_ptr(type_storage_t *storage,
                                      uint64_t obj_idx,
                                      uint64_t prop) {
-    if(!storage) {
+    if (!storage) {
         return NULL;
     }
 
@@ -577,6 +581,7 @@ void reg_obj_type(uint64_t type,
         ce_array_push(_G.type_defs.defs, (ce_cdb_type_def_t0) {}, _G.allocator);
 
         ce_hash_add(&_G.type_defs.def_map, type, idx, _G.allocator);
+        ce_array_push(_G.type_defs.type, type, _G.allocator);
     }
 
     ce_cdb_type_def_t0 *def = &_G.type_defs.defs[idx];
@@ -613,20 +618,20 @@ static void _add_changed_obj(db_t *db_inst,
                              object_t *obj) {
     uint64_t k = ce_hash_murmur2_64(&obj->orig_obj, sizeof(uint64_t), 0);
 
+    ce_os_thread_a0->spin_lock(&db_inst->change_lock);
     if (!ce_hash_contain(&db_inst->changed_obj_set, k)) {
-        ce_os_thread_a0->spin_lock(&db_inst->change_lock);
+
         ce_array_push(db_inst->changed_obj, obj->orig_obj, _G.allocator);
         ce_hash_add(&db_inst->changed_obj_set, k, 0, _G.allocator);
-        ce_os_thread_a0->spin_unlock(&db_inst->change_lock);
-
         ce_cdb_ev_t0 ev = {
                 .ev_type = CE_CDB_OBJ_CHANGE_EVENT,
                 .obj =  obj->orig_obj,
                 .obj_type  = obj->type,
         };
 
-        _push_event(&db_inst->chnaged_objs, &ev);
-    };
+        _push_db_change_event(db_inst, &ev);
+    }
+    ce_os_thread_a0->spin_unlock(&db_inst->change_lock);
 }
 
 static void _push_change_event(object_t *obj,
@@ -634,20 +639,40 @@ static void _push_change_event(object_t *obj,
     ce_array_push(obj->changed, ev, _G.allocator);
 }
 
+void init_objects(object_data_t *data) {
+    data->objects[0] = (object_item_t) {};
+}
+
+uint32_t allocate_object(object_data_t *data) {
+    const uint32_t slot = data->objects[0].next;
+    data->objects[0].next = data->objects[slot].next;
+
+    if (slot) {
+        return slot;
+    }
+
+    uint64_t idx = atomic_fetch_add(&data->object_used, 1) + 1;
+
+//    memset(&data->objects[idx].obj, 0, sizeof(object_t));
+    data->objects[idx].obj.idx = idx;
+
+    return idx;
+}
+
+void delete_object(object_data_t *data,
+                   uint32_t i) {
+    data->objects[i].next = data->objects[0].next;
+    data->objects[0].next = i;
+}
+
+
 struct object_t *_new_object(db_t *db,
                              const struct ce_alloc_t0 *a) {
 
-    object_t *obj;
+    uint32_t idx = allocate_object(&db->objects);
+    object_t *obj = &db->objects.objects[idx].obj;
 
-    if (!ce_mpmc_dequeue(&db->free_objects, &obj)) {
-        uint64_t idx = atomic_fetch_add(&db->object_pool_n, 1);
-
-        obj = &db->object_pool[idx];
-        *obj = (object_t) {};
-
-        _init_listener_pack(&obj->obj_listeners);
-    }
-
+    obj->idx = idx;
     obj->db.idx = db->idx;
     obj->key = 0;
     return obj;
@@ -677,6 +702,7 @@ static void _destroy_object(db_t *db_inst,
 }
 
 static struct ce_cdb_t0 create_db(uint64_t max_objects) {
+
     uint64_t n = ce_array_size(_G.dbs);
 
     uint32_t idx = UINT32_MAX;
@@ -701,7 +727,7 @@ static struct ce_cdb_t0 create_db(uint64_t max_objects) {
                     max_objects * sizeof(ce_cdb_uuid_t0)),
 
             //
-            .object_pool = (object_t *) virt_alloc(max_objects * sizeof(object_t)),
+            .objects.objects = (object_item_t *) virt_alloc(max_objects * sizeof(object_t)),
 
             //
             .object_id_pool = (object_t **) virt_alloc(max_objects * sizeof(object_t **)),
@@ -727,6 +753,11 @@ static struct ce_cdb_t0 create_db(uint64_t max_objects) {
 
     // create blob with idx == 0
     _new_blob(&_G.dbs[idx]);
+
+    uint64_t types_n = ce_array_size(_G.type_defs.type);
+    for (int j = 0; j < types_n; ++j) {
+        _get_or_create_storage(db, _G.type_defs.type[j]);
+    }
 
     return (ce_cdb_t0) {.idx = idx};
 };
@@ -794,9 +825,8 @@ static uint64_t create_object(ce_cdb_t0 db,
         return 0;
     }
 
-    uint64_t uid = _gen_uid();
-    create_object_uid(db, uid, type, true);
-    return uid;
+    ce_cdb_uuid_t0 uuid = _gen_uid();
+    return create_object_uid(db, uuid, type, true);
 }
 
 static ce_cdb_obj_o0 *write_begin(ce_cdb_t0 db,
@@ -1000,7 +1030,7 @@ static void destroy_object(ce_cdb_t0 db,
                            uint64_t _obj) {
     db_t *db_inst = _get_db(db);
 
-    ce_log_a0->debug(LOG_WHERE, "Destroy obj %llx", _obj);
+//    ce_log_a0->debug(LOG_WHERE, "Destroy obj %llx", _obj);
 
     object_t *obj = _get_object_from_id(db_inst, _obj);
 
@@ -1069,22 +1099,20 @@ static void _gc_db() {
         struct db_t *db_inst = &_G.dbs[idx];
 
         uint32_t blob_n = ce_array_size(db_inst->blobs);
-        for (int j = 0; j < blob_n; ++j) {
+        for (int j = 1; j < blob_n; ++j) {
             CE_FREE(_G.allocator, db_inst->blobs[j].data);
         }
         ce_array_free(db_inst->blobs, _G.allocator);
 
         uint32_t sets_n = ce_array_size(db_inst->sets);
-        for (int j = 0; j < sets_n; ++j) {
+        for (int j = 1; j < sets_n; ++j) {
             ce_array_free(db_inst->sets[i].objs, _G.allocator);
             ce_hash_free(&db_inst->sets[i].set, _G.allocator);
         }
         ce_array_free(db_inst->sets, _G.allocator);
 
         virt_free(db_inst->to_free_objects_uid, db_inst->max_objects * sizeof(object_t **));
-        virt_free(db_inst->object_pool, db_inst->max_objects * sizeof(object_t));
 
-        ce_mpmc_free(&db_inst->free_objects);
         ce_mpmc_free(&db_inst->to_free_objects);
 
         db_inst->used = false;
@@ -1185,11 +1213,10 @@ static void tick() {
             delete_object(&db_inst->objects, to_free_obj->idx);
 
             *to_free_obj = (object_t) {
+                    .idx = to_free_obj->idx,
                     .instances = to_free_obj->instances,
                     .changed = to_free_obj->changed,
             };
-
-            ce_mpmc_enqueue(&db_inst->free_objects, &to_free_obj);
         }
 
         _spaw_change_buffers(db_inst);
@@ -1234,7 +1261,7 @@ void _dump(ce_cdb_t0 db,
 
     object_t *obj = _get_object_from_id(dbi, _obj);
 
-    if(!obj->storage) {
+    if (!obj->storage) {
         return;
     }
 

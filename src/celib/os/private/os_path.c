@@ -277,8 +277,8 @@ const char *path_filename(const char *path) {
     return ch != NULL ? ch + 1 : path;
 }
 
-void path_basename(const char *path,
-                   char *out) {
+void path_basename(char *out,
+                   const char *path) {
     const char *filename = path_filename(path);
     const char *ch = strchr(filename, '.');
 
@@ -317,7 +317,7 @@ void path_dirname(char *out,
     char *ch = strrchr(buffer, DIR_DELIM_CH);
 
     if (ch != NULL) {
-        strcpy(out, ch + 1);
+        strncpy(out, path, ch-buffer);
     } else {
         strcpy(out, buffer);
     }

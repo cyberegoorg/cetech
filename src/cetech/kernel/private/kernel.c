@@ -22,13 +22,16 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/static_module.h>
-#include <cetech/resource/resource_compiler.h>
+#include <cetech/asset_io/asset_io.h>
 #include <cetech/ecs/ecs.h>
 #include <celib/os/path.h>
 #include <celib/os/time.h>
 #include <cetech/metrics/metrics.h>
 #include <celib/memory/memory_tracer.h>
 #include "cetech/kernel/kernel.h"
+
+#define CONFIG_MODULE_DIR \
+     CE_ID64_0("module_dir", 0xa96daa49986032f4ULL)
 
 static struct KernelGlobals {
     bool is_running;
@@ -264,7 +267,7 @@ static void cetech_kernel_start() {
 
     _init_config();
 
-    ct_resource_compiler_a0->compile_all();
+    ct_asset_io_a0->compile_all();
 
     if (ce_config_a0->read_uint(CONFIG_COMPILE, 0)) {
         return;

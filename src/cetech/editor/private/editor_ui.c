@@ -15,13 +15,13 @@
 #include <cetech/resource/resourcedb.h>
 #include <cetech/resource/resource.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/editor/selcted_object.h>
-#include <cetech/resource/resource_compiler.h>
+#include <cetech/asset_io/asset_io.h>
 #include <fnmatch.h>
 
 #include "cetech/editor/editor_ui.h"

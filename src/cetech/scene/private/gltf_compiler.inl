@@ -1,7 +1,19 @@
 #define CGLTF_IMPLEMENTATION
 
 #include <celib/macros.h>
+#include <celib/log.h>
+#include <cetech/material/material.h>
+#include <cetech/resource/resourcedb.h>
+#include <cetech/default_rg/default_rg.h>
+#include <celib/fs.h>
+#include <cetech/kernel/kernel.h>
+#include <cetech/transform/transform.h>
+#include <cetech/mesh/static_mesh.h>
+#include <celib/containers/hash.h>
+
 #include "include/cgltf/cgltf.h"
+
+CE_MODULE(ct_resourcedb_a0);
 
 static inline bgfx_attrib_t _to_bgxfx_attr(cgltf_attribute_type attr) {
     switch (attr) {
@@ -94,60 +106,41 @@ static int _gltf_comp_num(cgltf_type type) {
     return tbl[type];
 }
 
-static bool _compile_gtlf(ce_cdb_t0 db,
-                          uint64_t k,
-                          scene_compile_output_t *output) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, k);
-    uint64_t import_obj = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
+static bool _compile_gltf_mesh(const cgltf_mesh *mesh,
+                               uint32_t m,
+                               scene_compile_output_t *output) {
+    size_t name_len = mesh->name ? strlen(mesh->name) : 0;
 
-    ct_scene_import_obj_t0 io = {};
-    ce_cdb_a0->read_to(db, import_obj, &io, sizeof(io));
+    char tmp_buffer[1024] = {};
+    char tmp_buffer2[1024] = {};
+    uint32_t unique = 0;
 
-    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
-
-    char *input_path = NULL;
-    ce_os_path_a0->join(&input_path, _G.allocator, 2, source_dir, io.input);
-
-    cgltf_options options = {};
-    cgltf_data *data = NULL;
-    cgltf_result result = cgltf_parse_file(&options, input_path, &data);
-    if (result != cgltf_result_success) {
-        return false;
+    if (name_len == 0) {
+        snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "geom_%d", m);
+    } else {
+        memcpy(tmp_buffer, mesh->name, name_len);
     }
 
-    result = cgltf_load_buffers(&options, data, input_path);
-    if (result != cgltf_result_success) {
-        return false;
+    uint64_t name_id = ce_id_a0->id64(tmp_buffer);
+    for (uint32_t i = 0; i < ce_array_size(output->geom_name); ++i) {
+        if (name_id == output->geom_name[i]) {
+            snprintf(tmp_buffer2, CE_ARRAY_LEN(tmp_buffer2), "%s%d", tmp_buffer, ++unique);
+            snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "%s", tmp_buffer2);
+            break;
+        }
     }
 
-    for (int m = 0; m < data->meshes_count; ++m) {
-        cgltf_mesh *mesh = &data->meshes[m];
-
-        size_t name_len = strlen(mesh->name);
-
-        char tmp_buffer[1024] = {};
-        char tmp_buffer2[1024] = {};
-        uint32_t unique = 0;
-
-        if (name_len == 0) {
-            snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "geom_%d", m);
-        } else {
-            memcpy(tmp_buffer, mesh->name, name_len);
-        }
-
-        uint64_t name_id = ce_id_a0->id64(tmp_buffer);
-        for (uint32_t i = 0; k < ce_array_size(output->geom_name); ++i) {
-            if (name_id == output->geom_name[k]) {
-                snprintf(tmp_buffer2, CE_ARRAY_LEN(tmp_buffer2), "%s%d", tmp_buffer, ++unique);
-                snprintf(tmp_buffer, CE_ARRAY_LEN(tmp_buffer), "%s", tmp_buffer2);
-                break;
-            }
-        }
-
+    for (int p = 0; p < mesh->primitives_count; ++p) {
         char tmp_name[128] = {};
-        strncpy(tmp_name, tmp_buffer, 127);
+
+        if (0 == p) {
+            snprintf(tmp_name, CE_ARRAY_LEN(tmp_name), "%s", tmp_buffer);
+        } else {
+            snprintf(tmp_name, CE_ARRAY_LEN(tmp_name), "%s_%d", tmp_buffer, p);
+        }
+
         ce_array_push_n(output->geom_str, &tmp_name, 1, _G.allocator);
-        ce_array_push(output->geom_name, ce_id_a0->id64(tmp_buffer), _G.allocator);
+        ce_array_push(output->geom_name, ce_id_a0->id64(tmp_name), _G.allocator);
         ce_array_push(output->ib_offset, ce_array_size(output->ib), _G.allocator);
         ce_array_push(output->vb_offset, ce_array_size(output->vb), _G.allocator);
 
@@ -156,7 +149,7 @@ static bool _compile_gtlf(ce_cdb_t0 db,
 
         uint32_t v_size = 0;
         uint32_t vertex_n = 0;
-        cgltf_primitive *prim = &mesh->primitives[0];
+        cgltf_primitive *prim = &mesh->primitives[p];
         for (int l = 0; l < prim->attributes_count; ++l) {
             cgltf_attribute *attr = &prim->attributes[l];
             cgltf_accessor *acess = attr->data;
@@ -359,8 +352,32 @@ static bool _import_gtlf(ce_cdb_t0 db,
                     ce_cdb_a0->objset_add_obj(mesh_ent_w, ENTITY_COMPONENTS, static_mesh_comp);
                     ce_cdb_a0->write_commit(mesh_ent_w);
 
+                    ce_cdb_a0->objset_add_obj(root_ent_w, ENTITY_CHILDREN, mesh_ent);
+                }
+            }
+            ce_cdb_a0->write_commit(root_ent_w);
+
+            char entity_filename[512] = {};
+            snprintf(entity_filename, CE_ARRAY_LEN(entity_filename), "%s/%s.entity",
+                     resource_path, basae_name);
+            ct_asset_io_a0->save_to_cdb(db, root_ent, entity_filename);
+
+            cgltf_free(data);
+
+        }
     }
 
-    cgltf_free(data);
     return true;
 }
+
+
+static bool supported_extension(const char *extension) {
+    return !strcmp(extension, "gltf");
+//    return false;
+}
+
+static ct_asset_dcc_io_i0 gltf_io = {
+        .import_group = CT_SCENE_IMPORT_GROUP,
+        .supported_extension = supported_extension,
+        .import_dcc = _import_gtlf,
+};

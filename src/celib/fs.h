@@ -61,6 +61,8 @@ struct ce_fs_a0 {
                           char *fullpath,
                           uint32_t max_len);
 
+    bool (*exist)(uint64_t root, const char *full_path);
+
 };
 
 CE_MODULE(ce_fs_a0);

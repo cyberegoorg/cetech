@@ -42,6 +42,8 @@ static inline void ce_mpmc_init(ce_mpmc_queue_t0 *q,
                                 size_t capacity,
                                 size_t itemsize,
                                 struct ce_alloc_t0 *allocator) {
+
+
     // capacity must be power of two
     CE_ASSERT("QUEUEMPC", 0 == (capacity & (capacity - 1)));
 

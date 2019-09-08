@@ -11,7 +11,7 @@
 #include <cetech/explorer/explorer.h>
 #include <stdio.h>
 #include <cetech/node_graph_editor/node_graph_editor.h>
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/editor/editor_ui.h>
 

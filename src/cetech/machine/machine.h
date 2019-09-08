@@ -32,7 +32,6 @@ enum {
     EVENT_MOUSE_UP = 10,      //!< Mouse button up
     EVENT_MOUSE_DOWN = 11,    //!< Mouse button down
     EVENT_MOUSE_WHEEL = 12,    //!< Mouse wheel move
-
 };
 
 //! Mouse button enum

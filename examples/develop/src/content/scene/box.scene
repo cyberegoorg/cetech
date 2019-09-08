@@ -1,6 +1,0 @@
-cdb_uid: 0x3d4a26bc5ef4b90d
-cdb_type: scene
-import:
-  cdb_uid: 0xdb81a075de3f3562
-  cdb_type: scene_import
-  input: content/scene/Box.gltf

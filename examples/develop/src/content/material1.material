@@ -26,7 +26,7 @@ layers:
         cdb_uuid: "0xf81a1ce60b9ba9e8"
         name: u_texColor
         cdb_type: material_variable_texture
-        value: "0xe918b8b9d6e08e45"
+        value: "0"
 
       0x3e8302bae4fce293:
         cdb_uuid: "0x3e8302bae4fce293"

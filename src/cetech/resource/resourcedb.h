@@ -15,13 +15,14 @@ typedef struct ce_cdb_uuid_t0 ct_resource_id_t0;
 typedef struct ce_alloc_t0 ce_alloc_t0;
 
 struct ct_resourcedb_a0 {
+    int64_t (*get_file_mtime)(const char *filename);
+
     void (*put_file)(const char *filename,
                      time_t mtime);
 
     void (*put_resource)(ce_cdb_uuid_t0 rid,
                          const char *type,
-                         const char *filename,
-                         bool file_resource);
+                         const char *filename);
 
     void (*put_resource_blob)(ce_cdb_uuid_t0 rid,
                               const char *data,
@@ -52,6 +53,17 @@ struct ct_resourcedb_a0 {
 
     void (*clean_resource_list)(char **filename,
                                 ce_alloc_t0 *alloc);
+
+    ce_cdb_uuid_t0 (*get_resource_root)(ce_cdb_uuid_t0 uuid);
+
+    void (*set_resource_root)(ce_cdb_uuid_t0 uuid,
+                              ce_cdb_uuid_t0 root_uid);
+
+
+    ////
+    bool (*put_obj)(ce_cdb_t0 db,
+                    uint64_t obj,
+                    ce_alloc_t0 *alloc);
 };
 
 #ifdef __cplusplus

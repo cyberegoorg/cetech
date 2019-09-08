@@ -21,7 +21,7 @@
 #include <cetech/texture/texture.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/resource/resourcedb.h>
 #include <cetech/property_editor/property_editor.h>
@@ -30,6 +30,7 @@
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/primitive_mesh.h>
+#include <cetech/asset_io/asset_io.h>
 
 
 //==============================================================================
@@ -293,10 +294,6 @@ static const char *name() {
     return "material";
 }
 
-static bool compilator(ce_cdb_t0 db, uint64_t obj){
-    return true;
-}
-
 static struct ct_resource_i0 ct_resource_api = {
         .cdb_type = cdb_type,
         .name = name,
@@ -304,13 +301,19 @@ static struct ct_resource_i0 ct_resource_api = {
         .online = online,
         .offline = offline,
         .get_interface = get_interface,
-        .compilator = compilator
 };
 
+static bool supported_extension(const char *extension) {
+    return !strcmp(extension, "material");
+}
+
+static ct_asset_io_i0 material_io = {
+        .supported_extension = supported_extension,
+};
 
 //==============================================================================
 // Interface
-//==============================================================================
+//===================================================================
 
 static uint64_t create(uint64_t name) {
     ce_cdb_uuid_t0 rid = (ce_cdb_uuid_t0) {
@@ -321,10 +324,10 @@ static uint64_t create(uint64_t name) {
     return object;
 }
 
-static uint64_t _find_slot_by_name(uint64_t layer,
+static uint64_t _find_slot_by_name(ce_cdb_t0 db, uint64_t layer,
                                    const char *name) {
 
-    const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(ce_cdb_a0->db(), layer);
+    const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(db, layer);
     uint64_t k_n = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
     uint64_t k[k_n];
     ce_cdb_a0->read_objset(layer_reader, MATERIAL_VARIABLES_PROP, k);
@@ -332,13 +335,12 @@ static uint64_t _find_slot_by_name(uint64_t layer,
     for (int i = 0; i < k_n; ++i) {
         uint64_t var = k[i];
 
-        const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(ce_cdb_a0->db(), var);
+        const ce_cdb_obj_o0 *var_reader = ce_cdb_a0->read(db, var);
         const char *var_name = ce_cdb_a0->read_str(var_reader, MATERIAL_VAR_NAME_PROP, "");
 
         if (!strcmp(name, var_name)) {
             return var;
         }
-
     }
 
     return 0;
@@ -364,7 +366,7 @@ static void set_texture_handler(uint64_t material,
             continue;
         }
 
-        uint64_t var = _find_slot_by_name(layer_obj, slot);
+        uint64_t var = _find_slot_by_name(ce_cdb_a0->db(), layer_obj, slot);
         if (!var) {
             ce_log_a0->warning(LOG_WHERE, "invalid slot: %s", slot);
             return;
@@ -387,6 +389,42 @@ static void set_texture_handler(uint64_t material,
 
         writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), layer_obj);
         ce_cdb_a0->objset_add_obj(writer, MATERIAL_VARIABLES_PROP, t);
+        ce_cdb_a0->write_commit(writer);
+        break;
+    }
+}
+
+static void set_texture(ce_cdb_t0 db,
+                        uint64_t material,
+                        uint64_t layer,
+                        const char *slot,
+                        uint64_t texture) {
+    const ce_cdb_obj_o0 *mat_reader = ce_cdb_a0->read(db, material);
+
+    uint64_t layers_n = ce_cdb_a0->read_objset_num(mat_reader, MATERIAL_LAYERS);
+    uint64_t layers_keys[layers_n];
+    ce_cdb_a0->read_objset(mat_reader, MATERIAL_LAYERS, layers_keys);
+
+    for (int i = 0; i < layers_n; ++i) {
+        uint64_t layer_obj = layers_keys[i];
+
+        const ce_cdb_obj_o0 *layer_reader = ce_cdb_a0->read(db, layer_obj);
+        const char *layer_name = ce_cdb_a0->read_str(layer_reader, MATERIAL_LAYER_NAME, 0);
+        if (ce_id_a0->id64(layer_name) != layer) {
+            continue;
+        }
+
+        uint64_t var = _find_slot_by_name(db, layer_obj, slot);
+        if (!var) {
+            ce_log_a0->warning(LOG_WHERE, "invalid slot: %s", slot);
+            return;
+        }
+
+        uint64_t t = var;
+
+        ce_cdb_obj_o0 *writer = ce_cdb_a0->write_begin(db, t);
+        ce_cdb_a0->set_ref(writer, MATERIAL_VAR_VALUE_PROP, texture);
+        ce_cdb_a0->set_str(writer, MATERIAL_VAR_NAME_PROP, slot);
         ce_cdb_a0->write_commit(writer);
         break;
     }
@@ -532,6 +570,7 @@ static void submit(uint64_t material,
 static struct ct_material_a0 material_api = {
         .create = create,
         .set_texture_handler = set_texture_handler,
+        .set_texture = set_texture,
         .submit = submit
 };
 
@@ -799,8 +838,11 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
             .db = ce_cdb_a0->db()
     };
 
+    ce_id_a0->id64("material");
+
     api->add_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_IO_I, &material_io, sizeof(material_io));
     api->add_impl(CT_PROPERTY_EDITOR_I, &_property_editor_api,
                   sizeof(_property_editor_api));
 

@@ -273,7 +273,7 @@ void process_file(void *data) {
 
     char basename[128];
     char output_filename[128];
-    ce_os_path_a0->basename(filename, basename);
+    ce_os_path_a0->basename(basename, filename);
     snprintf(output_filename, CE_ARRAY_LEN(output_filename),
              "%s/%s.md.html", build_dir, basename);
 

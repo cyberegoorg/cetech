@@ -20,6 +20,9 @@
 #include <celib/containers/hash.h>
 #include <celib/os/path.h>
 #include <celib/os/thread.h>
+#include <celib/fs.h>
+#include <celib/os/vio.h>
+#include <celib/uuid64.h>
 
 #include "cetech/resource/resourcedb.h"
 
@@ -31,16 +34,17 @@
 struct sqls_s {
     sqlite3_stmt *put_file;
     sqlite3_stmt *put_resource;
-    sqlite3_stmt *put_file_blob;
-    sqlite3_stmt *load_file_blob;
     sqlite3_stmt *get_filename;
     sqlite3_stmt *get_uid_by_filename;
+    sqlite3_stmt *get_file_mtime;
 
     sqlite3_stmt *get_resource_by_type;
     sqlite3_stmt *get_resource_from_dirs;
     sqlite3_stmt *get_resource_type;
-    sqlite3_stmt *resource_exist;
     sqlite3_stmt *set_file_resource;
+
+    sqlite3_stmt *get_resource_root;
+    sqlite3_stmt *set_resource_root;
 };
 
 static struct _G {
@@ -72,11 +76,10 @@ const char *CREATE_SQL[] = {
         "PRIMARY KEY (uuid)"
         ");",
 
-        "CREATE TABLE IF NOT EXISTS resource_data (\n"
-        "uid      INTEGER                                 NOT NULL,\n"
-        "data     BLOB,                                            \n"
-        "FOREIGN KEY(uid) REFERENCES resource(uid),                \n"
-        "PRIMARY KEY (uid)                                         \n"
+        "CREATE TABLE IF NOT EXISTS resource_root (\n"
+        "uuid      TEXT                                 NOT NULL,\n"
+        "root_uid TEXT                                 NOT NULL,\n"
+        "PRIMARY KEY (uuid)                                         \n"
         ");"
         "",
 
@@ -105,10 +108,11 @@ static struct {
                   "JOIN files on files.id == resource.file\n"
                   "WHERE resource.uuid = ?1;"),
 
-        _STATMENT(resource_exist,
-                  "SELECT 1\n"
-                  "FROM resource\n"
-                  "WHERE resource.uid = ?1;"),
+        _STATMENT(get_file_mtime,
+                  "SELECT files.mtime\n"
+                  "FROM files"
+                  "\n"
+                  "WHERE files.id = ?1;"),
 
         _STATMENT(get_resource_type,
                   "SELECT resource.type\n"
@@ -118,14 +122,8 @@ static struct {
         _STATMENT(put_file,
                   "INSERT OR REPLACE INTO files (id, filename, mtime) VALUES(?1, ?2, ?3);"),
 
-        _STATMENT(put_file_blob,
-                  "INSERT OR REPLACE INTO resource_data (uid, data) VALUES(?1, ?2);"),
-
         _STATMENT(put_resource,
                   "INSERT OR REPLACE INTO resource (uuid, type, file) VALUES(?1, ?2, ?3);"),
-
-        _STATMENT(load_file_blob,
-                  "SELECT data FROM resource_data WHERE uid = ?1"),
 
         _STATMENT(set_file_resource,
                   "INSERT OR REPLACE INTO file_resource (uuid, file) VALUES(?1, ?2);"),
@@ -146,6 +144,14 @@ static struct {
                   "select files.filename\n"
                   "from files\n"
                   "where instr(files.filename, ?1);"),
+
+        _STATMENT(get_resource_root,
+                  "SELECT resource_root.root_uid\n"
+                  "FROM resource_root\n"
+                  "WHERE resource_root.uuid = ?1;"),
+
+        _STATMENT(set_resource_root,
+                  "INSERT OR REPLACE INTO resource_root (uuid, root_uid) VALUES(?1, ?2);"),
 };
 
 static int _step(sqlite3 *db,
@@ -278,6 +284,24 @@ static int resourcedb_init_db() {
     }
 
     return 1;
+}
+
+int64_t get_file_mtime(const char *filename) {
+    sqlite3 *_db = _opendb();
+    struct sqls_s *sqls = _get_sqls();
+
+    uint64_t fileid = ce_id_a0->id64(filename);
+
+    sqlite3_bind_int64(sqls->get_file_mtime, 1, fileid);
+    bool ok = _step(_db, sqls->get_file_mtime) == SQLITE_ROW;
+
+    int64_t mtime = 0;
+    if (ok) {
+        mtime = sqlite3_column_int64(sqls->get_file_mtime, 0);
+        _step(_db, sqls->get_file_mtime);
+    }
+
+    return mtime;
 }
 
 static void put_file(const char *filename,
@@ -561,7 +585,23 @@ void clean_resource_list(char **filename,
     }
 }
 
+bool put_obj(ce_cdb_t0 db,
+             uint64_t obj,
+             ce_alloc_t0 *alloc) {
+
+    char *output = NULL;
+    ce_cdb_a0->dump(db, obj, &output, alloc);
+
+    ce_cdb_uuid_t0 uuid = ce_cdb_a0->obj_uid(db, obj);
+
+    put_resource_blob(uuid, output, ce_array_size(output));
+    ce_buffer_free(output, _G.alloc);
+
+    return true;
+}
+
 static struct ct_resourcedb_a0 ct_resourcedb_api = {
+        .get_file_mtime = get_file_mtime,
         .put_file = put_file,
         .put_resource_blob = put_resource_blob,
         .put_resource = put_resource,
@@ -573,6 +613,11 @@ static struct ct_resourcedb_a0 ct_resourcedb_api = {
         .list_resource_from_dirs = get_resource_from_dirs,
         .list_resource_by_type = get_resource_by_type,
         .clean_resource_list = clean_resource_list,
+        .set_resource_root = set_resource_root,
+        .get_resource_root = get_resource_root,
+
+        ///
+        .put_obj = put_obj,
 };
 
 struct ct_resourcedb_a0 *ct_resourcedb_a0 = &ct_resourcedb_api;

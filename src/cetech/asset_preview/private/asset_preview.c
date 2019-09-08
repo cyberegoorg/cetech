@@ -7,7 +7,7 @@
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 
-#include <cetech/resource_preview/resource_preview.h>
+#include <cetech/asset_preview/asset_preview.h>
 #include <cetech/editor/editor.h>
 #include <celib/containers/hash.h>
 #include <celib/math/math.h>
@@ -152,6 +152,8 @@ static void _draw_preview(preview_instance *pi,
     if (i->draw_raw) {
         i->draw_raw(pi->selected_object, size);
     } else {
+        ct_ecs_a0->step(pi->world, 1);
+
         viewport_component *viewport = ct_ecs_c_a0->get_one(pi->world, VIEWPORT_COMPONENT,
                                                             pi->camera_ent, false);
 
@@ -236,6 +238,9 @@ static void update(float dt) {
     uint32_t n = ce_array_size(_G.instances);
     for (int i = 0; i < n; ++i) {
         struct preview_instance *pi = &_G.instances[i];
+        if(_G.baground == pi) {
+            continue;
+        }
 
         if (ct_ecs_c_a0->has(pi->world, pi->ent, (uint64_t[]) {ROTATION_COMPONENT}, 1)) {
             ct_rotation_c *rot_t = ct_ecs_c_a0->get_one(pi->world,

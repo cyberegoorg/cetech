@@ -8,6 +8,12 @@ extern "C" {
 #define CT_TEXTURE_API \
     CE_ID64_0("ct_texture_a0", 0x642bfe2717995f2fULL)
 
+#define CT_TEXTURE_IMPORT_GROUP \
+    CE_ID64_0("ct_texture_import_group", 0x1ec6c0c97e3983deULL)
+
+#define CT_DCC_ASSET_TEXTURE_TYPE \
+    CE_ID64_0("ct_dcc_asset_texture", 0xccf89315b1a80908ULL)
+
 #define TEXTURE_TASK \
     CE_ID64_0("texture_task", 0xcfe0d7ae816cf881ULL)
 

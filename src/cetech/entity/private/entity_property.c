@@ -240,7 +240,7 @@ void draw_menu(uint64_t obj) {
 
 
 static uint64_t cdb_type() {
-    return ENTITY_RESOURCE_ID;
+    return ENTITY_TYPE;
 }
 
 static struct ct_property_editor_i0 property_editor_api = {

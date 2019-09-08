@@ -343,6 +343,8 @@ void CE_MODULE_LOAD(parent)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_log_a0);
 
     ce_id_a0->id64("parent");
+    ce_id_a0->id64("child");
+    ce_id_a0->id64("previous_parent");
 
     _G = (struct _G) {
             .alloc = ce_memory_a0->system,

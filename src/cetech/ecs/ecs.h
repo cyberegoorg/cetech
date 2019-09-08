@@ -39,7 +39,7 @@ extern "C" {
 #define ENTITY_CHILDREN \
     CE_ID64_0("children", 0x6fbb13de0e1dce0dULL)
 
-#define ENTITY_RESOURCE_ID \
+#define ENTITY_TYPE \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
 #define CT_ECS_SYSTEM_I \

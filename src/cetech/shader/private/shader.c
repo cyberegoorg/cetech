@@ -26,11 +26,12 @@
 
 #include <celib/config.h>
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/resource_compiler.h>
+#include <cetech/asset_io/asset_io.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <celib/os/path.h>
 #include <celib/os/process.h>
 #include <celib/os/vio.h>
+#include <cetech/texture/texture.h>
 
 //==============================================================================
 // GLobals
@@ -57,7 +58,7 @@ static int _shaderc(const char *input,
 
     char *buffer = NULL;
 
-    char *shaderc = ct_resource_compiler_a0->external_join(a, "shaderc");
+    char *shaderc = ct_asset_io_a0->external_join(a, "shaderc");
 
     ce_buffer_printf(&buffer, a, "%s", shaderc);
 
@@ -83,17 +84,15 @@ static int _shaderc(const char *input,
 }
 
 #if CE_PLATFORM_LINUX
-const char *platform = "linux";
+const char *shadrc_platform = "linux";
 const char *vs_profile = "120";
 const char *fs_profile = "120";
 #elif CE_PLATFORM_OSX
-//const char *platform = "osx";
+const char *shadrc_platform = "osx";
 const char *vs_profile = "metal";
 const char *fs_profile = "metal";
-//const char *vs_profile = "120";
-//const char *fs_profile = "120";
 #elif CE_PLATFORM_WINDOWS
-const char* platform = "windows";
+const char* shadrc_platform = "windows";
 const char* vs_profile = "vs_4_0";
 const char* fs_profile = "ps_4_0";
 #endif
@@ -127,11 +126,11 @@ static bool _compile(ce_cdb_t0 db,
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, vs_input);
 
-    ct_resource_compiler_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
-                                          vs_input, NULL);
+    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
+                                 vs_input, NULL);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
-                          platform, vs_profile);
+                          shadrc_platform, vs_profile);
 
     ce_buffer_free(input_path, a);
 
@@ -165,12 +164,12 @@ static bool _compile(ce_cdb_t0 db,
 
     ce_os_path_a0->join(&input_path, a, 2, source_dir, fs_input);
 
-    ct_resource_compiler_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
-                                          platform, fs_input, NULL);
+    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+                                 platform, fs_input, NULL);
 
     result = _shaderc(input_path, output_path,
                       include_dir, "fragment",
-                      platform, fs_profile);
+                      shadrc_platform, fs_profile);
 
     ce_buffer_free(input_path, a);
 
@@ -196,12 +195,6 @@ static bool _compile(ce_cdb_t0 db,
 
     return true;
 }
-
-bool shader_compiler(ce_cdb_t0 db,
-                     uint64_t k) {
-    return _compile(db, k);
-}
-
 
 static void online(ce_cdb_t0 db,
                    uint64_t obj) {
@@ -262,8 +255,17 @@ static struct ct_resource_i0 ct_resource_api = {
         .display_icon = display_icon,
         .online = online,
         .offline = offline,
-        .compilator = shader_compiler,
 };
+
+static bool supported_extension(const char *extension) {
+    return !strcmp(extension, "shader");
+}
+
+static ct_asset_io_i0 shader_io = {
+        .supported_extension = supported_extension,
+        .import = _compile,
+};
+
 
 //==============================================================================
 // Interface
@@ -319,6 +321,7 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
 
     api->add_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
     api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_IO_I, &shader_io, sizeof(shader_io));
 
     ce_cdb_a0->reg_obj_type(SHADER_TYPE, CE_ARR_ARG(shader_type_def));
 }

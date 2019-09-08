@@ -233,10 +233,9 @@ struct ce_cdb_a0 {
                  char **output,
                  ce_alloc_t0 *allocator);
 
-    void (*load)(ce_cdb_t0 db,
-                 const char *input,
-                 uint64_t obj,
-                 ce_alloc_t0 *allocator);
+    uint64_t (*load)(ce_cdb_t0 db,
+                     const char *input,
+                     ce_alloc_t0 *allocator);
 
     uint64_t (*find_root)(ce_cdb_t0 _db,
                           uint64_t obj);
