@@ -38,7 +38,7 @@ bimg::ImageContainer *imageLoad(const char *_filePath,
 ///
 void calcTangents(void *_vertices,
                   uint16_t _numVertices,
-                  bgfx::VertexDecl _decl,
+                  bgfx::VertexLayout _decl,
                   const uint16_t *_indices,
                   uint32_t _numIndices);
 
@@ -50,7 +50,7 @@ void calcTangents(void *_vertices,
 /// @param[in] _numIndices Number of indices.
 ///
 inline bool checkAvailTransientBuffers(uint32_t _numVertices,
-                                       const bgfx::VertexDecl &_decl,
+                                       const bgfx::VertexLayout &_decl,
                                        uint32_t _numIndices) {
     return _numVertices ==
            bgfx::getAvailTransientVertexBuffer(_numVertices, _decl)

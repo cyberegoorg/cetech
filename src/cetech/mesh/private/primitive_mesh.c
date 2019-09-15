@@ -40,7 +40,7 @@ struct pt_vertex {
     float m_u;
     float m_v;
 };
-static bgfx_vertex_decl_t pt_vertex_decl;
+static bgfx_vertex_layout_t pt_vertex_decl;
 
 static const struct pt_vertex _vertices[24] = {
         // Back
@@ -207,18 +207,18 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
     api->add_impl(CT_RENDERER_COMPONENT_I,
                   &ct_renderer_component_i, sizeof(ct_renderer_component_i));
 
-    ct_gfx_a0->bgfx_vertex_decl_begin(&pt_vertex_decl,
+    ct_gfx_a0->bgfx_vertex_layout_begin(&pt_vertex_decl,
                                       ct_gfx_a0->bgfx_get_renderer_type());
 
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
+    ct_gfx_a0->bgfx_vertex_layout_add(&pt_vertex_decl,
                                     BGFX_ATTRIB_POSITION, 3,
                                     BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_vertex_decl,
+    ct_gfx_a0->bgfx_vertex_layout_add(&pt_vertex_decl,
                                     BGFX_ATTRIB_TEXCOORD0, 2,
                                     BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_gfx_a0->bgfx_vertex_decl_end(&pt_vertex_decl);
+    ct_gfx_a0->bgfx_vertex_layout_end(&pt_vertex_decl);
 
     cube_vbh = ct_gfx_a0->bgfx_create_vertex_buffer(
             ct_gfx_a0->bgfx_make_ref(_vertices, sizeof(_vertices)),

@@ -74,20 +74,20 @@ typedef struct PosTexCoord0Vertex {
     float u;
     float v;
 } PosTexCoord0Vertex;
-static bgfx_vertex_decl_t pt_decl;
+static bgfx_vertex_layout_t pt_decl;
 
 static void init_decl() {
-    ct_gfx_a0->bgfx_vertex_decl_begin(&pt_decl,
+    ct_gfx_a0->bgfx_vertex_layout_begin(&pt_decl,
                                       ct_gfx_a0->bgfx_get_renderer_type());
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_decl,
+    ct_gfx_a0->bgfx_vertex_layout_add(&pt_decl,
                                     BGFX_ATTRIB_POSITION, 3,
                                     BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_gfx_a0->bgfx_vertex_decl_add(&pt_decl,
+    ct_gfx_a0->bgfx_vertex_layout_add(&pt_decl,
                                     BGFX_ATTRIB_TEXCOORD0, 2,
                                     BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
-    ct_gfx_a0->bgfx_vertex_decl_end(&pt_decl);
+    ct_gfx_a0->bgfx_vertex_layout_end(&pt_decl);
 }
 
 void screenspace_quad(float texture_width,

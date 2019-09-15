@@ -144,8 +144,8 @@ static bool _compile_gltf_mesh(const cgltf_mesh *mesh,
         ce_array_push(output->ib_offset, ce_array_size(output->ib), _G.allocator);
         ce_array_push(output->vb_offset, ce_array_size(output->vb), _G.allocator);
 
-        bgfx_vertex_decl_t vertex_decl;
-        ct_gfx_a0->bgfx_vertex_decl_begin(&vertex_decl, BGFX_RENDERER_TYPE_COUNT);
+        bgfx_vertex_layout_t vertex_decl;
+        ct_gfx_a0->bgfx_vertex_layout_begin(&vertex_decl, BGFX_RENDERER_TYPE_COUNT);
 
         uint32_t v_size = 0;
         uint32_t vertex_n = 0;
@@ -162,14 +162,14 @@ static bool _compile_gltf_mesh(const cgltf_mesh *mesh,
             int num = _gltf_comp_num(acess->type);
             bool normalized = bgfx_attr == BGFX_ATTRIB_NORMAL;
 
-            ct_gfx_a0->bgfx_vertex_decl_add(&vertex_decl,
+            ct_gfx_a0->bgfx_vertex_layout_add(&vertex_decl,
                                             bgfx_attr, num,
                                             bgfx_attr_type, normalized, 0);
 
             v_size += _comp_size(bgfx_attr_type) * num;
         }
 
-        ct_gfx_a0->bgfx_vertex_decl_end(&vertex_decl);
+        ct_gfx_a0->bgfx_vertex_layout_end(&vertex_decl);
 
         uint32_t indices_n = prim->indices->count;
 

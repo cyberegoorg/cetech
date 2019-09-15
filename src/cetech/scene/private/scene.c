@@ -50,7 +50,7 @@ typedef struct ct_scene_obj_t {
 
     uint32_t *ib;
     uint8_t *vb;
-    bgfx_vertex_decl_t *vb_decl;
+    bgfx_vertex_layout_t *vb_decl;
     uint64_t *geom_name;
     uint32_t *ib_offset;
     uint32_t *vb_offset;

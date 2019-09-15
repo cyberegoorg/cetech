@@ -32,7 +32,7 @@ typedef struct scene_compile_output_t {
     uint64_t *geom_name;
     uint32_t *ib_offset;
     uint32_t *vb_offset;
-    bgfx_vertex_decl_t *vb_decl;
+    bgfx_vertex_layout_t *vb_decl;
     uint32_t *ib_size;
     uint32_t *vb_size;
     uint32_t *ib;
