@@ -326,38 +326,38 @@ struct ct_physics2d_a0 *ct_physics2d_a0 = &api;
 
 void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
                                int reload) {
-    api->add_api(CT_PHYSICS_A0, ct_physics2d_a0, sizeof(struct ct_physics2d_a0));
+    api->add_api(CT_PHYSICS_A0_STR, ct_physics2d_a0, sizeof(struct ct_physics2d_a0));
 
     ce_id_a0->id64("collider2d");
     ce_id_a0->id64("collider2d_shape_rectangle");
     ce_id_a0->id64("mass2d");
     ce_id_a0->id64("physics_world2d");
 
-    api->add_impl(CT_ECS_SYSTEM_GROUP_I,
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I0_STR,
                   &physics_group, sizeof(physics_group));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &world2d_component_i, sizeof(world2d_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &velocity2d_component_i, sizeof(velocity2d_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &collider2d_component_i, sizeof(collider2d_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &mass2d_component_i, sizeof(mass2d_component_i));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &wolrd2_dproperty_editor_api, sizeof(wolrd2_dproperty_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &property_editor_api, sizeof(property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &_collider_property_editor_api, sizeof(_collider_property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &mass2d_property_editor_api, sizeof(mass2d_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(PHYSICS_WORLD2D_COMPONENT,

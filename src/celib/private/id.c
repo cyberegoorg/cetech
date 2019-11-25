@@ -110,7 +110,7 @@ void CE_MODULE_LOAD (hashlib)(struct ce_api_a0 *api,
                               int reload) {
     CE_UNUSED(reload);
 
-    api->add_api(CE_ID_API, &hash_api, sizeof(hash_api));
+    api->add_api(CE_ID_A0_STR, &hash_api, sizeof(hash_api));
 
     _G = (struct _G) {
     };

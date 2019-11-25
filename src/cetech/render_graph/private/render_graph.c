@@ -168,7 +168,7 @@ void CE_MODULE_LOAD(render_graph)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->add_api(CT_RG_API, &render_graph_api, sizeof(render_graph_api));
+    api->add_api(CT_RG_A0_STR, &render_graph_api, sizeof(render_graph_api));
 
     init_decl();
 }

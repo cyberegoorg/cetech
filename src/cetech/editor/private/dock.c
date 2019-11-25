@@ -43,7 +43,7 @@ static struct _G {
 #define MAX_CONTEXT 8
 
 struct ct_dock_i0 *_find_dock_i(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I0);
 
     while (it.api) {
         struct ct_dock_i0 *i = (it.api);
@@ -254,7 +254,7 @@ static void draw_menu() {
     if (ct_debugui_a0->BeginMenu("Docks", true)) {
 
         if (ct_debugui_a0->BeginMenu(ICON_FA_PLUS" ""Add new dock", true)) {
-            struct ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I);
+            struct ce_api_entry_t0 it = ce_api_a0->first(CT_DOCK_I0);
 
             while (it.api) {
                 struct ct_dock_i0 *i = (it.api);
@@ -417,7 +417,7 @@ void CE_MODULE_LOAD(dock)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_api(CT_DOCK_API, ct_dock_a0, sizeof(dock_a0));
+    api->add_api(CT_DOCK_A0_STR, ct_dock_a0, sizeof(dock_a0));
 
     ce_cdb_a0->reg_obj_type(DOCKS_LAYOUT_TYPE, CE_ARR_ARG(docks_layout_cdb_type_def));
     ce_cdb_a0->reg_obj_type(DOCK_LAYOUT_TYPE, CE_ARR_ARG(dock_layout_cdb_type_def));

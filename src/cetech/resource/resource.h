@@ -9,6 +9,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#define CT_RESOURCE_A0_STR "ct_resource_a0"
+
 #define CT_RESOURCE_API \
     CE_ID64_0("ct_resource_a0", 0x60a25ca5a83c2ac2ULL)
 
@@ -42,7 +44,9 @@ extern "C" {
 #define CONFIG_COMPILE \
      CE_ID64_0("compile", 0x3c797c340e1e5467ULL)
 
-#define CT_RESOURCE_I \
+#define CT_RESOURCE_I0_STR "ct_resource_i0"
+
+#define CT_RESOURCE_I0 \
     CE_ID64_0("ct_resource_i0", 0x3e0127963a0db5b9ULL)
 
 typedef struct ce_vio_t0 ce_vio_t0;

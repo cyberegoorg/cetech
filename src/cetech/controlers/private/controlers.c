@@ -41,7 +41,7 @@ static struct _G {
 static void _on_api_add(uint64_t name,
                               void *api) {
 
-    if (name == CT_CONTROLERS_I) {
+    if (name == CT_CONTROLERS_I0) {
         ct_controler_i0 *controlers_i = api;
 
         ce_hash_add(&_G.interface_map, controlers_i->name(),
@@ -70,7 +70,7 @@ void CE_MODULE_LOAD(controlers)(struct ce_api_a0 *api,
 
     _G = (struct _G) {};
 
-    api->add_api(CT_CONTROLERS_API,
+    api->add_api(CT_CONTROLERS_A0_STR,
                  ct_controlers_a0, sizeof(ct_controlers_api));
 
     api->register_on_add(_on_api_add);

@@ -201,22 +201,22 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
-    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &property_editor_api, sizeof(property_editor_api));
 
-    api->add_impl(CT_RENDERER_COMPONENT_I,
+    api->add_impl(CT_RENDERER_COMPONENT_I0_STR,
                   &ct_renderer_component_i, sizeof(ct_renderer_component_i));
 
     ct_gfx_a0->bgfx_vertex_layout_begin(&pt_vertex_decl,
-                                      ct_gfx_a0->bgfx_get_renderer_type());
+                                        ct_gfx_a0->bgfx_get_renderer_type());
 
     ct_gfx_a0->bgfx_vertex_layout_add(&pt_vertex_decl,
-                                    BGFX_ATTRIB_POSITION, 3,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_POSITION, 3,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_add(&pt_vertex_decl,
-                                    BGFX_ATTRIB_TEXCOORD0, 2,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_TEXCOORD0, 2,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_end(&pt_vertex_decl);
 

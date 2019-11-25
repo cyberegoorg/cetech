@@ -162,7 +162,7 @@ static struct ce_memory_tracer_a0 _tracer_api = {
 struct ce_memory_tracer_a0 *ce_memory_tracer_a0 = &_tracer_api;
 
 void memory_tracer_init(struct ce_api_a0 *api) {
-    api->add_api(CE_MEMORY_TRACER_API, &_tracer_api, sizeof(_tracer_api));
+    api->add_api("ce_memory_tracer_a0", &_tracer_api, sizeof(_tracer_api));
 }
 
 void memory_tracer_shutdown() {

@@ -351,24 +351,24 @@ void CE_MODULE_LOAD(parent)(struct ce_api_a0 *api,
     };
 
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &parent_c_api, sizeof(parent_c_api));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &previous_parent_c_api, sizeof(previous_parent_c_api));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &child_c_api, sizeof(child_c_api));
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &spawn_children_system_i0, sizeof(spawn_children_system_i0));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &parent_system_i0, sizeof(parent_system_i0));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &change_previous_parent_system_i0, sizeof(change_previous_parent_system_i0));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &change_previous_parent_system2_i0, sizeof(change_previous_parent_system2_i0));
 }
 

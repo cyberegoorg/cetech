@@ -7,6 +7,8 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_DD_A0_STR "ct_dd_a0"
+
 #define CT_DD_A0 \
     CE_ID64_0("ct_dd_a0", 0xfdd19bc6b2e51af8ULL)
 

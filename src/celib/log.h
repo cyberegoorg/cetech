@@ -1,5 +1,5 @@
-#ifndef CE_LOG_API_H
-#define CE_LOG_API_H
+#ifndef CE_LOG_A0_H
+#define CE_LOG_A0_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,6 +8,8 @@ extern "C" {
 #include "celib_types.h"
 
 #include <celib/macros.h>
+
+#define CE_LOG_A0_STR "ce_log_a0"
 
 #define CE_LOG_API \
     CE_ID64_0("ce_log_a0", 0x1e2a79ce44a2031cULL)
@@ -105,4 +107,4 @@ CE_MODULE(ce_log_a0);
 };
 #endif
 
-#endif //CE_LOG_API_H
+#endif //CE_LOG_A0_H

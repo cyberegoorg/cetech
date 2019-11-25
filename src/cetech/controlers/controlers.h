@@ -7,11 +7,14 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_CONTROLERS_A0_STR "ct_controlers_a0"
 
 #define CT_CONTROLERS_API \
     CE_ID64_0("ct_controlers_a0", 0x81e928c4fbba526dULL)
 
-#define CT_CONTROLERS_I \
+#define CT_CONTROLERS_I0_STR "ct_controler_i0"
+
+#define CT_CONTROLERS_I0 \
     CE_ID64_0("ct_controler_i0", 0xa5442c265384697cULL)
 
 #define CONTROLER_BUTTON \

@@ -31,16 +31,16 @@ void CE_MODULE_LOAD(os)(struct ce_api_a0 *api,
                         int reload) {
     CE_UNUSED(reload);
 
-    api->add_api(CE_OS_PATH_API, &path_api, sizeof(path_api));
-    api->add_api(CE_OS_CPU_API, &cpu_api, sizeof(cpu_api));
-    api->add_api(CE_OS_ERROR_API, &error_api, sizeof(error_api));
-    api->add_api(CE_OS_OBJECT_API, &object_api, sizeof(object_api));
-    api->add_api(CE_OS_PROCESS_API, &process_api, sizeof(process_api));
-    api->add_api(CE_OS_TIME_API, &time_api, sizeof(time_api));
-    api->add_api(CE_OS_VIO_API, &vio_api, sizeof(vio_api));
-    api->add_api(CE_OS_WINDOW_API, &window_api, sizeof(window_api));
-    api->add_api(CE_OS_INPUT_API, &input_api, sizeof(input_api));
-    api->add_api(CE_OS_THREAD_API, &thread_api, sizeof(thread_api));
+    api->add_api(CE_OS_PATH_A0_STR, &path_api, sizeof(path_api));
+    api->add_api(CE_OS_CPU_A0_STR, &cpu_api, sizeof(cpu_api));
+    api->add_api(CE_OS_ERROR_A0_STR, &error_api, sizeof(error_api));
+    api->add_api(CE_OS_OBJECT_A0_STR, &object_api, sizeof(object_api));
+    api->add_api(CE_OS_PROCESS_A0_STR, &process_api, sizeof(process_api));
+    api->add_api(CE_OS_TIME_A0_STR, &time_api, sizeof(time_api));
+    api->add_api(CE_OS_VIO_A0_STR, &vio_api, sizeof(vio_api));
+    api->add_api(CE_OS_WINDOW_A0_STR, &window_api, sizeof(window_api));
+    api->add_api(CE_OS_INPUT_A0_STR, &input_api, sizeof(input_api));
+    api->add_api(CE_OS_THREAD_A0_STR, &thread_api, sizeof(thread_api));
 
 }
 

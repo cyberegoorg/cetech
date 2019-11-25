@@ -965,7 +965,7 @@ void CE_MODULE_LOAD(sourcedb_ui)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
-    api->add_api(CT_RESOURCE_UI_API, ct_editor_ui_a0, sizeof(editor_ui_a0));
+    api->add_api(CT_RESOURCE_UI_A0_STR, ct_editor_ui_a0, sizeof(editor_ui_a0));
 }
 
 void CE_MODULE_UNLOAD(sourcedb_ui)(struct ce_api_a0 *api,

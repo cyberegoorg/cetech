@@ -116,7 +116,7 @@ static void draw(ce_cdb_t0 db,
         return;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
 
     uint64_t obj_type = ce_cdb_a0->obj_type(db, obj);
 
@@ -145,7 +145,7 @@ static ct_property_editor_i0 *get_interface(uint64_t obj) {
         return NULL;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
 
     while (it.api) {
         ct_property_editor_i0 *i = (it.api);
@@ -167,7 +167,7 @@ static void draw_menu(uint64_t obj) {
         return;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
 
     while (it.api) {
         struct ct_property_editor_i0 *i = (it.api);
@@ -287,7 +287,7 @@ static const char *name(uint64_t dock) {
 
 
 static struct ct_dock_i0 dock_api = {
-        .type = CT_PROPERTY_EDITOR_I,
+        .type = CT_PROPERTY_EDITOR_I0,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
@@ -310,10 +310,10 @@ void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
             .visible = true
     };
 
-    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
-    api->add_api(CT_PROP_EDITOR_API, ct_property_editor_a0, sizeof(ct_property_editor_a0));
+    api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
+    api->add_api(CT_PROP_EDITOR_A0_STR, ct_property_editor_a0, sizeof(ct_property_editor_a0));
 
-    ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_I, true);
+    ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_I0, true);
 
 }
 

@@ -7,6 +7,8 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_SCENE_A0_STR "ct_scene_a0"
+
 #define CT_SCENE_API \
     CE_ID64_0("ct_scene_a0", 0x2ee97ac6b2e2386eULL)
 

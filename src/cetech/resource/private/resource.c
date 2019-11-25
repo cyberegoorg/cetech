@@ -59,7 +59,7 @@ struct _G {
 
 static void _resource_api_add(uint64_t name,
                               void *api) {
-    if (name == CT_RESOURCE_I) {
+    if (name == CT_RESOURCE_I0) {
         ct_resource_i0 *ct_resource_i = api;
         CE_ASSERT(LOG_WHERE, ct_resource_i->name);
 
@@ -174,7 +174,7 @@ static struct ct_resource_a0 resource_api = {
 struct ct_resource_a0 *ct_resource_a0 = &resource_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->add_api(CT_RESOURCE_API, &resource_api, sizeof(resource_api));
+    api->add_api(CT_RESOURCE_A0_STR, &resource_api, sizeof(resource_api));
 
 }
 

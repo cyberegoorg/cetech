@@ -116,7 +116,7 @@ bool cetech_kernel_init(int argc,
 
     ce_init();
 
-    ce_api_a0->add_api(CT_KERNEL_API, ct_kernel_a0, sizeof(kernel_api));
+    ce_api_a0->add_api(CT_KERNEL_A0_STR, ct_kernel_a0, sizeof(kernel_api));
 
     _G = (struct KernelGlobals) {
             .allocator = ce_memory_a0->system,
@@ -165,7 +165,7 @@ static void _build_update_graph(ce_ba_graph_t *sg) {
     ce_bag_clean(sg);
     ce_hash_clean(&_G.update_map);
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_KERNEL_TASK_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_KERNEL_TASK_I0);
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
@@ -200,7 +200,7 @@ static void _build_init_graph(ce_ba_graph_t *sg) {
     ce_hash_clean(&_G.init_map);
     ce_hash_clean(&_G.shutdown_map);
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_KERNEL_TASK_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_KERNEL_TASK_I0);
     while (it.api) {
         struct ct_kernel_task_i0 *i = (it.api);
 
@@ -263,7 +263,7 @@ static struct ct_kernel_task_i0 input_task = {
 
 
 static void cetech_kernel_start() {
-    ce_api_a0->add_impl(CT_KERNEL_TASK_I, &input_task, sizeof(input_task));
+    ce_api_a0->add_impl(CT_KERNEL_TASK_I0_STR, &input_task, sizeof(input_task));
 
     _init_config();
 

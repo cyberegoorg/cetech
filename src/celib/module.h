@@ -1,5 +1,5 @@
-#ifndef CE_PLUGIN_API_H
-#define CE_PLUGIN_API_H
+#ifndef CE_PLUGIN_A0_H
+#define CE_PLUGIN_A0_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,6 +8,8 @@ extern "C" {
 #include "celib_types.h"
 
 struct ce_api_a0;
+
+#define CE_MODULE_A0_STR "ce_module_a0"
 
 #define CE_MODULE0_API \
     CE_ID64_0("ce_module_a0", 0x23a8afeb527d63dcULL)
@@ -72,4 +74,4 @@ CE_MODULE(ce_module_a0);
 };
 #endif
 
-#endif //CE_PLUGIN_API_H
+#endif //CE_PLUGIN_A0_H

@@ -742,25 +742,25 @@ void CE_MODULE_LOAD(physics_box2d)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_RENDERER_COMPONENT_I,
+    api->add_impl(CT_RENDERER_COMPONENT_I0_STR,
                   &debug_renderer_i, sizeof(debug_renderer_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics2D_system_i, sizeof(physics2D_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics2D_destroy_system_i, sizeof(physics2D_destroy_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics2D_spawn_world_system_i, sizeof(physics2D_spawn_world_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics2D_destroy_worl_system_i, sizeof(physics2D_destroy_worl_system_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &box2d_component_i, sizeof(box2d_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &box2d_world_component_i, sizeof(box2d_world_component_i));
 
     gb2Draw.SetFlags(~0);

@@ -98,7 +98,7 @@ static uint64_t dock_flags() {
 }
 
 static struct ct_dock_i0 dock_api = {
-        .type =  CT_GAME_I,
+        .type =  CT_GAME_I0,
         .ui_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
@@ -112,9 +112,9 @@ void CE_MODULE_LOAD(game_view)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_id_a0);
 
-    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
 
-    ct_dock_a0->create_dock(CT_GAME_I, true);
+    ct_dock_a0->create_dock(CT_GAME_I0, true);
 }
 
 void CE_MODULE_UNLOAD(game_view)(struct ce_api_a0 *api,

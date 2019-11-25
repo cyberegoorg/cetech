@@ -8,11 +8,15 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
+#define CT_PROP_EDITOR_A0_STR "ct_property_editor_a0"
+
 #define CT_PROP_EDITOR_API \
     CE_ID64_0("ct_property_editor_a0", 0x10996d5471937b8aULL)
 
 
-#define CT_PROPERTY_EDITOR_I \
+#define CT_PROPERTY_EDITOR_I0_STR "ct_property_editor_i0"
+
+#define CT_PROPERTY_EDITOR_I0 \
     CE_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)
 
 typedef struct ce_cdb_uuid_t0 ct_resource_id_t0;

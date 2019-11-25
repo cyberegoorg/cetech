@@ -8,6 +8,8 @@ extern "C" {
 #include <stddef.h>
 
 
+#define CT_CAMERA_A0_STR "ct_camera_a0"
+
 #define CT_CAMERA_API \
     CE_ID64_0("ct_camera_a0", 0x66ecb4e7c5973115ULL)
 

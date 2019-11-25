@@ -281,7 +281,7 @@ void CE_MODULE_LOAD (config)(struct ce_api_a0 *api,
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 
-    api->add_api(CE_CONFIG_API, &config_a0, sizeof(config_a0));
+    api->add_api("ce_config_a0", &config_a0, sizeof(config_a0));
 
     ce_cdb_a0->reg_obj_type(CE_CONFIG_TYPE, CE_ARR_ARG(config_cdb_type_def));
     ce_cdb_a0->reg_obj_type(CE_CONFIG_VARIABLE_REF, CE_ARR_ARG(config_variable_ref_cdb_type_def));

@@ -7,11 +7,14 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_NODE_GRAPH_A0_STR "ct_node_graph_a0"
 
 #define CT_NODE_GRAPH_API \
     CE_ID64_0("ct_node_graph_a0", 0x83f8b5f2c9f24145ULL)
 
-#define CT_NODE_I \
+#define CT_NODE_I0_STR "ct_node_i0"
+
+#define CT_NODE_I0 \
     CE_ID64_0("ct_node_i0", 0x31747424097dbbefULL)
 
 #define CT_NODE_GRAPH_RESOURCE \

@@ -10,6 +10,8 @@ extern "C" {
 #include <stdbool.h>
 
 
+#define CT_RESOURCE_UI_A0_STR "ct_editor_ui_a0"
+
 #define CT_RESOURCE_UI_API \
     CE_ID64_0("ct_editor_ui_a0", 0x864e3516a3c025aeULL)
 

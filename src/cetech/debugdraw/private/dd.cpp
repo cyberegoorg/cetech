@@ -112,7 +112,7 @@ void CE_MODULE_LOAD(dd)(struct ce_api_a0 *api,
                         int reload) {
     _G = (struct _G) {};
 
-    api->add_api(CT_DD_A0, ct_dd_a0, sizeof(struct ct_dd_a0));
+    api->add_api(CT_DD_A0_STR, ct_dd_a0, sizeof(struct ct_dd_a0));
 
     ddInit();
 }

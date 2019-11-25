@@ -78,7 +78,7 @@ static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
         return NULL;
     }
 
-    return resource_i->get_interface(RESOURCE_PREVIEW_I);
+    return resource_i->get_interface(RESOURCE_PREVIEW_I0);
 }
 
 static void set_asset(preview_instance *pi,
@@ -230,7 +230,7 @@ static bool init() {
                              }
                      })));
 
-    ct_dock_a0->create_dock(RESOURCE_PREVIEW_I, true);
+    ct_dock_a0->create_dock(RESOURCE_PREVIEW_I0, true);
     return true;
 }
 
@@ -277,7 +277,7 @@ static void resource_tooltip(ce_cdb_uuid_t0 resourceid,
         return;
     }
 
-    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I));
+    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I0));
 
     uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resourceid);
 
@@ -350,7 +350,7 @@ static uint64_t open(uint64_t dock) {
 
 
 static struct ct_dock_i0 dock_api = {
-        .type = RESOURCE_PREVIEW_I,
+        .type = RESOURCE_PREVIEW_I0,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_dock,
@@ -380,9 +380,9 @@ void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->add_api(CT_ASSET_PREVIEW_API, &asset_preview_api, sizeof(asset_preview_api));
-    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
-    api->add_impl(CT_EDITOR_MODULE_I, &ct_editor_module_api, sizeof(ct_editor_module_api));
+    api->add_api(CT_ASSET_PREVIEW_A0_STR, &asset_preview_api, sizeof(asset_preview_api));
+    api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_EDITOR_MODULE_I0_STR, &ct_editor_module_api, sizeof(ct_editor_module_api));
 }
 
 void CE_MODULE_UNLOAD(asset_preview)(struct ce_api_a0 *api,

@@ -122,7 +122,7 @@ static void _create_from_modal(const char *modal_id) {
         char *buffer = NULL;
         ce_hash_t type_hash = {};
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I0);
         uint32_t idx = 1;
         while (it.api) {
             struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
@@ -345,7 +345,7 @@ static void _select_type_modal(const char *modal_id) {
             _selected_type[0] = '\0';
         };
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I0);
         while (it.api) {
             struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
 
@@ -597,7 +597,7 @@ void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
 
     CE_INIT_API(api, ce_cdb_a0);
 
-    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
 
     _G = (struct _G) {
             .allocator = ce_memory_a0->system,

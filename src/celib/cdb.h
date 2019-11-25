@@ -7,6 +7,8 @@ extern "C" {
 
 #include "celib_types.h"
 
+#define CE_CDB_A0_STR "ce_cdb_a0"
+
 #define CE_CDB_API \
     CE_ID64_0("ce_cdb_a0", 0xf069efc5d4120b7bULL)
 

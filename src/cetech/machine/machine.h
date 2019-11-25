@@ -8,6 +8,8 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+#define CT_MACHINE_A0_STR "ct_machine_a0"
+
 #define CT_MACHINE_API \
     CE_ID64_0("ct_machine_a0", 0xce8b7f45bc305909ULL)
 

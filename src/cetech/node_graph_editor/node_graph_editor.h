@@ -7,11 +7,13 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_NODE_GRAPH_EDITOR_A0_STR "ct_node_graph_editor_a0"
+
 #define CT_NODE_GRAPH_EDITOR_API \
     CE_ID64_0("ct_node_graph_editor_a0", 0xc13af81eb433e221ULL)
 
 
-#define CT_EDITOR_NODE_I \
+#define CT_EDITOR_NODE_I0 \
     CE_ID64_0("ct_editor_node_i0", 0x3cb5090f34945e9bULL)
 
 

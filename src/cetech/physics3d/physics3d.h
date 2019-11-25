@@ -13,6 +13,8 @@ extern "C" {
 #define PHYSICS3D_SYSTEM \
    CE_ID64_0("physics3d_system", 0x1a502fdb5130e3e7ULL)
 
+#define CT_PHYSICS3D_A0_STR "ct_physics3d_a0"
+
 #define CT_PHYSICS3D_A0 \
     CE_ID64_0("ct_physics3d_a0", 0x5f3b66dce0aa7c35ULL)
 

@@ -143,7 +143,7 @@ void CE_MODULE_LOAD(selected_object)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    api->add_api(CT_SELECTED_OBJECT_API,
+    api->add_api(CT_SELECTED_OBJECT_A0_STR,
                  &ct_selected_object_api0,
                  sizeof(ct_selected_object_api0));
 }

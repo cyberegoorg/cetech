@@ -462,35 +462,35 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &transform_c_api, sizeof(transform_c_api));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &local_to_parent_c_api, sizeof(local_to_parent_c_api));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &transform_system_i0, sizeof(transform_system_i0));
 
-    api->add_impl(CT_ECS_SYSTEM_GROUP_I,
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I0_STR,
                   &transform_group, sizeof(transform_group));
 
     ///
-    api->add_impl(CT_ECS_COMPONENT_I, &position_c_api, sizeof(position_c_api));
-    api->add_impl(CT_ECS_COMPONENT_I, &rotation_c_api, sizeof(rotation_c_api));
-    api->add_impl(CT_ECS_COMPONENT_I, &scale_c_api, sizeof(scale_c_api));
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &position_c_api, sizeof(position_c_api));
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &rotation_c_api, sizeof(rotation_c_api));
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &scale_c_api, sizeof(scale_c_api));
 
     ce_cdb_a0->reg_obj_type(POSITION_COMPONENT, position_c_prop, CE_ARRAY_LEN(position_c_prop));
     ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT, rotation_c_prop, CE_ARRAY_LEN(rotation_c_prop));
     ce_cdb_a0->reg_obj_type(SCALE_COMPONENT, scale_c_prop, CE_ARRAY_LEN(scale_c_prop));
     ///
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &position_property_editor_api, sizeof(position_property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &rotation_property_editor_api, sizeof(rotation_property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &scale_property_editor_api, sizeof(scale_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,

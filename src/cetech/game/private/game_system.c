@@ -87,7 +87,7 @@ static void game_play() {
 
 static void _game_api_add(uint64_t name,
                           void *api) {
-    if (CT_GAME_I == name) {
+    if (CT_GAME_I0 == name) {
         ct_game_i0 *game_i = api;
 
         if (_G.game) {
@@ -127,8 +127,8 @@ void CE_MODULE_LOAD (game_system)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    api->add_api(CT_GAME_SYSTEM_API, ct_game_system_a0, sizeof(game_system_api));
-    api->add_impl(CT_KERNEL_TASK_I, &game_task, sizeof(game_task));
+    api->add_api(CT_GAME_SYSTEM_A0_STR, ct_game_system_a0, sizeof(game_system_api));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &game_task, sizeof(game_task));
 
     ce_api_a0->register_on_add(_game_api_add);
 

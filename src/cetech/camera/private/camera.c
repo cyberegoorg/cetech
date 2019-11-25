@@ -162,17 +162,17 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_api(CT_CAMERA_API, &camera_api, sizeof(camera_api));
+    api->add_api(CT_CAMERA_A0_STR, &camera_api, sizeof(camera_api));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &ct_component_api,
                   sizeof(ct_component_api));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &ct_active_camera_component,
                   sizeof(ct_active_camera_component));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &property_editor_api,
                   sizeof(property_editor_api));
 

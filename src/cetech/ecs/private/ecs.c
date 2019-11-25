@@ -1259,7 +1259,7 @@ static void _build_graphs() {
 
     uint64_t *graphs = NULL;
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_GROUP_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_SYSTEM_GROUP_I0);
     while (it.api) {
         ct_system_group_i0 *i = (it.api);
 
@@ -1293,7 +1293,7 @@ static void _build_graphs() {
         it = ce_api_a0->next(it);
     }
 
-    it = ce_api_a0->first(CT_ECS_SYSTEM_I);
+    it = ce_api_a0->first(CT_ECS_SYSTEM_I0);
     while (it.api) {
         struct ct_system_i0 *i = (it.api);
 
@@ -1508,7 +1508,7 @@ void *get_resource_interface(uint64_t name_hash) {
             .load = load,
     };
 
-    if (name_hash == RESOURCE_PREVIEW_I) {
+    if (name_hash == RESOURCE_PREVIEW_I0) {
         return &ct_resource_preview_i0;
     };
 
@@ -1765,7 +1765,7 @@ struct ct_ecs_q_a0 *ct_ecs_q_a0 = &q_api;
 static void _on_api_add(uint64_t name,
                         void *api) {
 
-    if (CT_ECS_COMPONENT_I == name) {
+    if (CT_ECS_COMPONENT_I0 == name) {
         ct_ecs_component_i0 *component_i = api;
 
         if (!component_i->cdb_type) {
@@ -1794,7 +1794,7 @@ static void _on_api_add(uint64_t name,
             }
         }
 
-    } else if (CT_ECS_SYSTEM_I == name) {
+    } else if (CT_ECS_SYSTEM_I0 == name) {
         uint32_t n = ce_array_size(_G.world_array);
         for (int i = 0; i < n; ++i) {
             _G.world_array[i].global_world_version++;
@@ -2125,19 +2125,19 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
 
     ce_array_set_capacity(_G.cmd_buf_pool, 64, _G.allocator);
 
-    api->add_api(CT_ECS_API, &_api, sizeof(_api));
-    api->add_api(CT_ECS_E_API, &e_api, sizeof(e_api));
-    api->add_api(CT_ECS_C_API, &c_api, sizeof(c_api));
-    api->add_api(CT_ECS_Q_API, &q_api, sizeof(q_api));
+    api->add_api(CT_ECS_A0_STR, &_api, sizeof(_api));
+    api->add_api(CT_ECS_E_A0_STR, &e_api, sizeof(e_api));
+    api->add_api(CT_ECS_C_A0_STR, &c_api, sizeof(c_api));
+    api->add_api(CT_ECS_Q_A0_STR, &q_api, sizeof(q_api));
 
-    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->add_impl(CT_ASSET_IO_I, &entitiy_io, sizeof(entitiy_io));
-    api->add_impl(CT_KERNEL_TASK_I, &ecs_sync_task, sizeof(ecs_sync_task));
+    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_IO_I0_STR, &entitiy_io, sizeof(entitiy_io));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &ecs_sync_task, sizeof(ecs_sync_task));
 
-    api->add_impl(CT_ECS_SYSTEM_GROUP_I, &simulation_sysg, sizeof(simulation_sysg));
-    api->add_impl(CT_ECS_SYSTEM_GROUP_I, &presentation_sysg, sizeof(presentation_sysg));
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I0_STR, &simulation_sysg, sizeof(simulation_sysg));
+    api->add_impl(CT_ECS_SYSTEM_GROUP_I0_STR, &presentation_sysg, sizeof(presentation_sysg));
 
-    api->add_impl(CT_DOCK_I, &ecs_debuger_dock, sizeof(ecs_debuger_dock));
+    api->add_impl(CT_DOCK_I0_STR, &ecs_debuger_dock, sizeof(ecs_debuger_dock));
 
     api->register_on_add(_on_api_add);
 

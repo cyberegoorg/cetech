@@ -9,6 +9,7 @@ extern "C" {
 #include <stdarg.h>
 #include <stdbool.h>
 
+#define CT_RENDERER_A0_STR "ct_renderer_a0"
 #define CT_RENDERER_API \
     CE_ID64_0("ct_renderer_a0", 0xfe29b15a8b749c94ULL)
 
@@ -39,7 +40,8 @@ extern "C" {
 #define CT_RENDER_TASK \
      CE_ID64_0("render_task", 0x193bb679e415e81bULL)
 
-#define CT_RENDERER_COMPONENT_I \
+#define CT_RENDERER_COMPONENT_I0_STR "ct_renderer_component_i0"
+#define CT_RENDERER_COMPONENT_I0 \
      CE_ID64_0("ct_renderer_component_i0", 0xe832f6a0542ec6a0ULL)
 
 

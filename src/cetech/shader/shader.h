@@ -10,9 +10,10 @@ extern "C" {
 #include <stdint.h>
 #include <cetech/renderer/renderer.h>
 
+#define CT_SHADER_A0_STR "ct_shader_a0"
+
 #define CT_SHADER_API \
     CE_ID64_0("ct_shader_a0", 0x6a9d892dacfc7576ULL)
-
 
 #define SHADER_TYPE \
     CE_ID64_0("shader", 0xcce8d5b5f5ae333fULL)

@@ -365,8 +365,8 @@ void CE_MODULE_LOAD(debugui)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_UNUSED(reload);
 
-    api->add_api(CT_DEBUGUI_API, &debugui_api, sizeof(debugui_api));
-    api->add_impl(CT_KERNEL_TASK_I, &debugui_task, sizeof(debugui_task));
+    api->add_api(CT_DEBUGUI_A0_STR, &debugui_api, sizeof(debugui_api));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &debugui_task, sizeof(debugui_task));
 
     imguiCreate(12);
 

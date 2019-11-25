@@ -8,7 +8,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#define CT_EDITOR_MODULE_I \
+#define CT_EDITOR_MODULE_I0_STR "ct_editor_module_i0"
+
+#define CT_EDITOR_MODULE_I0 \
     CE_ID64_0("ct_editor_module_i0", 0x761dbf8cf91061a1ULL)
 
 #define CT_EDITOR_TASK \

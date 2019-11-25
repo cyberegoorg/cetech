@@ -319,9 +319,9 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
 
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
-    api->add_api(CT_SHADER_API, &shader_api, sizeof(shader_api));
-    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->add_impl(CT_ASSET_IO_I, &shader_io, sizeof(shader_io));
+    api->add_api(CT_SHADER_A0_STR, &shader_api, sizeof(shader_api));
+    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_IO_I0_STR, &shader_io, sizeof(shader_io));
 
     ce_cdb_a0->reg_obj_type(SHADER_TYPE, CE_ARR_ARG(shader_type_def));
 }

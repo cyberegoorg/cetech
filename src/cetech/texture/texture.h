@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define CT_TEXTURE_A0_STR "ct_texture_a0"
+
 #define CT_TEXTURE_API \
     CE_ID64_0("ct_texture_a0", 0x642bfe2717995f2fULL)
 

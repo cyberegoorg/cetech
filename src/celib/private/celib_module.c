@@ -319,7 +319,7 @@ void CE_MODULE_LOAD(module)(struct ce_api_a0 *api,
     };
 
     ce_api_a0 = api;
-    api->add_api(CE_MODULE0_API, &module_api, sizeof(module_api));
+    api->add_api(CE_MODULE_A0_STR, &module_api, sizeof(module_api));
 
 
 }

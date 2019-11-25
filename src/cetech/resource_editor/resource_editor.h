@@ -7,7 +7,9 @@ extern "C" {
 
 #include <stdint.h>
 
-#define CT_RESOURCE_EDITOR_I \
+#define CT_RESOURCE_EDITOR_I0_STR "ct_resource_editor_i0"
+
+#define CT_RESOURCE_EDITOR_I0 \
     CE_ID64_0("ct_resource_editor_i0", 0x1271656210cd7528ULL)
 
 #define CT_RESOURCE_EDITOR_CONTEXT \

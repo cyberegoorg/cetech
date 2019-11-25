@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define CT_KERNEL_A0_STR "ct_kernel_a0"
+
 #define CT_KERNEL_API \
     CE_ID64_0("ct_kernel_a0", 0xdb873264c27eedf3ULL)
 
@@ -29,8 +31,10 @@ extern "C" {
 #define CT_INPUT_TASK \
     CE_ID64_0("input_task", 0xba6140c0d9e00706ULL)
 
-#define CT_KERNEL_TASK_I \
+#define CT_KERNEL_TASK_I0 \
     CE_ID64_0("ct_kernel_task_i0", 0xc47eec37e164c0a7ULL)
+
+#define CT_KERNEL_TASK_I0_STR "ct_kernel_task_i0"
 
 #define _KERNEL_LIST(...) (uint64_t[]){__VA_ARGS__}
 #define _KERNEL_LIST_SIZE(list) (sizeof(list) / sizeof(list[0]))

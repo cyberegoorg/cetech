@@ -275,7 +275,7 @@ void CE_MODULE_LOAD(entity_editor)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    api->add_impl(CT_RESOURCE_EDITOR_I, &ct_resource_editor_api, sizeof(ct_resource_editor_api));
+    api->add_impl(CT_RESOURCE_EDITOR_I0_STR, &ct_resource_editor_api, sizeof(ct_resource_editor_api));
 }
 
 void CE_MODULE_UNLOAD(entity_editor)(struct ce_api_a0 *api,

@@ -205,7 +205,7 @@ static struct ct_resource_preview_i0 ct_resource_preview_api = {
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I) {
+    if (name_hash == RESOURCE_PREVIEW_I0) {
         return &ct_resource_preview_api;
     }
     return NULL;
@@ -294,7 +294,7 @@ static struct ct_scene_a0 scene_api = {
 struct ct_scene_a0 *ct_scene_a0 = &scene_api;
 
 static void _init_api(struct ce_api_a0 *api) {
-    api->add_api(CT_SCENE_API, &scene_api, sizeof(scene_api));
+    api->add_api(CT_SCENE_A0_STR, &scene_api, sizeof(scene_api));
 }
 
 
@@ -465,9 +465,9 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
 
     };
 
-    ce_api_a0->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    ce_api_a0->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &property_editor_api, sizeof(property_editor_api));
 
     scenecompiler_init(api);

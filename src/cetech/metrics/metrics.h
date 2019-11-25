@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_METRICS_A0_STR "ct_metrics_a0"
 #define CT_METRICS_API \
    CE_ID64_0("ct_metrics_a0", 0xcb85cc37c965043ULL)
 

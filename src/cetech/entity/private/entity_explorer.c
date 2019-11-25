@@ -321,7 +321,7 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
             .draw_menu = draw_menu,
     };
 
-    api->add_impl(CT_EXPLORER_I, &entity_explorer, sizeof(entity_explorer));
+    api->add_impl(CT_EXPLORER_I0_STR, &entity_explorer, sizeof(entity_explorer));
 }
 
 void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,

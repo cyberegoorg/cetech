@@ -8,6 +8,8 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
+#define CT_ACTION_MANAGER_A0_STR "ct_action_manager_a0"
+
 #define CT_ACTION_MANAGER_API \
     CE_ID64_0("ct_action_manager_a0", 0xcdad2ddf745f6c55ULL)
 

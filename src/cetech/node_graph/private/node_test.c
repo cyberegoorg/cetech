@@ -29,7 +29,7 @@ static uint64_t cdb_type() {
 }
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == CT_EDITOR_NODE_I) {
+    if (name_hash == CT_EDITOR_NODE_I0) {
         return &editor_node_i0;
     }
     return NULL;
@@ -85,7 +85,7 @@ void CE_MODULE_LOAD (node_test)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_NODE_I, &node_i0, sizeof(node_i0));
+    api->add_impl(CT_NODE_I0_STR, &node_i0, sizeof(node_i0));
 
 }
 

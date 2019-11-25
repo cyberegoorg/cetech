@@ -196,9 +196,9 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
-    api->add_impl(CT_RENDERER_COMPONENT_I, &rectangle_renderer_i, sizeof(rectangle_renderer_i));
-    api->add_impl(CT_PROPERTY_EDITOR_I, &rectangle_renderer_property_editor_api,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_RENDERER_COMPONENT_I0_STR, &rectangle_renderer_i, sizeof(rectangle_renderer_i));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &rectangle_renderer_property_editor_api,
                   sizeof(rectangle_renderer_property_editor_api));
 
     ct_gfx_a0->bgfx_vertex_layout_begin(&pt_vertex_decl,
@@ -232,7 +232,7 @@ void CE_MODULE_UNLOAD(rectangle_render)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    api->remove_impl(CT_RENDERER_COMPONENT_I, &rectangle_renderer_i);
-    api->remove_impl(CT_PROPERTY_EDITOR_I, &rectangle_renderer_property_editor_api);
-    api->remove_impl(CT_ECS_COMPONENT_I, &ct_component_api);
+    api->remove_impl(CT_RENDERER_COMPONENT_I0, &rectangle_renderer_i);
+    api->remove_impl(CT_PROPERTY_EDITOR_I0, &rectangle_renderer_property_editor_api);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &ct_component_api);
 }

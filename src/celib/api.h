@@ -1,7 +1,7 @@
 // # API
 
-#ifndef CE_API_H
-#define CE_API_H
+#ifndef CE_A0_H
+#define CE_A0_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,12 +11,13 @@ extern "C" {
 
 #include "murmur.h"
 
-#define CE_API_API \
+
+#define CE_A0_API \
     CE_ID64_0("ce_api_a0", 0x95b23cc231103112ULL)
 
 // Init api
 #define CE_INIT_API(_api, name) \
-    name = (struct name*) (_api)->get(ce_hash_murmur2_64(#name, strlen(#name), 0))
+    name = (struct name*) (_api)->get(#name)
 
 
 // Api entry
@@ -38,11 +39,11 @@ typedef void (ce_api_on_remove_t0)(uint64_t name,
                                    void *api);
 
 struct ce_api_a0 {
-    void (*add_api)(uint64_t name_id,
+    void (*add_api)(const char *name,
                     void *api,
                     uint32_t size);
 
-    void (*add_impl)(uint64_t name_id,
+    void (*add_impl)(const char *name,
                      void *api,
                      uint32_t size);
 
@@ -54,7 +55,7 @@ struct ce_api_a0 {
 
     int (*exist)(const char *name);
 
-    void *(*get)(uint64_t name);
+    void *(*get)(const char* name);
 
     ce_api_entry_t0 (*first)(uint64_t name);
 
@@ -70,4 +71,4 @@ CE_MODULE(ce_api_a0);
 };
 #endif
 
-#endif //CE_API_H
+#endif //CE_A0_H

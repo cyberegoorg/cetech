@@ -632,7 +632,7 @@ void CE_MODULE_LOAD(resourcedb)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->add_api(CT_BUILDDB_API, ct_resourcedb_a0, sizeof(ct_resourcedb_api));
+    api->add_api(CT_BUILDDB_A0_STR, ct_resourcedb_a0, sizeof(ct_resourcedb_api));
 
     resourcedb_init_db();
 }

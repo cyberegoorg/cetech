@@ -175,7 +175,7 @@
 // Android compiler defines __linux__
 #	include <sys/cdefs.h> // Defines __BIONIC__ and includes android/api-level.h
 #	undef  CE_PLATFORM_ANDROID
-#	define CE_PLATFORM_ANDROID __ANDROID_API__
+#	define CE_PLATFORM_ANDROID __ANDROID_A0__
 #elif defined(__STEAMLINK__)
 // SteamLink compiler defines __linux__
 #	undef  CE_PLATFORM_STEAMLINK

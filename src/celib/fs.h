@@ -7,6 +7,8 @@ extern "C" {
 
 #include "celib_types.h"
 
+#define CE_FS_A0_STR "ce_fs_a0"
+
 #define CE_FS_API \
     CE_ID64_0("ce_fs_a0", 0xb833e93306ececb0ULL)
 

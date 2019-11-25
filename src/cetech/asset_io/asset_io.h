@@ -9,13 +9,19 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#define CT_ASSET_IO_A0_STR "ct_asset_io_a0"
+
 #define CT_ASSET_IO_API \
     CE_ID64_0("ct_asset_io_a0", 0x823c8aaed53dfa2aULL)
 
-#define CT_ASSET_IO_I \
+#define CT_ASSET_IO_I0_STR "ct_asset_io_i0"
+
+#define CT_ASSET_IO_I0 \
     CE_ID64_0("ct_asset_io_i0", 0xf1029647efb47d31ULL)
 
-#define CT_DCC_ASSET_IO_I \
+#define CT_DCC_ASSET_IO_I0_STR "ct_asset_dcc_io_i0"
+
+#define CT_DCC_ASSET_IO_I0 \
     CE_ID64_0("ct_asset_dcc_io_i0", 0xd08dd66b6b1f23c0ULL)
 
 #define CT_DCC_IMPORT_GROUP \

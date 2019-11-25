@@ -325,7 +325,7 @@ static struct ct_resource_preview_i0 ct_resource_preview_api = {
 
 
 void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I) {
+    if (name_hash == RESOURCE_PREVIEW_I0) {
         return &ct_resource_preview_api;
     }
 
@@ -447,17 +447,17 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
-    api->add_api(CT_TEXTURE_API, &texture_api, sizeof(texture_api));
+    api->add_api(CT_TEXTURE_A0_STR, &texture_api, sizeof(texture_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &property_editor_api, sizeof(property_editor_api));
 
-    api->add_impl(CT_KERNEL_TASK_I,
+    api->add_impl(CT_KERNEL_TASK_I0_STR,
                   &texture_compile_watch_task, sizeof(texture_compile_watch_task));
 
-    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
 
-    api->add_impl(CT_DCC_ASSET_IO_I, &texture_io, sizeof(texture_io));
+    api->add_impl(CT_DCC_ASSET_IO_I0_STR, &texture_io, sizeof(texture_io));
 
     ce_cdb_a0->reg_obj_type(TEXTURE_TYPE, texture_prop, CE_ARRAY_LEN(texture_prop));
     ce_cdb_a0->reg_obj_type(CT_DCC_ASSET_TEXTURE_TYPE,

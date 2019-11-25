@@ -116,25 +116,25 @@ void CE_MODULE_LOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Init %d", reload);
 
-    api->add_api(CT_GAME_I,
+    api->add_api(CT_GAME_I0_STR,
                  &game_i0, sizeof(game_i0));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &player_input_component_i, sizeof(player_input_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &ball_component_i, sizeof(ball_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &pad_component_i, sizeof(pad_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &rectangle_component_i, sizeof(rectangle_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &gamepad_controler_component_i, sizeof(gamepad_controler_component_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &player_input_system_i0, sizeof(player_input_system_i0));
 
     ce_cdb_a0->reg_obj_type(GAMEPAD_COMPONENT,
@@ -161,13 +161,13 @@ void CE_MODULE_UNLOAD (example_develop)(struct ce_api_a0 *api,
 
     ce_log_a0->info("example", "Shutdown %d", reload);
 
-    api->remove_impl(CT_ECS_SYSTEM_I, &player_input_system_i0);
+    api->remove_impl(CT_ECS_SYSTEM_I0, &player_input_system_i0);
 
-    api->remove_impl(CT_ECS_COMPONENT_I, &player_input_component_i);
-    api->remove_impl(CT_ECS_COMPONENT_I, &ball_component_i);
-    api->remove_impl(CT_ECS_COMPONENT_I, &pad_component_i);
-    api->remove_impl(CT_ECS_COMPONENT_I, &rectangle_component_i);
-    api->remove_impl(CT_ECS_COMPONENT_I, &gamepad_controler_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &player_input_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &ball_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &pad_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &rectangle_component_i);
+    api->remove_impl(CT_ECS_COMPONENT_I0, &gamepad_controler_component_i);
 
     rectangle_render_unload_module(api, reload);
 }

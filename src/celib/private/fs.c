@@ -409,7 +409,7 @@ void CE_MODULE_LOAD(filesystem)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_api(CE_FS_API, &_api, sizeof(_api));
+    api->add_api(CE_FS_A0_STR, &_api, sizeof(_api));
 
     ce_log_a0->debug(LOG_WHERE, "Init");
 }

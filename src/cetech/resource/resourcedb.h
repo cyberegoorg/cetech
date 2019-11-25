@@ -8,6 +8,8 @@ extern "C" {
 #include <stdint.h>
 #include <time.h>
 
+#define CT_BUILDDB_A0_STR "ct_resourcedb_a0"
+
 #define CT_BUILDDB_API \
    CE_ID64_0("ct_resourcedb_a0", 0xc81a8d961ebf878ULL)
 

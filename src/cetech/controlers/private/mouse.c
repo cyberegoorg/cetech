@@ -231,8 +231,8 @@ void CE_MODULE_LOAD(mouse)(struct ce_api_a0 *api,
             .ev_queue = ct_machine_a0->new_ev_listener(),
     };
 
-    api->add_impl(CT_CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
-    api->add_impl(CT_KERNEL_TASK_I, &mouse_task, sizeof(mouse_task));
+    api->add_impl(CT_CONTROLERS_I0_STR, &ct_controlers_api, sizeof(ct_controlers_api));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &mouse_task, sizeof(mouse_task));
 }
 
 void CE_MODULE_UNLOAD(mouse)(struct ce_api_a0 *api,

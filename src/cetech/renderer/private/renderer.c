@@ -208,7 +208,7 @@ static void renderer_get_size(uint32_t *width,
 
 static void _feed_module(ct_world_t0 world,
                          struct ct_rg_module_t0 *module) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I0);
     while (it.api) {
         struct ct_renderer_component_i0 *i = (ct_renderer_component_i0 *) (it.api);
 
@@ -222,7 +222,7 @@ static void _feed_module(ct_world_t0 world,
 
 void _render_components(ct_world_t0 world,
                         struct ct_rg_builder_t0 *builder) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RENDERER_COMPONENT_I0);
     while (it.api) {
         ct_renderer_component_i0 *ci = (ct_renderer_component_i0 *) (it.api);
 
@@ -444,10 +444,10 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
 
-    api->add_api(CT_RENDERER_API, &rendderer_api, sizeof(rendderer_api));
-    api->add_api(CT_GFX_API, &gfx_api, sizeof(gfx_api));
-    api->add_impl(CT_KERNEL_TASK_I, &render_task, sizeof(render_task));
-    api->add_impl(CT_KERNEL_TASK_I, &render_begin_task, sizeof(render_begin_task));
+    api->add_api(CT_RENDERER_A0_STR, &rendderer_api, sizeof(rendderer_api));
+    api->add_api(CT_GFX_A0_STR, &gfx_api, sizeof(gfx_api));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &render_task, sizeof(render_task));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &render_begin_task, sizeof(render_begin_task));
 
     ce_api_a0 = api;
 
@@ -479,10 +479,10 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
 
     _G.vsync = ce_config_a0->read_uint(CONFIG_SCREEN_VSYNC, 1) > 0;
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &render_system, sizeof(render_system));
 
-    api->add_impl(CT_ECS_COMPONENT_I, &viewport_component_i, sizeof(viewport_component_i));
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &viewport_component_i, sizeof(viewport_component_i));
 
     ce_cdb_a0->reg_obj_type(VIEWPORT_COMPONENT, NULL, 0);
 

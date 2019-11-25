@@ -9,22 +9,26 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#define CT_ECS_A0_STR "ct_ecs_a0"
 #define CT_ECS_API \
     CE_ID64_0("ct_ecs_a0", 0x2abf54879e52240fULL)
 
+#define CT_ECS_E_A0_STR "ct_ecs_e_a0"
 #define CT_ECS_E_API \
     CE_ID64_0("ct_ecs_e_a0", 0x16082519819f93abULL)
 
+#define CT_ECS_C_A0_STR "ct_ecs_c_a0"
 #define CT_ECS_C_API \
     CE_ID64_0("ct_ecs_c_a0", 0xfef0f9e05beb0918ULL)
 
+#define CT_ECS_Q_A0_STR "ct_ecs_q_a0"
 #define CT_ECS_Q_API \
     CE_ID64_0("ct_ecs_q_a0", 0x6335c7d4eda844edULL)
 
 #define CT_ECS_SYNC_TASK \
     CE_ID64_0("ecs_sync_task", 0x5dd474f338cddf7ULL)
 
-#define CT_EDITOR_COMPONENT_I \
+#define CT_EDITOR_COMPONENT_I0 \
     CE_ID64_0("ct_editor_component_i0", 0x5b3beb29b490cfd8ULL)
 
 #define ENTITY_INSTANCE \
@@ -42,13 +46,19 @@ extern "C" {
 #define ENTITY_TYPE \
     CE_ID64_0("entity", 0x9831ca893b0d087dULL)
 
-#define CT_ECS_SYSTEM_I \
+#define CT_ECS_SYSTEM_I0_STR "ct_system_i0"
+
+#define CT_ECS_SYSTEM_I0 \
     CE_ID64_0("ct_system_i0", 0x1b993a5859f15c5cULL)
 
-#define CT_ECS_SYSTEM_GROUP_I \
+#define CT_ECS_SYSTEM_GROUP_I0_STR "ct_system_group_i0"
+
+#define CT_ECS_SYSTEM_GROUP_I0 \
     CE_ID64_0("ct_system_group_i0", 0xabe09ba0753e7968ULL)
 
-#define CT_ECS_COMPONENT_I \
+#define CT_ECS_COMPONENT_I0_STR "ct_ecs_component_i0"
+
+#define CT_ECS_COMPONENT_I0 \
     CE_ID64_0("ct_ecs_component_i0", 0x9fda2263be703cb3ULL)
 
 #define CT_ECS_SIMULATION_GROUP \

@@ -34,7 +34,7 @@ static struct _G {
 } _G;
 
 static struct ct_ecs_component_i0 *get_component_interface(uint64_t cdb_type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I0);
     while (it.api) {
         struct ct_ecs_component_i0 *i = (it.api);
 
@@ -173,7 +173,7 @@ static void _add_comp_popup(ce_cdb_t0 db,
                                  0, NULL);
 
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_ECS_COMPONENT_I0);
         while (it.api) {
             struct ct_ecs_component_i0 *i = (it.api);
 
@@ -265,7 +265,7 @@ void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system
     };
 
-    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &property_editor_api, sizeof(property_editor_api));
 
 }
 

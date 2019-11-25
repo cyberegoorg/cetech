@@ -10,6 +10,8 @@ extern "C" {
 
 #include "celib/celib_types.h"
 
+#define CE_OS_PATH_A0_STR "ce_os_path_a0"
+
 #define CE_OS_PATH_API \
     CE_ID64_0("ce_os_path_a0", 0xb1f6bb5e13c8aca1ULL)
 

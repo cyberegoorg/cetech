@@ -7,6 +7,8 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_RG_A0_STR "ct_rg_a0"
+
 #define CT_RG_API \
     CE_ID64_0("ct_rg_a0", 0xa4e3156b3079009bULL)
 

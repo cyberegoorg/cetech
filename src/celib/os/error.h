@@ -10,6 +10,8 @@ extern "C" {
 
 #include "celib/celib_types.h"
 
+#define CE_OS_ERROR_A0_STR "ce_os_error_a0"
+
 #define CE_OS_ERROR_API \
     CE_ID64_0("ce_os_error_a0", 0x67f389a4cfbbeb51ULL)
 

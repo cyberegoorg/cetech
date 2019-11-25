@@ -48,14 +48,14 @@ static bgfx_vertex_layout_t ms_decl;
 
 static void init_decl() {
     ct_gfx_a0->bgfx_vertex_layout_begin(&ms_decl,
-                                      ct_gfx_a0->bgfx_get_renderer_type());
+                                        ct_gfx_a0->bgfx_get_renderer_type());
     ct_gfx_a0->bgfx_vertex_layout_add(&ms_decl,
-                                    BGFX_ATTRIB_POSITION, 3,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_POSITION, 3,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_add(&ms_decl,
-                                    BGFX_ATTRIB_TEXCOORD0, 2,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_TEXCOORD0, 2,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_end(&ms_decl);
 }
@@ -101,7 +101,7 @@ static void output_pass_on_pass(void *inst,
     ct_gfx_a0->bgfx_set_view_transform(viewid, NULL, proj);
 
     static uint64_t copy_material = 0;
-    if(!copy_material){
+    if (!copy_material) {
         copy_material = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(),
                                                 (ce_cdb_uuid_t0) {0xe27880f9fbb28b8d});
     }
@@ -213,7 +213,7 @@ void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
 
     init_decl();
 
-    api->add_api(CT_DEFAULT_RG_API, &default_render_graph_api,
+    api->add_api(CT_DEFAULT_RG_A0_STR, &default_render_graph_api,
                  sizeof(default_render_graph_api));
 }
 

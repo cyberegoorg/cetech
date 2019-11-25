@@ -60,7 +60,7 @@ static struct _G {
 //==============================================================================
 
 ct_asset_io_i0 *_find_asset_io(const char *extension) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_ASSET_IO_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_ASSET_IO_I0);
     while (it.api) {
         ct_asset_io_i0 *i = (it.api);
 
@@ -76,7 +76,7 @@ ct_asset_io_i0 *_find_asset_io(const char *extension) {
 
 ct_asset_dcc_io_i0 *_find_dcc_asset_io(const char *extension,
                                        uint64_t group) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_DCC_ASSET_IO_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_DCC_ASSET_IO_I0);
     while (it.api) {
         ct_asset_dcc_io_i0 *i = (it.api);
 
@@ -521,7 +521,7 @@ void CE_MODULE_LOAD(resourcecompiler)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(CT_DCC_RESOURCE, dcc_resource_prop, CE_ARRAY_LEN(dcc_resource_prop));
 
     _init_cvar(ce_config_a0);
-    api->add_api(CT_ASSET_IO_API,
+    api->add_api(CT_ASSET_IO_A0_STR,
                  &resource_compiler_api,
                  sizeof(resource_compiler_api));
 

@@ -3253,7 +3253,7 @@ void CE_MODULE_LOAD(cdb)(struct ce_api_a0 *api,
 
     _G.global_db = create_db(MAX_OBJECTS);
 
-    api->add_api(CE_CDB_API, &cdb_api, sizeof(cdb_api));
+    api->add_api(CE_CDB_A0_STR, &cdb_api, sizeof(cdb_api));
 }
 
 void CE_MODULE_UNLOAD(cdb)(struct ce_api_a0 *api,

@@ -7,10 +7,14 @@ extern "C" {
 
 #include <stdint.h>
 
+#define CT_GAME_SYSTEM_A0_STR "ct_game_system_a0"
+
 #define CT_GAME_SYSTEM_API \
     CE_ID64_0("ct_game_system_a0", 0x1a5b2ed4808612b9ULL)
 
-#define CT_GAME_I \
+#define CT_GAME_I0_STR "ct_game_i0"
+
+#define CT_GAME_I0 \
     CE_ID64_0("ct_game_i0", 0x22500b95a05f8b37ULL)
 
 #define CT_GAME_TASK \

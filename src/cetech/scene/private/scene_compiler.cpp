@@ -141,7 +141,7 @@ extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
             .allocator=ce_memory_a0->system
     };
 
-    api->add_impl(CT_DCC_ASSET_IO_I, &gltf_io, sizeof(gltf_io));
+    api->add_impl(CT_DCC_ASSET_IO_I0_STR, &gltf_io, sizeof(gltf_io));
 
     ct_asset_io_a0->create_import_group(CT_SCENE_IMPORT_GROUP, 3.0f);
 

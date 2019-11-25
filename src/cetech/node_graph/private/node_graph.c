@@ -59,7 +59,7 @@ static struct ct_resource_preview_i0 resource_preview_i0 = {
 };
 
 static void *get_res_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I) {
+    if (name_hash == RESOURCE_PREVIEW_I0) {
         return &resource_preview_i0;
     }
     return NULL;
@@ -197,7 +197,7 @@ static void draw_menu(uint64_t selected_obj,
 }
 
 static struct ct_node_i0 *get_interface(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I0);
 
     while (it.api) {
         struct ct_node_i0 *i = (it.api);
@@ -247,18 +247,18 @@ static void _node_property_draw(ce_cdb_t0 db,
                     break;
 
                 case CT_NODE_PIN_FLOAT:
-                    ct_editor_ui_a0->prop_float(inputs_o,filter,
+                    ct_editor_ui_a0->prop_float(inputs_o, filter,
                                                 def->name, def->prop,
                                                 (ui_float_p0) {});
                     break;
 
                 case CT_NODE_PIN_STRING:
-                    ct_editor_ui_a0->prop_str(inputs_o,filter,
+                    ct_editor_ui_a0->prop_str(inputs_o, filter,
                                               def->name, def->prop, i);
                     break;
 
                 case CT_NODE_PIN_BOOL:
-                    ct_editor_ui_a0->prop_bool(inputs_o,filter,
+                    ct_editor_ui_a0->prop_bool(inputs_o, filter,
                                                def->name, def->prop);
                     break;
             }
@@ -317,10 +317,10 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
             .draw_menu = draw_menu,
     };
 
-    api->add_api(CT_NODE_GRAPH_API, &ng_api, sizeof(ng_api));
-    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->add_impl(CT_EXPLORER_I, &entity_explorer, sizeof(entity_explorer));
-    api->add_impl(CT_PROPERTY_EDITOR_I, &node_property_editor_i0,
+    api->add_api(CT_NODE_GRAPH_A0_STR, &ng_api, sizeof(ng_api));
+    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_EXPLORER_I0_STR, &entity_explorer, sizeof(entity_explorer));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &node_property_editor_i0,
                   sizeof(node_property_editor_i0));
 
     ce_cdb_a0->reg_obj_type(CT_NODE_GRAPH_NODE, node_prop, CE_ARRAY_LEN(node_prop));

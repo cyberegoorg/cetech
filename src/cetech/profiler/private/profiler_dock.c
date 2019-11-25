@@ -111,7 +111,7 @@ void CE_MODULE_LOAD(profiler)(struct ce_api_a0 *api,
             .alloc = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_DOCK_I, &profile_dock, sizeof(profile_dock));
+    api->add_impl(CT_DOCK_I0_STR, &profile_dock, sizeof(profile_dock));
 
     if (!reload) {
         ct_dock_a0->create_dock(CT_PROFILER_DOCK, true);
@@ -124,5 +124,5 @@ void CE_MODULE_UNLOAD(profiler)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_UNUSED(api);
 
-    api->remove_impl(CT_DOCK_I, &profile_dock);
+    api->remove_impl(CT_DOCK_I0, &profile_dock);
 }

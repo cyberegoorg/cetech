@@ -7,8 +7,11 @@ extern "C" {
 
 #include <stdint.h>
 
-#define CT_EXPLORER_I \
+#define CT_EXPLORER_I0_STR "ct_explorer_i0"
+
+#define CT_EXPLORER_I0 \
     CE_ID64_0("ct_explorer_i0", 0xdaa9b6ac2664c06dULL)
+
 
 typedef struct ct_explorer_i0 {
     uint64_t (*cdb_type)();

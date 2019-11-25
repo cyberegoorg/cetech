@@ -10,6 +10,8 @@ extern "C" {
 
 #include "celib/celib_types.h"
 
+#define CE_OS_THREAD_A0_STR "ce_os_thread_a0"
+
 #define CE_OS_THREAD_API \
     CE_ID64_0("ce_os_thread_a0", 0x487c28f7f512ba0dULL)
 

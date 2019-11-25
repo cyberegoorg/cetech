@@ -99,7 +99,7 @@ static void add_node_modal(const char *modal_id,
                                  0, NULL);
 
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I0);
         while (it.api) {
             struct ct_node_i0 *i = static_cast<ct_node_i0 *>(it.api);
             struct ct_editor_node_i0 *ei;
@@ -110,7 +110,7 @@ static void add_node_modal(const char *modal_id,
             }
 
             ei = static_cast<ct_editor_node_i0 *>(i->get_interface(
-                    CT_EDITOR_NODE_I));
+                    CT_EDITOR_NODE_I0));
 
             if (ei->display_name) {
                 const char *label = ei->display_name();
@@ -323,7 +323,7 @@ static void _draw_nodes(uint64_t graph,
         ImGui::PushID(node);
 
         ct_editor_node_i0 *eni = (ct_editor_node_i0 *) ni->get_interface(
-                CT_EDITOR_NODE_I);
+                CT_EDITOR_NODE_I0);
 
         uint32_t input_n = 0;
         const ct_node_pin_def *inputs = ni->input_defs(&input_n);
@@ -694,11 +694,11 @@ void CE_MODULE_LOAD (node_graph_editor)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_api(CT_NODE_GRAPH_EDITOR_API,
+    api->add_api(CT_NODE_GRAPH_EDITOR_A0_STR,
                  ct_node_graph_editor_a0,
                  sizeof(nge_api));
 
-    api->add_impl(CT_RESOURCE_EDITOR_I,
+    api->add_impl(CT_RESOURCE_EDITOR_I0_STR,
                   &ct_resource_editor_api,
                   sizeof(ct_resource_editor_i0));
 }

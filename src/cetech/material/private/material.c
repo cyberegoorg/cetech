@@ -279,7 +279,7 @@ static struct ct_resource_preview_i0 ct_resource_preview_api = {
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I) {
+    if (name_hash == RESOURCE_PREVIEW_I0) {
         return &ct_resource_preview_api;
     }
     return NULL;
@@ -840,16 +840,16 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
 
     ce_id_a0->id64("material");
 
-    api->add_api(CT_MATERIAL_API, &material_api, sizeof(material_api));
-    api->add_impl(CT_RESOURCE_I, &ct_resource_api, sizeof(ct_resource_api));
-    api->add_impl(CT_ASSET_IO_I, &material_io, sizeof(material_io));
-    api->add_impl(CT_PROPERTY_EDITOR_I, &_property_editor_api,
+    api->add_api(CT_MATERIAL_A0_STR, &material_api, sizeof(material_api));
+    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_IO_I0_STR, &material_io, sizeof(material_io));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &_property_editor_api,
                   sizeof(_property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &vec4_property_editor_api, sizeof(vec4_property_editor_api));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I,
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &color_property_editor_api, sizeof(color_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(MATERIAL_TYPE, material_prop, CE_ARRAY_LEN(material_prop));

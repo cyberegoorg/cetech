@@ -11,10 +11,12 @@ extern "C" {
 typedef struct ct_world_t0 ct_world_t0;
 typedef struct ct_entity_t0 ct_entity_t0;
 
+#define CT_ASSET_PREVIEW_A0_STR "ct_resource_preview_a0"
+
 #define CT_ASSET_PREVIEW_API \
     CE_ID64_0("ct_resource_preview_a0", 0x8498c030ac811f8eULL)
 
-#define RESOURCE_PREVIEW_I \
+#define RESOURCE_PREVIEW_I0 \
     CE_ID64_0("ct_resource_preview_i0", 0x5e8a61eef5a43b61ULL)
 
 typedef struct ct_resource_preview_i0 {

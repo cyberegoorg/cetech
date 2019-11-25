@@ -867,47 +867,47 @@ void CE_MODULE_LOAD(physics_bullet)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_spawn_world_system_i, sizeof(physics3d_spawn_world_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_destroy_world_system_i, sizeof(physics3d_destroy_world_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_system_i, sizeof(physics3d_system_i));
 
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_spawn_dynamic_body_system_i,
                   sizeof(physics3d_spawn_dynamic_body_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_spawn_static_body_system_i,
                   sizeof(physics3d_spawn_static_body_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_collider_change_system_i,
                   sizeof(physics3d_collider_change_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_transform_change_system_i,
                   sizeof(physics3d_transform_change_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_write_back_system_i,
                   sizeof(physics3d_write_back_system_i));
 
-    api->add_impl(CT_ECS_SYSTEM_I,
+    api->add_impl(CT_ECS_SYSTEM_I0_STR,
                   &physics3d_velocity_change_system_i,
                   sizeof(physics3d_velocity_change_system_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &bullet_world_component_i, sizeof(bullet_world_component_i));
 
-    api->add_impl(CT_ECS_COMPONENT_I,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &body_component_i, sizeof(body_component_i));
 
-    api->add_impl(CT_RENDERER_COMPONENT_I,
+    api->add_impl(CT_RENDERER_COMPONENT_I0_STR,
                   &debug_renderer_i, sizeof(debug_renderer_i));
 }
 

@@ -211,11 +211,11 @@ void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    api->add_impl(CT_ECS_COMPONENT_I, &ct_component_api, sizeof(ct_component_api));
-    api->add_impl(CT_RENDERER_COMPONENT_I, &ct_renderer_component_i,
+    api->add_impl(CT_ECS_COMPONENT_I0_STR, &ct_component_api, sizeof(ct_component_api));
+    api->add_impl(CT_RENDERER_COMPONENT_I0_STR, &ct_renderer_component_i,
                   sizeof(ct_renderer_component_i));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I, &property_editor_api, sizeof(property_editor_api));
+    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &property_editor_api, sizeof(property_editor_api));
 
     ce_cdb_a0->reg_obj_type(STATIC_MESH_COMPONENT,
                             static_mesh_component_prop,

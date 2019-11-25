@@ -31,7 +31,7 @@ static struct _G {
 } _G;
 
 static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_EXPLORER_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_EXPLORER_I0);
 
     while (it.api) {
         struct ct_explorer_i0 *i = (it.api);
@@ -110,7 +110,7 @@ static uint64_t dock_flags() {
 }
 
 static struct ct_dock_i0 dock_api = {
-        .type = CT_EXPLORER_I,
+        .type = CT_EXPLORER_I0,
         .ui_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
@@ -132,9 +132,9 @@ void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
             .visible = true
     };
 
-    api->add_impl(CT_DOCK_I, &dock_api, sizeof(dock_api));
+    api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
 
-    ct_dock_a0->create_dock(CT_EXPLORER_I, true);
+    ct_dock_a0->create_dock(CT_EXPLORER_I0, true);
 }
 
 void CE_MODULE_UNLOAD(level_inspector)(struct ce_api_a0 *api,

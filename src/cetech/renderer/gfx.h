@@ -11,6 +11,8 @@ extern "C" {
 
 #include <bgfx/c99/bgfx.h>
 
+#define CT_GFX_A0_STR "ct_gfx_a0"
+
 #define CT_GFX_API \
     CE_ID64_0("ct_gfx_a0", 0x945b4a9e424eaecULL)
 

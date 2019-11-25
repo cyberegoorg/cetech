@@ -53,7 +53,7 @@ static struct editor *_get_or_create_editor() {
 
 
 static struct ct_resource_editor_i0 *get_resource_editor(uint64_t cdb_type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_EDITOR_I);
+    ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_EDITOR_I0);
     while (it.api) {
         struct ct_resource_editor_i0 *i = (it.api);
 
@@ -264,8 +264,8 @@ void CE_MODULE_LOAD(editor)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    ce_api_a0->add_impl(CT_DOCK_I, &dock_i, sizeof(dock_i));
-    ce_api_a0->add_impl(CT_EDITOR_MODULE_I, &editor_module_api, sizeof(editor_module_api));
+    ce_api_a0->add_impl(CT_DOCK_I0_STR, &dock_i, sizeof(dock_i));
+    ce_api_a0->add_impl(CT_EDITOR_MODULE_I0_STR, &editor_module_api, sizeof(editor_module_api));
 
     ct_dock_a0->create_dock(RESOURCE_EDITOR, true);
 }

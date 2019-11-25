@@ -42,10 +42,12 @@ static struct _G {
 //==============================================================================
 
 
-static void api_register_api(uint64_t name_id,
+static void api_register_api(const char *name,
                              void *api,
                              uint32_t size) {
-    ce_log_a0->debug(LOG_WHERE, "Add api %s", ce_id_a0->str_from_id64(name_id));
+    ce_log_a0->debug(LOG_WHERE, "Add api %s", name);
+
+    uint64_t name_id = ce_id_a0->id64(name);
 
     void *mem = (void *) ce_hash_lookup(&_G.api_map, name_id, 0);
 
@@ -66,21 +68,25 @@ static void api_register_api(uint64_t name_id,
 
 }
 
-static void *get_api(uint64_t name_id) {
+static void *get_api(const char* name) {
+    uint64_t name_id = ce_id_a0->id64(name);
     void *mem = (void *) ce_hash_lookup(&_G.api_map, name_id, 0);
 
     if (!mem) {
-        api_register_api(name_id, NULL, 0);
-        return get_api(name_id);
+        api_register_api(name, NULL, 0);
+        return get_api(name);
     }
 
     return mem;
 }
 
-static void api_add_impl(uint64_t name_id,
+static void api_add_impl(const char *name,
                          void *api,
                          uint32_t size) {
-    ce_log_a0->debug(LOG_WHERE, "Add impl %s", ce_id_a0->str_from_id64(name_id));
+    ce_log_a0->debug(LOG_WHERE, "Add impl %s", name);
+
+    uint64_t name_id = ce_id_a0->id64(name);
+
     uint64_t idx = ce_hash_lookup(&_G.impl_map, name_id, UINT64_MAX);
 
     if (idx == UINT64_MAX) {
@@ -185,17 +191,13 @@ static struct ce_api_a0 a0 = {
 
 struct ce_api_a0 *ce_api_a0 = &a0;
 
-void *_m_get_api(uint64_t name) {
-    return a0.get(name);
-}
-
 void api_init(ce_alloc_t0 *allocator) {
     _G = (struct _G) {
             .allocator = allocator,
     };
 
 
-    api_register_api(CE_API_API, &a0, sizeof(a0));
+    api_register_api("ce_api_a0", &a0, sizeof(a0));
 }
 
 void api_shutdown() {

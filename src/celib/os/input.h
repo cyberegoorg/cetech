@@ -10,6 +10,8 @@ extern "C" {
 
 #include "celib/celib_types.h"
 
+#define CE_OS_INPUT_A0_STR "ce_os_input_a0"
+
 #define CE_OS_INPUT_API \
     CE_ID64_0("ce_os_input_a0", 0x5b789087d6f8fcd7ULL)
 

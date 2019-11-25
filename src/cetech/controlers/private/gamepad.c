@@ -239,8 +239,8 @@ void CE_MODULE_LOAD(gamepad)(struct ce_api_a0 *api,
             .ev_queue = ct_machine_a0->new_ev_listener(),
     };
 
-    api->add_impl(CT_CONTROLERS_I, &ct_controlers_api, sizeof(ct_controlers_api));
-    api->add_impl(CT_KERNEL_TASK_I, &gamepad_task, sizeof(gamepad_task));
+    api->add_impl(CT_CONTROLERS_I0_STR, &ct_controlers_api, sizeof(ct_controlers_api));
+    api->add_impl(CT_KERNEL_TASK_I0_STR, &gamepad_task, sizeof(gamepad_task));
 
     for (int i = 0; i < GAMEPAD_MAX; ++i) {
         _G.active[i] = ct_machine_a0->gamepad_is_active(i);

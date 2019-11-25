@@ -7,6 +7,8 @@ extern "C" {
 
 #include <celib/celib_types.h>
 
+#define CT_SELECTED_OBJECT_A0_STR "ct_selected_object_a0"
+
 #define CT_SELECTED_OBJECT_API \
     CE_ID64_0("ct_selected_object_a0", 0x9ea58b4cfb24327cULL)
 
