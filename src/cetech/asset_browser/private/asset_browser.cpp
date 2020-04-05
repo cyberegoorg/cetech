@@ -17,14 +17,13 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/asset_browser/asset_browser.h>
 #include <cetech/debugui/private/ocornut-imgui/imgui.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/editor/editor.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/editor/dock.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/texture/texture.h>
 #include <cetech/asset_preview/asset_preview.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/asset_io/asset_io.h>
 #include <cetech/editor/selcted_object.h>
 
@@ -34,11 +33,11 @@
 #include <celib/os/path.h>
 
 
-#define WINDOW_NAME "Resource browser"
+#define WINDOW_NAME "Asset browser"
 
 #define _G asset_browser_global
 
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 static struct _G {
     char current_dir[512];
@@ -122,10 +121,10 @@ static void _create_from_modal(const char *modal_id) {
         char *buffer = NULL;
         ce_hash_t type_hash = {};
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I0);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_ASSET_I0);
         uint32_t idx = 1;
         while (it.api) {
-            struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
+            struct ct_asset_i0 *i = (ct_asset_i0 *) (it.api);
 
             if (i->cdb_type() == type) {
                 cur_type_idx = idx - 1;
@@ -188,7 +187,8 @@ static void _create_from_modal(const char *modal_id) {
             uint64_t new_res = 0;
 
             if (modal_buffer_from[0]) {
-                ce_cdb_uuid_t0 uuid = ct_resourcedb_a0->get_file_resource(modal_buffer_from);
+
+                ce_cdb_uuid_t0 uuid = ct_asset_a0->filename_asset(modal_buffer_from);
                 if (uuid.id) {
                     new_res = ce_cdb_a0->create_from(ce_cdb_a0->db(), uuid.id);
                 }
@@ -196,7 +196,7 @@ static void _create_from_modal(const char *modal_id) {
                 uint64_t type = ce_id_a0->id64(modal_buffer_type);
                 new_res = ce_cdb_a0->create_object(ce_cdb_a0->db(), type);
 
-                ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
+                ct_asset_i0 *ri = ct_asset_a0->get_interface(type);
 
                 if (ri && ri->create_new) {
                     ri->create_new(new_res);
@@ -208,19 +208,12 @@ static void _create_from_modal(const char *modal_id) {
                 snprintf(filename, CE_ARRAY_LEN(filename),
                          "%s.%s", modal_buffer_name, modal_buffer_type);
 
-                ce_cdb_uuid_t0 rid = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), new_res);
-
-                ct_resourcedb_a0->put_file(filename, 0);
-                ct_resourcedb_a0->put_resource(rid, modal_buffer_type, filename);
-                ct_resourcedb_a0->put_obj(ce_cdb_a0->db(), new_res, _G.allocator);
-                ct_resource_a0->save(new_res);
+                ct_asset_a0->save(new_res);
 
                 _G.need_reaload = true;
                 ct_debugui_a0->CloseCurrentPopup();
                 ct_debugui_a0->EndPopup();
             }
-
-            return;
         }
 
 
@@ -231,8 +224,8 @@ static void _create_from_modal(const char *modal_id) {
                                   (DebugUIWindowFlags_) (0));
 
         char **asset_list = NULL;
-        ct_resourcedb_a0->list_resource_from_dirs("", &asset_list,
-                                                  _G.allocator);
+        ct_asset_a0->list_assets_from_dirs("", &asset_list,
+                                              _G.allocator);
 
         uint32_t dir_n = ce_array_size(asset_list);
         for (int i = 0; i < dir_n; ++i) {
@@ -253,11 +246,13 @@ static void _create_from_modal(const char *modal_id) {
             }
 
 
-            ce_cdb_uuid_t0 rid = ct_resourcedb_a0->get_file_resource(path);
 
-            uint64_t resource_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), rid.id);
+            ce_cdb_uuid_t0 rid = ct_asset_a0->filename_asset(path);
+            uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                                                         ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(),
+                                                                                 rid));
 
-            ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+            ct_asset_i0 *ri = ct_asset_a0->get_interface(asset_type);
 
             if (!ri) {
                 continue;
@@ -284,11 +279,11 @@ static void _create_from_modal(const char *modal_id) {
                                               _G.selected_file == filename_hash,
                                               ImGuiSelectableFlags_DontClosePopups);
 
-            struct ce_cdb_uuid_t0 r = ct_resourcedb_a0->get_file_resource(name);
+            struct ce_cdb_uuid_t0 r = ct_asset_a0->filename_asset(name);
             if (ct_debugui_a0->IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
 
                 ct_debugui_a0->BeginTooltip();
-                ct_resource_preview_a0->resource_tooltip(r, path, (ce_vec2_t) {256, 256});
+                ct_asset_preview_a0->asset_tooltip(r, path, (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
@@ -304,7 +299,7 @@ static void _create_from_modal(const char *modal_id) {
             }
         }
 
-        ct_resourcedb_a0->clean_resource_list(asset_list, _G.allocator);
+        ct_asset_a0->clean_assets_list(asset_list, _G.allocator);
 
         ct_debugui_a0->EndChild();
 
@@ -345,9 +340,9 @@ static void _select_type_modal(const char *modal_id) {
             _selected_type[0] = '\0';
         };
 
-        struct ce_api_entry_t0 it = ce_api_a0->first(CT_RESOURCE_I0);
+        struct ce_api_entry_t0 it = ce_api_a0->first(CT_ASSET_I0);
         while (it.api) {
-            struct ct_resource_i0 *i = (ct_resource_i0 *) (it.api);
+            struct ct_asset_i0 *i = (ct_asset_i0 *) (it.api);
 
 
             const char *type = ce_id_a0->str_from_id64(i->cdb_type());
@@ -389,7 +384,7 @@ static void ui_asset_menu(uint64_t context) {
     ct_debugui_a0->SameLine(0, -1);
     if (ct_debugui_a0->Button(ICON_FA_FLOPPY_O, &CE_VEC2_ZERO)) {
         uint64_t selected = ct_selected_object_a0->selected_object(context);
-        ct_resource_a0->save(selected);
+        ct_asset_a0->save(selected);
     }
 
 
@@ -409,8 +404,8 @@ static void ui_asset_menu(uint64_t context) {
 
     ct_debugui_a0->SameLine(0, -1);
 
-    uint64_t resource_type = ce_id_a0->id64(_selected_type);
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+    uint64_t asset_type = ce_id_a0->id64(_selected_type);
+    ct_asset_i0 *ri = ct_asset_a0->get_interface(asset_type);
 
     char title[128] = {'\0'};
 
@@ -443,14 +438,14 @@ static void ui_asset_menu(uint64_t context) {
 }
 
 
-static void ui_resource_list(uint64_t context) {
+static void ui_asset_list(uint64_t context) {
     if (_G.need_reaload) {
         if (_G.asset_list) {
-            ct_resourcedb_a0->clean_resource_list(_G.asset_list, _G.allocator);
+            ct_asset_a0->clean_assets_list(_G.asset_list, _G.allocator);
             ce_array_free(_G.asset_list, _G.allocator);
         }
 
-        ct_resourcedb_a0->list_resource_from_dirs(_G.current_dir, &_G.asset_list, _G.allocator);
+        ct_asset_a0->list_assets_from_dirs(_G.current_dir, &_G.asset_list, _G.allocator);
 
         _G.need_reaload = false;
     }
@@ -478,12 +473,12 @@ static void ui_resource_list(uint64_t context) {
                 continue;
             }
 
-            ce_cdb_uuid_t0 resourceid = ct_resourcedb_a0->get_file_resource(path);
+            ce_cdb_uuid_t0 assetid = ct_asset_a0->filename_asset(path);
 
             char label[128];
 
-            uint64_t rtype = ct_resourcedb_a0->get_resource_type(resourceid);
-            ct_resource_i0 *ri = ct_resource_a0->get_interface(rtype);
+            uint64_t rtype = ct_asset_a0->get_asset_type(assetid);
+            ct_asset_i0 *ri = ct_asset_a0->get_interface(rtype);
 
             if (ri && ri->display_icon) {
                 snprintf(label, CE_ARRAY_LEN(label),
@@ -499,13 +494,13 @@ static void ui_resource_list(uint64_t context) {
 
 //            if (ct_debugui_a0->IsItemHovered(0)) {
 //                ct_debugui_a0->BeginTooltip();
-//                ct_resource_preview_a0->resource_tooltip(resourceid, path,
+//                ct_asset_preview_a0->asset_tooltip(assetid, path,
 //                                                         (ce_vec2_t) {128, 128});
 //                ct_debugui_a0->EndTooltip();
 //            }
 
             if (selected) {
-                _G.selected_asset = resourceid;
+                _G.selected_asset = assetid;
                 _G.selected_file = filename_hash;
 
                 if (ct_debugui_a0->IsMouseDoubleClicked(0)) {
@@ -516,9 +511,9 @@ static void ui_resource_list(uint64_t context) {
             }
 
             if (ct_debugui_a0->BeginDragDropSource(DebugUIDragDropFlags_SourceAllowNullID)) {
-                ct_resource_preview_a0->resource_tooltip(resourceid, path, (ce_vec2_t) {128, 128});
+                ct_asset_preview_a0->asset_tooltip(assetid, path, (ce_vec2_t) {128, 128});
 
-                uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resourceid);
+                uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), assetid);
 
                 ct_debugui_a0->SetDragDropPayload("asset",
                                                   &obj,
@@ -536,12 +531,12 @@ static void on_debugui(uint64_t content,
                        uint64_t context,
                        uint64_t selected_object) {
     _G.edit_asset.id = 0;
-    ui_resource_list(context);
+    ui_asset_list(context);
 }
 
 static const char *dock_title(uint64_t content,
                               uint64_t selected_object) {
-    return ICON_FA_FOLDER_OPEN " Resource browser";
+    return ICON_FA_FOLDER_OPEN " Asset browser";
 }
 
 static const char *name() {
@@ -572,11 +567,11 @@ static uint64_t edited() {
     return _G.edit_asset.id;
 }
 
-static struct ct_resource_browser_a0 resource_browser_api = {
+static struct ct_asset_browser_a0 asset_browser_api = {
         .edited = edited,
 };
 
-struct ct_resource_browser_a0 *ct_resource_browser_a0 = &resource_browser_api;
+struct ct_asset_browser_a0 *ct_asset_browser_a0 = &asset_browser_api;
 
 
 static void _shutdown() {
@@ -593,7 +588,7 @@ void CE_MODULE_LOAD(asset_browser)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ce_fs_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
 
     CE_INIT_API(api, ce_cdb_a0);
 

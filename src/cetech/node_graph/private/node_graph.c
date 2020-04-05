@@ -6,7 +6,7 @@
 #include <celib/cdb.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/explorer/explorer.h>
 #include <stdio.h>
@@ -45,7 +45,7 @@ static const char *display_icon() {
 }
 
 static uint64_t cdb_type() {
-    return CT_NODE_GRAPH_RESOURCE;
+    return CT_NODE_GRAPH_ASSET;
 }
 
 
@@ -54,13 +54,13 @@ void draw_raw(uint64_t obj,
     ct_node_graph_editor_a0->draw_ng_editor(obj, 0);
 }
 
-static struct ct_resource_preview_i0 resource_preview_i0 = {
+static struct ct_asset_preview_i0 asset_preview_i0 = {
         .draw_raw = draw_raw,
 };
 
 static void *get_res_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I0) {
-        return &resource_preview_i0;
+    if (name_hash == ASSET_PREVIEW_I0) {
+        return &asset_preview_i0;
     }
     return NULL;
 }
@@ -70,7 +70,7 @@ static const char *name() {
 }
 
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
@@ -318,7 +318,7 @@ void CE_MODULE_LOAD (node_graph)(struct ce_api_a0 *api,
     };
 
     api->add_api(CT_NODE_GRAPH_A0_STR, &ng_api, sizeof(ng_api));
-    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
     api->add_impl(CT_EXPLORER_I0_STR, &entity_explorer, sizeof(entity_explorer));
     api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &node_property_editor_i0,
                   sizeof(node_property_editor_i0));

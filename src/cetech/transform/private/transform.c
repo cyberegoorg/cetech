@@ -1,6 +1,6 @@
 
 #include <celib/memory/allocator.h>
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include "celib/id.h"
 #include "celib/memory/memory.h"
 #include "celib/api.h"

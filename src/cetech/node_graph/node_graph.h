@@ -17,7 +17,7 @@ extern "C" {
 #define CT_NODE_I0 \
     CE_ID64_0("ct_node_i0", 0x31747424097dbbefULL)
 
-#define CT_NODE_GRAPH_RESOURCE \
+#define CT_NODE_GRAPH_ASSET \
     CE_ID64_0("node_graph", 0xfdc584c720df8500ULL)
 
 #define CT_NODE_GRAPH_NODE \

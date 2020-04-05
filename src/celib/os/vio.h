@@ -16,8 +16,8 @@ extern "C" {
     CE_ID64_0("ce_os_vio_a0", 0x989fe40200d61012ULL)
 
 enum ce_vio_open_mode {
-    VIO_OPEN_READ,
-    VIO_OPEN_WRITE,
+    VIO_OPEN_READ = 1,
+    VIO_OPEN_WRITE = 2,
 };
 
 enum ce_vio_seek {

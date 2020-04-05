@@ -8,7 +8,6 @@ layers:
     cdb_type: material_layer
     name: gbuffer
     shader: "0x7ecb3362fa2b019c"
-
     render_state:
       cdb_uuid: "0x78ccc53d72122491"
       cdb_type: render_state

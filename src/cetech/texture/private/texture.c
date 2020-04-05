@@ -18,7 +18,7 @@
 
 
 #include "cetech/machine/machine.h"
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include <cetech/texture/texture.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
@@ -34,16 +34,14 @@
 #include <celib/os/process.h>
 #include <celib/os/vio.h>
 #include <celib/containers/hash.h>
-#include <cetech/resource/resourcedb.h>
 
-
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 //==============================================================================
 // GLobals
 //==============================================================================
 
-#define _G TextureResourceGlobals
+#define _G TextureAssetGlobals
 struct _G {
     ce_alloc_t0 *allocator;
 } _G;
@@ -54,7 +52,7 @@ struct _G {
 
 
 //==============================================================================
-// Resource
+// Asset
 //==============================================================================
 
 void texture_online(ce_cdb_t0 db,
@@ -88,12 +86,12 @@ void texture_offline(ce_cdb_t0 db,
             (bgfx_texture_handle_t) {.idx=(uint16_t) texture});
 }
 
-void _texture_resource_online(ce_cdb_t0 db,
+void _texture_asset_online(ce_cdb_t0 db,
                               uint64_t obj) {
     texture_online(db, obj);
 }
 
-void _texture_resource_offline(ce_cdb_t0 db,
+void _texture_asset_offline(ce_cdb_t0 db,
                                uint64_t obj) {
     texture_offline(db, obj);
 }
@@ -105,7 +103,7 @@ static int _texturec(const char *input,
     ce_alloc_t0 *alloc = ce_memory_a0->system;
     char *buffer = NULL;
 
-    char *texturec = ct_asset_io_a0->external_join(alloc, "texturec");
+    char *texturec = ct_asset_a0->external_join(alloc, "texturec");
 
     ce_buffer_printf(&buffer, alloc, "%s", texturec);
     ce_buffer_free(texturec, alloc);
@@ -149,7 +147,7 @@ static bool _compile(ce_cdb_t0 db,
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, input);
 
-    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+    ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
                                  platform, input, "ktx");
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
@@ -183,31 +181,30 @@ static bool _import(ce_cdb_t0 db,
                     uint64_t dcc_obj) {
     {
         const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, dcc_obj);
-        uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_RESOURCE_ASSETS_PROP);
+        uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_ASSET_ASSETS_PROP);
         if (!assets_n) {
             uint64_t dcc_texture = ce_cdb_a0->create_object(db, CT_DCC_ASSET_TEXTURE_TYPE);
             ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, dcc_texture);
-            ce_cdb_a0->set_uint64(w, CT_DCC_RESOURCE_UID_PROP, ce_cdb_a0->gen_uid(db).id);
+            ce_cdb_a0->set_uint64(w, CT_DCC_ASSET_UID_PROP, ce_cdb_a0->gen_uid(db).id);
             ce_cdb_a0->write_commit(w);
 
             w = ce_cdb_a0->write_begin(db, dcc_obj);
-            ce_cdb_a0->objset_add_obj(w, CT_DCC_RESOURCE_ASSETS_PROP, dcc_texture);
+            ce_cdb_a0->objset_add_obj(w, CT_DCC_ASSET_ASSETS_PROP, dcc_texture);
             ce_cdb_a0->write_commit(w);
         }
     }
 
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, dcc_obj);
-    uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_RESOURCE_ASSETS_PROP);
+    uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_ASSET_ASSETS_PROP);
     uint64_t assets[assets_n];
-    ce_cdb_a0->read_objset(r, CT_DCC_RESOURCE_ASSETS_PROP, assets);
+    ce_cdb_a0->read_objset(r, CT_DCC_ASSET_ASSETS_PROP, assets);
 
     const ce_cdb_obj_o0 *dcc_texture_r = ce_cdb_a0->read(db, assets[0]);
 
-    uint64_t obj_uid = ce_cdb_a0->read_uint64(dcc_texture_r, CT_DCC_RESOURCE_UID_PROP, 0);
+    uint64_t obj_uid = ce_cdb_a0->read_uint64(dcc_texture_r, CT_DCC_ASSET_UID_PROP, 0);
     uint64_t obj = ce_cdb_a0->create_object_uid(db, (ce_cdb_uuid_t0){obj_uid}, TEXTURE_TYPE, true);
 
     const char *input = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, NULL);
-
     bool gen_mipmaps = ce_cdb_a0->read_bool(dcc_texture_r, TEXTURE_GEN_MIPMAPS, false);
     bool is_normalmap = ce_cdb_a0->read_bool(dcc_texture_r, TEXTURE_IS_NORMALMAP, false);
 
@@ -222,7 +219,7 @@ static bool _import(ce_cdb_t0 db,
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, input);
 
-    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+    ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
                                  platform, input, "ktx");
 
     int result = _texturec(input_path, output_path, gen_mipmaps, is_normalmap);
@@ -246,9 +243,9 @@ static bool _import(ce_cdb_t0 db,
     char texture_filename[512];
     snprintf(texture_filename, CE_ARRAY_LEN(texture_filename), "%s.texture", input);
 
-    int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, texture_filename);
-    ct_resourcedb_a0->put_file(texture_filename, mtime);
-    ct_asset_io_a0->save_to_cdb(db, obj, texture_filename);
+//    int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, texture_filename);
+//    ct_assetdb_a0->put_file(texture_filename, mtime);
+    ct_asset_a0->save_to_cdb(db, obj, texture_filename);
     return true;
 }
 
@@ -271,7 +268,6 @@ static ct_asset_dcc_io_i0 texture_io = {
         .import_dcc = _import,
 };
 
-
 ////
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
@@ -289,9 +285,9 @@ static struct ct_property_editor_i0 property_editor_api = {
 };
 
 
-static void tooltip(uint64_t resource,
+static void tooltip(uint64_t asset,
                     ce_vec2_t size) {
-//    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),resource);
+//    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),asset);
 //
 //    bgfx_texture_handle_t texture = {
 //            .idx = (uint16_t) ce_cdb_a0->read_uint64(reader,
@@ -318,15 +314,15 @@ static void draw_raw(uint64_t obj,
                          &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
 }
 
-static struct ct_resource_preview_i0 ct_resource_preview_api = {
+static struct ct_asset_preview_i0 ct_asset_preview_api = {
         .tooltip = tooltip,
         .draw_raw = draw_raw,
 };
 
 
 void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I0) {
-        return &ct_resource_preview_api;
+    if (name_hash == ASSET_PREVIEW_I0) {
+        return &ct_asset_preview_api;
     }
 
     return NULL;
@@ -341,13 +337,13 @@ static const char *name() {
 }
 
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
         .get_interface = get_interface,
-        .online =_texture_resource_online,
-        .offline =_texture_resource_offline,
+        .online =_texture_asset_online,
+        .offline =_texture_asset_offline,
 };
 
 
@@ -441,7 +437,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
 
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
@@ -455,7 +451,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     api->add_impl(CT_KERNEL_TASK_I0_STR,
                   &texture_compile_watch_task, sizeof(texture_compile_watch_task));
 
-    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
 
     api->add_impl(CT_DCC_ASSET_IO_I0_STR, &texture_io, sizeof(texture_io));
 

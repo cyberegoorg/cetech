@@ -14,7 +14,7 @@
 #include <celib/fs.h>
 #include <celib/containers/hash.h>
 #include <celib/containers/bagraph.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 
 #include <cetech/machine/machine.h>
 
@@ -65,34 +65,17 @@ int init_config(int argc,
                 const char **argv) {
     ce_config_a0->set_str(CONFIG_PLATFORM, _platform());
     ce_config_a0->set_str(CONFIG_NATIVE_PLATFORM, _platform());
-    ce_config_a0->set_str(CONFIG_BUILD, "build");
 
     if (!ce_config_a0->parse_args(argc, argv)) {
         return 0;
     }
 
-    const char *build_dir_str = ce_config_a0->read_str(CONFIG_BUILD, NULL);
-    char *build_dir = NULL;
-
-    ce_os_path_a0->join(&build_dir, _G.allocator, 2,
-                        build_dir_str,
-                        ce_config_a0->read_str(CONFIG_NATIVE_PLATFORM, ""));
-
-    char *build_config = NULL;
-    ce_os_path_a0->join(&build_config, _G.allocator, 2, build_dir, "global.yml");
-
     const char *source_dir_str = ce_config_a0->read_str(CONFIG_SRC, "");
     char *source_config = NULL;
     ce_os_path_a0->join(&source_config, _G.allocator, 2, source_dir_str, "global.yml");
-
-    ce_os_path_a0->make_path(build_dir);
-    ce_os_path_a0->copy_file(_G.allocator, source_config, build_config);
-
-    ce_config_a0->from_file(ce_cdb_a0->db(), build_config, _G.allocator);
+    ce_config_a0->from_file(ce_cdb_a0->db(), source_config, _G.allocator);
 
     ce_buffer_free(source_config, _G.allocator);
-    ce_buffer_free(build_config, _G.allocator);
-    ce_buffer_free(build_dir, _G.allocator);
 
     return 1;
 }
@@ -135,12 +118,12 @@ bool cetech_kernel_init(int argc,
     ce_module_a0->load_dirs(module_path);
     ce_config_a0->log_all();
 
-    CE_INIT_API(ce_api_a0, ct_resource_a0);
+    CE_INIT_API(ce_api_a0, ct_asset_a0);
     CE_INIT_API(ce_api_a0, ct_machine_a0);
     CE_INIT_API(ce_api_a0, ct_debugui_a0);
     CE_INIT_API(ce_api_a0, ct_renderer_a0);
 
-    ce_cdb_a0->set_loader(ct_resource_a0->cdb_loader);
+    ce_cdb_a0->set_loader(ct_asset_a0->cdb_loader);
     return true;
 }
 
@@ -267,7 +250,7 @@ static void cetech_kernel_start() {
 
     _init_config();
 
-    ct_asset_io_a0->compile_all();
+    ct_asset_a0->compile_all();
 
     if (ce_config_a0->read_uint(CONFIG_COMPILE, 0)) {
         return;
@@ -296,7 +279,7 @@ static void cetech_kernel_start() {
         ct_metrics_a0->begin();
         ct_metrics_a0->set_float(ce_id_a0->id64("dt"), dt);
         ct_metrics_a0->set_float(ce_id_a0->id64("memory.system"),
-                                     t->vt->allocated_size(t->inst)* 0.000001);
+                                 t->vt->allocated_size(t->inst) * 0.000001);
 
         _build_update_graph(&_G.updateg);
         _update(&_G.updateg, dt);

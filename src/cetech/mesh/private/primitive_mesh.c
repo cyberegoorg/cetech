@@ -7,7 +7,7 @@
 #include <celib/macros.h>
 
 #include "celib/api.h"
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include "cetech/ecs/ecs.h"
 #include "cetech/transform/transform.h"
 #include <cetech/renderer/renderer.h>
@@ -194,7 +194,7 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_material_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
     _G = (struct _G) {

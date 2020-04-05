@@ -15,7 +15,7 @@
 #include "celib/id.h"
 #include "cetech/machine/machine.h"
 
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 
 #include <cetech/renderer/gfx.h>
 
@@ -37,14 +37,14 @@
 // GLobals
 //==============================================================================
 
-#define _G ShaderResourceGlobals
+#define _G ShaderAssetGlobals
 struct _G {
     ce_alloc_t0 *allocator;
 } _G;
 
 
 //==============================================================================
-// Resource
+// Asset
 //==============================================================================
 
 
@@ -58,7 +58,7 @@ static int _shaderc(const char *input,
 
     char *buffer = NULL;
 
-    char *shaderc = ct_asset_io_a0->external_join(a, "shaderc");
+    char *shaderc = ct_asset_a0->external_join(a, "shaderc");
 
     ce_buffer_printf(&buffer, a, "%s", shaderc);
 
@@ -126,7 +126,7 @@ static bool _compile(ce_cdb_t0 db,
     char *input_path = NULL;
     ce_os_path_a0->join(&input_path, a, 2, source_dir, vs_input);
 
-    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
+    ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
                                  vs_input, NULL);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
@@ -164,7 +164,7 @@ static bool _compile(ce_cdb_t0 db,
 
     ce_os_path_a0->join(&input_path, a, 2, source_dir, fs_input);
 
-    ct_asset_io_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
+    ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
                                  platform, fs_input, NULL);
 
     result = _shaderc(input_path, output_path,
@@ -199,6 +199,9 @@ static bool _compile(ce_cdb_t0 db,
 static void online(ce_cdb_t0 db,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
+
+    _compile(db, obj);
+
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 
     uint64_t fs_blob_size = 0;
@@ -209,10 +212,10 @@ static void online(ce_cdb_t0 db,
     void *vs_blob;
     vs_blob = ce_cdb_a0->read_blob(reader, SHADER_VS_DATA, &vs_blob_size, 0);
 
-    const bgfx_memory_t *vs_mem = ct_gfx_a0->bgfx_make_ref(vs_blob,
-                                                           vs_blob_size);
-    const bgfx_memory_t *fs_mem = ct_gfx_a0->bgfx_make_ref(fs_blob,
-                                                           fs_blob_size);
+    const bgfx_memory_t *vs_mem = ct_gfx_a0->bgfx_copy(vs_blob,
+                                                       vs_blob_size);
+    const bgfx_memory_t *fs_mem = ct_gfx_a0->bgfx_copy(fs_blob,
+                                                       fs_blob_size);
 
     bgfx_shader_handle_t vs_shader = ct_gfx_a0->bgfx_create_shader(vs_mem);
     bgfx_shader_handle_t fs_shader = ct_gfx_a0->bgfx_create_shader(fs_mem);
@@ -249,7 +252,7 @@ static const char *name() {
 }
 
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
@@ -311,7 +314,7 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
                             int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
@@ -320,7 +323,7 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
     _G = (struct _G) {.allocator = ce_memory_a0->system};
 
     api->add_api(CT_SHADER_A0_STR, &shader_api, sizeof(shader_api));
-    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
     api->add_impl(CT_ASSET_IO_I0_STR, &shader_io, sizeof(shader_io));
 
     ce_cdb_a0->reg_obj_type(SHADER_TYPE, CE_ARR_ARG(shader_type_def));

@@ -44,7 +44,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${PLATFORM_ID})
 ################################################################################
 
 set(EXTERNAL_SOURCE_FILES
-        src/sqlite/private/sqlite3.c
         )
 
 set(CORELIB_SOURCE_FILES
@@ -80,7 +79,7 @@ set(CORELIB_SOURCE_FILES
 set(SOURCE_FILES
         ${EXTERNAL_SOURCE_FILES}
 
-        src/cetech/resource/private/resource.c
+        src/cetech/asset/private/asset.c
         src/cetech/asset_io/private/asset_io.c
         src/cetech/kernel/private/kernel.c
         src/cetech/debugui/private/bgfx_imgui/imgui.cpp
@@ -113,7 +112,7 @@ set(SOURCE_FILES
         src/cetech/transform/private/transform.c
         src/cetech/camera/private/camera.c
         src/cetech/entity/private/entity_editor.c
-        src/cetech/resource_editor/private/resource_editor.c
+        src/cetech/asset_editor/private/asset_editor.c
         src/cetech/entity/private/entity_property.c
         src/cetech/explorer/private/explorer.c
         src/cetech/asset_preview/private/asset_preview.c
@@ -122,7 +121,6 @@ set(SOURCE_FILES
         src/cetech/property_editor/private/property_editor.c
         src/cetech/log_view/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
-        src/cetech/resource/private/resourcedb.c
         src/cetech/editor/private/editor_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
@@ -141,7 +139,7 @@ set(SOURCE_FILES
 
         src/cetech/parent/private/parent.c
         src/cetech/metrics/private/metrics.c
-#        src/cetech/mono/private/mono.c
+        #        src/cetech/mono/private/mono.c
         )
 
 ################################################################################
@@ -205,7 +203,7 @@ set(RELEASE_LIBS
         SDL2.a
         yaml_static.a
         Box2D.a
-#        monosgen-2.0.a
+        #        monosgen-2.0.a
         celib
 
         Bullet2FileLoader.a

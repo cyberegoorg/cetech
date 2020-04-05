@@ -13,7 +13,7 @@
 #include <celib/config.h>
 
 #include "cetech/machine/machine.h"
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include "cetech/ecs/ecs.h"
@@ -131,7 +131,7 @@ static bool _fill_scene(ce_cdb_t0 db, uint64_t obj, scene_compile_output_t* outp
 
 extern "C" int scenecompiler_init(struct ce_api_a0 *api) {
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ce_yaml_cdb_a0);

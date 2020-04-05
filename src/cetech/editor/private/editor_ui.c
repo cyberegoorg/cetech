@@ -12,8 +12,7 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 
-#include <cetech/resource/resourcedb.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/controlers/controlers.h>
@@ -28,7 +27,7 @@
 
 #include "include/nfd/nfd.h"
 
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 static bool filter_pass(const char *filter,
                         const char *str) {
@@ -97,13 +96,12 @@ static bool prop_revert_btn(uint64_t _obj,
                         break;
                     }
 
-
-                    char res_name[128] = {0};;
-                    if (ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {ref},
-                                                                CE_ARR_ARG(res_name))) {
+                    const char *fn = ct_asset_a0->asset_filename(
+                            ce_cdb_a0->obj_uid(ce_cdb_a0->db(), ref));
+                    if (fn) {
                         offset += snprintf(v_str + offset,
                                            CE_ARRAY_LEN(v_str) - offset,
-                                           "%s ", res_name);
+                                           "%s ", fn);
                     }
                 }
                     break;
@@ -553,10 +551,10 @@ static void ui_str_combo2(uint64_t obj,
 
 static char modal_buffer[128] = {};
 
-static bool resource_select_modal(const char *modal_id,
+static bool asset_select_modal(const char *modal_id,
                                   uint64_t id,
-                                  uint64_t resource_type,
-                                  uint64_t *selected_resource,
+                                  uint64_t asset_type,
+                                  uint64_t *selected_asset,
                                   uint32_t *count) {
     bool changed = false;
 
@@ -586,16 +584,16 @@ static bool resource_select_modal(const char *modal_id,
             *count = (uint32_t) c;
         }
 
-        const char *resource_type_s = ce_id_a0->str_from_id64(resource_type);
-        char **resources = NULL;
+        const char *asset_type_s = ce_id_a0->str_from_id64(asset_type);
+        char **assets = NULL;
 
-        ct_resourcedb_a0->list_resource_by_type(modal_buffer, resource_type_s,
-                                                &resources,
-                                                ce_memory_a0->system);
+        ct_asset_a0->list_assets_by_type(modal_buffer, asset_type_s,
+                                            &assets,
+                                            ce_memory_a0->system);
 
-        uint32_t dir_n = ce_array_size(resources);
+        uint32_t dir_n = ce_array_size(assets);
         for (int i = 0; i < dir_n; ++i) {
-            const char *name = resources[i];
+            const char *name = assets[i];
 
             if (!strlen(name)) {
                 continue;
@@ -603,18 +601,19 @@ static bool resource_select_modal(const char *modal_id,
 
             bool selected = ct_debugui_a0->Selectable(name, false, 0, &CE_VEC2_ZERO);
 
-            struct ce_cdb_uuid_t0 r = ct_resourcedb_a0->get_file_resource(name);
+
+            struct ce_cdb_uuid_t0 r = ct_asset_a0->filename_asset(name);
 
             if (ct_debugui_a0->IsItemHovered(0)) {
 
                 ct_debugui_a0->BeginTooltip();
-                ct_resource_preview_a0->resource_tooltip(r, name, (ce_vec2_t) {256, 256});
+                ct_asset_preview_a0->asset_tooltip(r, name, (ce_vec2_t) {256, 256});
                 ct_debugui_a0->EndTooltip();
             }
 
             if (selected) {
                 uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), r);
-                *selected_resource = obj;
+                *selected_asset = obj;
                 changed = true;
 
                 modal_buffer[0] = '\0';
@@ -622,7 +621,7 @@ static bool resource_select_modal(const char *modal_id,
             }
         }
 
-        ct_resourcedb_a0->clean_resource_list(resources, ce_memory_a0->system);
+        ct_asset_a0->clean_assets_list(assets, ce_memory_a0->system);
         ct_debugui_a0->EndPopup();
     }
 
@@ -659,11 +658,11 @@ static void ui_prop_body_end() {
 //    ct_debugui_a0->Columns(1, NULL, true);
 }
 
-static void ui_resource(uint64_t obj,
+static void ui_asset(uint64_t obj,
                         const char *label,
                         const char *filter,
                         uint64_t prop,
-                        uint64_t resource_type,
+                        uint64_t asset_type,
                         uint64_t context,
                         uint32_t i) {
 
@@ -678,26 +677,30 @@ static void ui_resource(uint64_t obj,
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
     uint64_t ref_obj = ce_cdb_a0->read_ref(reader, prop, 0);
+
     ce_cdb_uuid_t0 ref_obj_uid = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), ref_obj);
     char buffer[128] = {'\0'};
-    ct_resourcedb_a0->get_resource_filename(ref_obj_uid, buffer,
-                                            CE_ARRAY_LEN(buffer));
+
+    const char *fn = ct_asset_a0->asset_filename(ref_obj_uid);
+    if (fn) {
+        strcpy(buffer, fn);
+    }
 
     char labelid[128] = {'\0'};
     char modal_id[128] = {'\0'};
 
     bool change = false;
 
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(resource_type);
+    ct_asset_i0 *ri = ct_asset_a0->get_interface(asset_type);
 
 
     uint64_t new_value = 0;
 
     sprintf(modal_id, ICON_FA_FOLDER_OPEN
-            " ""select...##select_resource_%d", i);
+            " ""select...##select_asset_%d", i);
 
-    change = resource_select_modal(modal_id, obj + prop,
-                                   resource_type, &new_value, NULL);
+    change = asset_select_modal(modal_id, obj + prop,
+                                   asset_type, &new_value, NULL);
 
 
     const char *icon = ri && ri->display_icon ? ri->display_icon() : NULL;
@@ -713,7 +716,7 @@ static void ui_resource(uint64_t obj,
 
     // Select btn
     sprintf(labelid, ICON_FA_ARROW_UP
-            "##%sprop_open_select_resource_%d", label, i);
+            "##%sprop_open_select_asset_%d", label, i);
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_selected_object_a0->set_selected_object(context, ref_obj);
     };
@@ -722,7 +725,7 @@ static void ui_resource(uint64_t obj,
 
     // Open btn
     sprintf(labelid, ICON_FA_FOLDER_OPEN
-            "##%sprop_select_resource_%d", label, i);
+            "##%sprop_select_asset_%d", label, i);
     ct_debugui_a0->SameLine(0, 2);
     if (ct_debugui_a0->Button(labelid, &(ce_vec2_t) {0.0f})) {
         ct_debugui_a0->OpenPopup(modal_id);
@@ -730,7 +733,7 @@ static void ui_resource(uint64_t obj,
 
     ct_debugui_a0->SameLine(0, 2);
 
-    sprintf(labelid, "##%sresource_prop_str_%d", label, i);
+    sprintf(labelid, "##%sasset_prop_str_%d", label, i);
     ct_debugui_a0->PushItemWidth(-1);
     ct_debugui_a0->InputText(labelid,
                              buffer,
@@ -748,10 +751,10 @@ static void ui_resource(uint64_t obj,
 
             if (drag_obj) {
 
-                uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
+                uint64_t drag_asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
                                                           drag_obj);
 
-                if (resource_type == asset_type) {
+                if (drag_asset_type == asset_type) {
                     new_value = drag_obj;
                     change = true;
                 }
@@ -937,13 +940,13 @@ static struct ct_editor_ui_a0 editor_ui_a0 = {
         .prop_filename = ui_filename,
         .prop_str_combo = ui_str_combo,
         .prop_str_combo2 = ui_str_combo2,
-        .prop_resource = ui_resource,
+        .prop_asset = ui_asset,
         .prop_vec2 = ui_vec2,
         .prop_vec3 = ui_vec3,
         .prop_vec4 = ui_vec4,
         .prop_bool = ui_bool,
         .prop_revert_btn = prop_revert_btn,
-        .resource_select_modal = resource_select_modal,
+        .asset_select_modal = asset_select_modal,
         .ui_prop_header = ui_prop_header,
         .ui_prop_header_end = ui_prop_header_end,
         .ui_prop_body = ui_prop_body,
@@ -965,7 +968,7 @@ void CE_MODULE_LOAD(sourcedb_ui)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
-    api->add_api(CT_RESOURCE_UI_A0_STR, ct_editor_ui_a0, sizeof(editor_ui_a0));
+    api->add_api(CT_ASSET_UI_A0_STR, ct_editor_ui_a0, sizeof(editor_ui_a0));
 }
 
 void CE_MODULE_UNLOAD(sourcedb_ui)(struct ce_api_a0 *api,

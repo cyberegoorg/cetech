@@ -13,7 +13,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/explorer/explorer.h>
@@ -79,12 +79,12 @@ void item_btns(uint64_t context,
     bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
 
     char modal_id[128] = {'\0'};
-    sprintf(modal_id, "select...##select_resource_%llu", obj);
+    sprintf(modal_id, "select...##select_asset_%llu", obj);
 
     uint64_t new_value = 0;
 
     static uint32_t count = 1;
-    bool changed = ct_editor_ui_a0->resource_select_modal(modal_id,
+    bool changed = ct_editor_ui_a0->asset_select_modal(modal_id,
                                                           obj,
                                                           ENTITY_TYPE,
                                                           &new_value,
@@ -310,7 +310,7 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_debugui_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);

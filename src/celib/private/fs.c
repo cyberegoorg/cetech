@@ -167,8 +167,8 @@ static struct ce_vio_t0 *open(uint64_t root,
     ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
                                               (enum ce_vio_open_mode) mode);
 
-    if (!file) {
-        ce_log_a0->error(LOG_WHERE, "Could not load file %s", full_path);
+    if (!file && (mode == FS_OPEN_WRITE)) {
+        ce_log_a0->error(LOG_WHERE, "Could not open file %s", full_path);
         ce_buffer_free(full_path, _G.allocator);
         return NULL;
     }
@@ -180,14 +180,7 @@ static struct ce_vio_t0 *open(uint64_t root,
 static bool exist(uint64_t root,
                   const char *path) {
     char *full_path = get_full_path(root, _G.allocator, path, false);
-    ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path, VIO_OPEN_READ);
-
-    if (file) {
-        file->vt->close(file->inst);
-        return true;
-    }
-
-    return false;
+    return full_path != NULL;
 }
 
 static void close(ce_vio_t0 *file) {
@@ -267,12 +260,12 @@ static void listdir_free(char **files,
     CE_FREE(allocator, files);
 }
 
-static void listdir2(uint64_t root,
-                     const char *path,
-                     const char *filter,
-                     bool only_dir,
-                     bool recursive,
-                     void (*on_item)(const char *path)) {
+static void listdir_iter(uint64_t root,
+                         const char *path,
+                         const char *filter,
+                         bool only_dir,
+                         bool recursive,
+                         void (*on_item)(const char *path)) {
 
     char **files;
     uint32_t count;
@@ -391,7 +384,7 @@ static struct ce_fs_a0 _api = {
         .close = close,
         .listdir = listdir,
         .listdir_free = listdir_free,
-        .listdir_iter = listdir2,
+        .listdir_iter = listdir_iter,
         .create_directory = create_directory,
         .file_mtime = get_file_mtime,
         .get_full_path = _get_full_path,

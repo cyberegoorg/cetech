@@ -5,6 +5,7 @@
 #include "include/SDL2/SDL.h"
 #include "celib/memory/allocator.h"
 #include <celib/os/vio.h>
+#include <celib/log.h>
 
 #define LOG_WHERE_OS "vio_sdl"
 
@@ -64,6 +65,7 @@ static ce_vio_vt0 vio_vt = {
 
 struct ce_vio_t0 *vio_from_file(const char *path,
                                 enum ce_vio_open_mode mode) {
+    CE_ASSERT(LOG_WHERE_OS, path != NULL);
 
     ce_alloc_t0 *alloc = ce_memory_a0->system;
 
@@ -75,12 +77,16 @@ struct ce_vio_t0 *vio_from_file(const char *path,
         return NULL;
     }
 
-    SDL_RWops *rwops = SDL_RWFromFile(path, mode == VIO_OPEN_WRITE ? "w" : "r");
+    SDL_RWops *rwops = SDL_RWFromFile(path, mode == VIO_OPEN_WRITE ? "wb" : "rb");
+
 
     if (!rwops) {
+        if(mode == VIO_OPEN_WRITE){
+            ce_log_a0->debug(LOG_WHERE_OS, "OEEEERRROOOR %s", SDL_GetError());
+        }
+
         return NULL;
     }
-
 
     vio->inst = (ce_vio_o0 *) rwops;
     vio->vt = &vio_vt;

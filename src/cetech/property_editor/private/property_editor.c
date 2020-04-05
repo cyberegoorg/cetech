@@ -9,7 +9,7 @@
 #include "celib/memory/allocator.h"
 #include "celib/containers/buffer.h"
 
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/debugui/icons_font_awesome.h>
@@ -24,14 +24,14 @@
 #include <cetech/editor/editor_ui.h>
 #include <celib/log.h>
 #include <celib/containers/buffer.h>
-#include <cetech/resource/resourcedb.h>
 #include <celib/yaml_cdb.h>
+#include <cetech/asset_io/asset_io.h>
 
 #define WINDOW_NAME "Property editor"
 
 #define _G property_inspector_global
 
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 static struct _G {
     bool visible;
@@ -60,7 +60,7 @@ static void _generic_prop_draw(ce_cdb_t0 db,
 
         switch (type) {
             case CE_CDB_TYPE_REF:
-                ct_editor_ui_a0->prop_resource(obj, def->name, filter, prop_name,
+                ct_editor_ui_a0->prop_asset(obj, def->name, filter, prop_name,
                                                def->obj_type, context, obj);
                 break;
             case CE_CDB_TYPE_FLOAT:
@@ -202,7 +202,7 @@ static void on_debugui(uint64_t content,
 
     snprintf(buffer, CE_ARRAY_LEN(buffer), "property%llx", 1ULL);
 
-    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Resource");
+    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Asset");
     if (open && obj) {
         if (ct_debugui_a0->Button("DDD", &CE_VEC2_ZERO)) {
             char *buffer = NULL;
@@ -214,15 +214,15 @@ static void on_debugui(uint64_t content,
         ct_editor_ui_a0->ui_prop_body(obj);
         const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-        if (ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {obj},
-                                                    buffer,
-                                                    CE_ARRAY_LEN(buffer))) {
+        const char* filename = ct_asset_a0->asset_filename(ce_cdb_a0->obj_uid(ce_cdb_a0->db(), obj));
+        if (filename) {
+            strcpy(buffer, filename);
 
             ct_editor_ui_a0->prop_label("File", 0, NULL, 0);
             ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
 
             ct_debugui_a0->PushItemWidth(-1);
-            ct_debugui_a0->InputText("##NameResourceProp",
+            ct_debugui_a0->InputText("##NameAssetProp",
                                      buffer, strlen(buffer),
                                      DebugInputTextFlags_ReadOnly,
                                      0, NULL);
@@ -233,15 +233,15 @@ static void on_debugui(uint64_t content,
         uint64_t instance_of = ce_cdb_a0->read_instance_of(reader_obj);
         if (instance_of) {
             char name[128] = {0};
-            ct_resourcedb_a0->get_resource_filename((ce_cdb_uuid_t0) {instance_of},
-                                                    buffer,
-                                                    CE_ARRAY_LEN(buffer));
+
+            const char* fn = ct_asset_a0->asset_filename(ce_cdb_a0->obj_uid(ce_cdb_a0->db(), instance_of));
+            strcpy(buffer, fn);
 
             ct_editor_ui_a0->prop_label("Inst. of", 0, NULL, 0);
             ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
 
             sprintf(buffer, ICON_FA_ARROW_UP
-                    "##%sprop_open_select_resource", name);
+                    "##%sprop_open_select_asset", name);
             if (ct_debugui_a0->Button(buffer, &(ce_vec2_t) {0.0f})) {
                 ct_selected_object_a0->set_selected_object(context, instance_of);
             }
@@ -254,7 +254,7 @@ static void on_debugui(uint64_t content,
             }
 
             ct_debugui_a0->PushItemWidth(-1);
-            ct_debugui_a0->InputText("##InstanceOfResourceProp",
+            ct_debugui_a0->InputText("##InstanceOfAssetProp",
                                      buffer,
                                      strlen(buffer),
                                      DebugInputTextFlags_ReadOnly,

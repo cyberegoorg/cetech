@@ -16,7 +16,7 @@
 #include <celib/os/vio.h>
 #include <celib/uuid64.h>
 
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 
 #include <yaml/yaml.h>
 
@@ -502,7 +502,7 @@ uint64_t get_obj(const char *path) {
 
     cnode_t *cnodes = NULL;
     load_obj(path, &cnodes, path_key);
-    uint64_t obj = ce_cdb_a0->create_root_obj(cnodes, ce_cdb_a0->db());
+    uint64_t obj = ce_cdb_a0->load_from_cnodes(cnodes, ce_cdb_a0->db());
 
     ce_array_free(cnodes, _G.allocator);
     return obj;
@@ -658,8 +658,7 @@ static void dump_str(ce_cdb_t0 _db,
                 break;
 
             case CE_CDB_TYPE_REF: {
-                uint64_t ref = ce_cdb_a0->read_ref(r, key, 0);
-                ce_cdb_uuid_t0 ref_uid = ce_cdb_a0->obj_uid(_db, ref);
+                ce_cdb_uuid_t0 ref_uid = ce_cdb_a0->read_ref_uuid(r, key, (ce_cdb_uuid_t0){0});
 
                 ce_uuid64_to_string(uuid_buffer, CE_ARRAY_LEN(uuid_buffer), (const ce_uuid64_t0 *) &ref_uid);
 

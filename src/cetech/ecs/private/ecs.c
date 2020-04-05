@@ -21,7 +21,7 @@
 #include <celib/containers/mpmc.h>
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
@@ -1494,22 +1494,22 @@ static uint64_t cdb_type() {
 static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
                                         uint64_t name);
 
-static struct ct_entity_t0 load(uint64_t resource,
+static struct ct_entity_t0 load(uint64_t asset,
                                 ct_world_t0 world) {
 
-    ct_entity_t0 ent = spawn_entity(world, resource);
+    ct_entity_t0 ent = spawn_entity(world, asset);
 
     return ent;
 }
 
 
-void *get_resource_interface(uint64_t name_hash) {
-    static struct ct_resource_preview_i0 ct_resource_preview_i0 = {
+void *asset_get_interface(uint64_t type) {
+    static struct ct_asset_preview_i0 ct_asset_preview_i0 = {
             .load = load,
     };
 
-    if (name_hash == RESOURCE_PREVIEW_I0) {
-        return &ct_resource_preview_i0;
+    if (type == ASSET_PREVIEW_I0) {
+        return &ct_asset_preview_i0;
     };
 
     return NULL;
@@ -1523,11 +1523,11 @@ static const char *name() {
     return "entity";
 }
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
-        .get_interface = get_resource_interface,
+        .get_interface = asset_get_interface,
 };
 
 static bool supported_extension(const char *extension) {
@@ -2109,7 +2109,7 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
                          int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ce_task_a0);
@@ -2130,7 +2130,7 @@ void CE_MODULE_LOAD(ecs)(struct ce_api_a0 *api,
     api->add_api(CT_ECS_C_A0_STR, &c_api, sizeof(c_api));
     api->add_api(CT_ECS_Q_A0_STR, &q_api, sizeof(q_api));
 
-    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
     api->add_impl(CT_ASSET_IO_I0_STR, &entitiy_io, sizeof(entitiy_io));
     api->add_impl(CT_KERNEL_TASK_I0_STR, &ecs_sync_task, sizeof(ecs_sync_task));
 

@@ -13,7 +13,7 @@
 
 #include <cetech/renderer/gfx.h>
 #include <cetech/debugui/debugui.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/explorer/explorer.h>
@@ -256,7 +256,7 @@ void CE_MODULE_LOAD(entity_property)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_debugui_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);

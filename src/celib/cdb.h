@@ -355,6 +355,10 @@ struct ce_cdb_a0 {
                          uint64_t property,
                          uint64_t defaultt);
 
+    ce_cdb_uuid_t0 (*read_ref_uuid)(const ce_cdb_obj_o0 *reader,
+                                    uint64_t property,
+                                    ce_cdb_uuid_t0 defaultt);
+
     uint64_t (*read_subobject)(const ce_cdb_obj_o0 *reader,
                                uint64_t property,
                                uint64_t defaultt);
@@ -372,8 +376,8 @@ struct ce_cdb_a0 {
     ce_cdb_uuid_t0 (*obj_uid)(ce_cdb_t0 db,
                               uint64_t obj);
 
-    uint64_t (*create_root_obj)(const cnode_t *cnodes,
-                                ce_cdb_t0 tmp_db);
+    uint64_t (*load_from_cnodes)(const cnode_t *cnodes,
+                                 ce_cdb_t0 tmp_db);
 
     void (*dump_cnodes)(const cnode_t *cnodes,
                         char **outputs);

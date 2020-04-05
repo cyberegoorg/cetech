@@ -1303,11 +1303,11 @@ void _dump(ce_cdb_t0 db,
                 break;
 
             case CE_CDB_TYPE_REF: {
-                ce_cdb_uuid_t0 ref_uid = obj_uid(db, v->ref);
+//                ce_cdb_uuid_t0 ref_uid = obj_uid(db, v->ref);
                 ce_array_push(*nodes, ((cnode_t) {
                         .key = k,
                         .type = CNODE_REF,
-                        .uuid = ref_uid,
+                        .uuid.id = v->ref,
                 }), allocator);
             }
                 break;
@@ -2190,7 +2190,25 @@ static uint64_t read_ref(const ce_cdb_obj_o0 *reader,
         return defaultt;
     }
 
+//    ce_cdb_a0->obj_from_uid(obj->db, (ce_cdb_uuid_t0) {v->ref});
+
     return v->ref;
+}
+
+static ce_cdb_uuid_t0 read_ref_uuid(const ce_cdb_obj_o0 *reader,
+                                    uint64_t property,
+                                    ce_cdb_uuid_t0 defaultt) {
+    if (!reader) {
+        return defaultt;
+    }
+
+    object_t *obj = _get_object_from_o(reader);
+    ce_cdb_value_u0 *v = _get_value_ptr_generic(obj, property);
+    if (!v) {
+        return defaultt;
+    }
+
+    return (ce_cdb_uuid_t0) {v->ref};
 }
 
 static uint64_t read_subobject(const ce_cdb_obj_o0 *reader,
@@ -3212,6 +3230,7 @@ static struct ce_cdb_a0 cdb_api = {
         .read_uint64 = read_uint64,
         .read_ptr = read_ptr,
         .read_ref = read_ref,
+        .read_ref_uuid = read_ref_uuid,
         .read_blob = read_blob,
         .read_subobject = read_subobject,
         .read_objset = read_objset,
@@ -3235,7 +3254,7 @@ static struct ce_cdb_a0 cdb_api = {
 
         .obj_from_uid = objectid_from_uid,
         .obj_uid = obj_uid,
-        .create_root_obj = _create_root_obj,
+        .load_from_cnodes = _create_root_obj,
         .dump_cnodes = _dump_cnodes,
         .changes = _changes,
         .objs_changes = _objs_changes,

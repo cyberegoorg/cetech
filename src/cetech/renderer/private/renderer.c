@@ -17,7 +17,7 @@
 #include <celib/os/window.h>
 
 #include <cetech/kernel/kernel.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/machine/machine.h>
 #include <cetech/ecs/ecs.h>
@@ -439,7 +439,7 @@ void CE_MODULE_LOAD(renderer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_config_a0);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ct_machine_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);

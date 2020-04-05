@@ -59,28 +59,14 @@ typedef struct ct_asset_dcc_io_i0 {
 } ct_asset_dcc_io_i0;
 
 struct ct_asset_io_a0 {
+    ct_asset_io_i0 *(*find_asset_io)(const char *extension);
+    ct_asset_dcc_io_i0 *(*find_asset_dcc_io)(const char *extension, uint64_t group);
+
     void (*create_import_group)(uint64_t name,
                                 float order);
 
-    void (*save_to_cdb)(ce_cdb_t0 db,
-                        uint64_t obj,
-                        const char *filename);
-
-    bool (*save_to_file)(ce_cdb_t0 db,
-                         uint64_t obj,
-                         const char *filename);
 
 
-    void (*compile_all)();
-
-    void (*gen_tmp_file)(char *output,
-                         uint64_t max_size,
-                         const char *platform,
-                         const char *filename,
-                         const char *ext);
-
-    char *(*external_join)(ce_alloc_t0 *a,
-                           const char *name);
 };
 
 CE_MODULE(ct_asset_io_a0);

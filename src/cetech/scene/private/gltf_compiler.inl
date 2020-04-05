@@ -3,7 +3,6 @@
 #include <celib/macros.h>
 #include <celib/log.h>
 #include <cetech/material/material.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/default_rg/default_rg.h>
 #include <celib/fs.h>
 #include <cetech/kernel/kernel.h>
@@ -13,7 +12,7 @@
 
 #include "include/cgltf/cgltf.h"
 
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 static inline bgfx_attrib_t _to_bgxfx_attr(cgltf_attribute_type attr) {
     switch (attr) {
@@ -205,17 +204,17 @@ static bool _import_gtlf(ce_cdb_t0 db,
     const char *filename = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, NULL);
 
     {
-        uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_RESOURCE_ASSETS_PROP);
+        uint32_t assets_n = ce_cdb_a0->read_objset_num(r, CT_DCC_ASSET_ASSETS_PROP);
         if (!assets_n) {
-            char resource_path[512];
+            char asset_path[512];
             char basae_name[128] = {};
             ce_os_path_a0->basename(basae_name, filename);
             char dir_name[128] = {};
             ce_os_path_a0->dirname(dir_name, filename);
-            snprintf(resource_path, CE_ARRAY_LEN(resource_path), "%s/%s_resource", dir_name,
+            snprintf(asset_path, CE_ARRAY_LEN(asset_path), "%s/%s_asset", dir_name,
                      basae_name);
 
-            ce_fs_a0->create_directory(SOURCE_ROOT, resource_path);
+            ce_fs_a0->create_directory(SOURCE_ROOT, asset_path);
 
 
             const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
@@ -239,10 +238,45 @@ static bool _import_gtlf(ce_cdb_t0 db,
             for (int m = 0; m < data->materials_count; ++m) {
                 cgltf_material *mat = &data->materials[m];
 
-                uint64_t base_material = ce_cdb_a0->obj_from_uid(db,
-                                                                 (ce_cdb_uuid_t0) {
-                                                                         0x24c9413e88ebaaa8});
-                uint64_t new_mat = ce_cdb_a0->create_from(db, base_material);
+//                uint64_t base_material = ce_cdb_a0->obj_from_uid(db,
+//                                                                 (ce_cdb_uuid_t0) {
+//                                                                         0x24c9413e88ebaaa8});
+
+                uint64_t var = ce_cdb_a0->create_object(db, MATERIAL_VAR_TYPE_TEXTURE);
+
+                uint64_t var2 = ce_cdb_a0->create_object(db, MATERIAL_VAR_TYPE_COLOR);
+                ce_cdb_obj_o0* w_var2 = ce_cdb_a0->write_begin(db, var2);
+                ce_cdb_a0->set_str(w_var2, MATERIAL_VAR_NAME_PROP, "u_vec4");
+                ce_cdb_a0->set_float(w_var2, MATERIAL_VAR_VALUE_PROP_X, 1.0f);
+                ce_cdb_a0->set_float(w_var2, MATERIAL_VAR_VALUE_PROP_Y, 1.0f);
+                ce_cdb_a0->set_float(w_var2, MATERIAL_VAR_VALUE_PROP_Z, 1.0f);
+                ce_cdb_a0->set_float(w_var2, MATERIAL_VAR_VALUE_PROP_W, 1.0f);
+                ce_cdb_a0->write_commit(w_var2);
+
+                uint64_t render_state = ce_cdb_a0->create_object(db, MATERIAL_RENDER_STATE);
+                ce_cdb_obj_o0* rw = ce_cdb_a0->write_begin(db, render_state);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_RGB_WRITE, true);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_DEPTH_WRITE, true);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_ALPHA_WRITE, true);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_DEPTH_TEST_LESS, true);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_CULL_CCW, true);
+                ce_cdb_a0->set_bool(rw, RENDER_STATE_MSAA, true);
+                ce_cdb_a0->write_commit(rw);
+
+                uint64_t layer = ce_cdb_a0->create_object(db, MATERIAL_LAYER_TYPE);
+                ce_cdb_obj_o0* lw = ce_cdb_a0->write_begin(db, layer);
+                ce_cdb_a0->set_subobject(lw, MATERIAL_RENDER_STATE, render_state);
+                ce_cdb_a0->set_str(lw, MATERIAL_LAYER_NAME, "gbuffer");
+                ce_cdb_a0->set_uint64(lw, MATERIAL_SHADER_PROP, 0x7ecb3362fa2b019c);
+                ce_cdb_a0->objset_add_obj(lw, MATERIAL_VARIABLES_PROP, var);
+                ce_cdb_a0->objset_add_obj(lw, MATERIAL_VARIABLES_PROP, var2);
+                ce_cdb_a0->write_commit(lw);
+
+                uint64_t new_mat = ce_cdb_a0->create_object(db, MATERIAL_TYPE);
+                ce_cdb_obj_o0* mw = ce_cdb_a0->write_begin(db, new_mat);
+                ce_cdb_a0->objset_add_obj(mw, MATERIAL_LAYERS, layer);
+                ce_cdb_a0->write_commit(mw);
+
                 ce_hash_add(&mat_to_obj, (uint64_t) mat, new_mat, _G.allocator);
 
                 if (mat->pbr_metallic_roughness.base_color_texture.texture) {
@@ -255,9 +289,12 @@ static bool _import_gtlf(ce_cdb_t0 db,
                     snprintf(texture_file, CE_ARRAY_LEN(texture_file), "%s/%s.texture", dirname,
                              tname);
 
-                    ce_cdb_uuid_t0 texture_uid = ct_resourcedb_a0->get_file_resource(texture_file);
-                    uint64_t texture_obj = ce_cdb_a0->obj_from_uid(db, texture_uid);
-                    ct_material_a0->set_texture(db, new_mat, _GBUFFER, "u_texColor", texture_obj);
+                    ce_cdb_uuid_t0 texture_uid = ct_asset_a0->filename_asset(texture_file);
+
+                    ce_cdb_obj_o0* vw = ce_cdb_a0->write_begin(db, var);
+                    ce_cdb_a0->set_str(vw, MATERIAL_VAR_NAME_PROP, "u_texColor");
+                    ce_cdb_a0->set_uint64(vw, MATERIAL_VAR_VALUE_PROP, texture_uid.id);
+                    ce_cdb_a0->write_commit(vw);
                 }
 
                 char material_name[128] = {};
@@ -270,10 +307,10 @@ static bool _import_gtlf(ce_cdb_t0 db,
 
                 char material_filename[512] = {};
                 snprintf(material_filename, CE_ARRAY_LEN(material_filename),
-                         "%s/%s.material", resource_path, material_name);
+                         "%s/%s.material", asset_path, material_name);
 
-                ct_asset_io_a0->save_to_cdb(db, new_mat, material_filename);
-                ct_asset_io_a0->save_to_file(db, new_mat, material_filename);
+                ct_asset_a0->save_to_cdb(db, new_mat, material_filename);
+                ct_asset_a0->save_to_file(db, new_mat, material_filename);
             }
 
             scene_compile_output_t *output = _crete_compile_output();
@@ -286,7 +323,7 @@ static bool _import_gtlf(ce_cdb_t0 db,
 
             char scene_filename[512] = {};
             snprintf(scene_filename, CE_ARRAY_LEN(scene_filename), "%s.scene", filename);
-            ct_asset_io_a0->save_to_cdb(db, scene_obj, scene_filename);
+            ct_asset_a0->save_to_cdb(db, scene_obj, scene_filename);
 
             _destroy_compile_output(output);
 
@@ -359,8 +396,8 @@ static bool _import_gtlf(ce_cdb_t0 db,
 
             char entity_filename[512] = {};
             snprintf(entity_filename, CE_ARRAY_LEN(entity_filename), "%s/%s.entity",
-                     resource_path, basae_name);
-            ct_asset_io_a0->save_to_cdb(db, root_ent, entity_filename);
+                     asset_path, basae_name);
+            ct_asset_a0->save_to_cdb(db, root_ent, entity_filename);
 
             cgltf_free(data);
 

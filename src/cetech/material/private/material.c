@@ -13,7 +13,7 @@
 #include <celib/macros.h>
 #include <celib/log.h>
 
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
@@ -23,7 +23,6 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/editor/editor_ui.h>
-#include <cetech/resource/resourcedb.h>
 #include <cetech/property_editor/property_editor.h>
 
 #include <bgfx/defines.h>
@@ -52,7 +51,7 @@ static struct _G {
 
 
 //==============================================================================
-// Resource
+// Asset
 //==============================================================================
 
 enum material_variable_type {
@@ -178,7 +177,7 @@ static void ui_texture(uint64_t var,
     const char *name = ce_cdb_a0->read_str(reader, MATERIAL_VAR_NAME_PROP,
                                            "");
 
-    ct_editor_ui_a0->prop_resource(var, name, filter,
+    ct_editor_ui_a0->prop_asset(var, name, filter,
                                    MATERIAL_VAR_VALUE_PROP,
                                    TEXTURE_TYPE, context, var);
 }
@@ -207,7 +206,7 @@ void draw_property(ce_cdb_t0 db,
                                               DebugUITreeNodeFlags_DefaultOpen);
         if (open) {
             ct_editor_ui_a0->prop_str(layer, "Layer name", filter, MATERIAL_LAYER_NAME, i);
-            ct_editor_ui_a0->prop_resource(layer, "Shader", filter,
+            ct_editor_ui_a0->prop_asset(layer, "Shader", filter,
                                            MATERIAL_SHADER_PROP, SHADER_TYPE, context, i);
 
             uint64_t count = ce_cdb_a0->read_objset_num(layer_reader, MATERIAL_VARIABLES_PROP);
@@ -241,7 +240,7 @@ void draw_property(ce_cdb_t0 db,
     }
 }
 
-static struct ct_entity_t0 load(uint64_t resource,
+static struct ct_entity_t0 load(uint64_t asset,
                                 ct_world_t0 world) {
     ct_entity_t0 ent = {};
     ct_ecs_e_a0->create_entities(world, &ent, 1);
@@ -266,7 +265,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                              {
                                      .type = PRIMITIVE_MESH_COMPONENT,
                                      .data = &(ct_primitive_mesh_c) {
-                                             .material = resource,
+                                             .material = asset,
                                      },
                              }
                      }, 4);
@@ -274,13 +273,13 @@ static struct ct_entity_t0 load(uint64_t resource,
     return ent;
 }
 
-static struct ct_resource_preview_i0 ct_resource_preview_api = {
+static struct ct_asset_preview_i0 ct_asset_preview_api = {
         .load = load,
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I0) {
-        return &ct_resource_preview_api;
+    if (name_hash == ASSET_PREVIEW_I0) {
+        return &ct_asset_preview_api;
     }
     return NULL;
 }
@@ -294,7 +293,7 @@ static const char *name() {
     return "material";
 }
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .cdb_type = cdb_type,
         .name = name,
         .display_icon = display_icon,
@@ -377,7 +376,7 @@ static void set_texture_handler(uint64_t material,
 
         if (var_type != MATERIAL_VAR_TYPE_TEXTURE_HANDLER) {
             t = ce_cdb_a0->create_object(ce_cdb_a0->db(), MATERIAL_VAR_TYPE_TEXTURE_HANDLER);
-            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), t);
+//            ce_cdb_a0->destroy_object(ce_cdb_a0->db(), t);
         } else {
             t = var;
         }
@@ -387,9 +386,9 @@ static void set_texture_handler(uint64_t material,
         ce_cdb_a0->set_str(writer, MATERIAL_VAR_NAME_PROP, slot);
         ce_cdb_a0->write_commit(writer);
 
-        writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), layer_obj);
-        ce_cdb_a0->objset_add_obj(writer, MATERIAL_VARIABLES_PROP, t);
-        ce_cdb_a0->write_commit(writer);
+//        writer = ce_cdb_a0->write_begin(ce_cdb_a0->db(), layer_obj);
+//        ce_cdb_a0->objset_add_obj(writer, MATERIAL_VARIABLES_PROP, t);
+//        ce_cdb_a0->write_commit(writer);
         break;
     }
 }
@@ -691,11 +690,6 @@ static const ce_cdb_prop_def_t0 material_texture_prop[] = {
                 .type = CE_CDB_TYPE_REF,
                 .obj_type = TEXTURE_TYPE,
         },
-
-        {
-                .name = "handler",
-                .type = CE_CDB_TYPE_UINT64,
-        },
 };
 
 static const ce_cdb_prop_def_t0 material_texture_handler_prop[] = {
@@ -826,7 +820,7 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
                               int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_texture_a0);
     CE_INIT_API(api, ct_shader_a0);
@@ -841,7 +835,7 @@ void CE_MODULE_LOAD(material)(struct ce_api_a0 *api,
     ce_id_a0->id64("material");
 
     api->add_api(CT_MATERIAL_A0_STR, &material_api, sizeof(material_api));
-    api->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
     api->add_impl(CT_ASSET_IO_I0_STR, &material_io, sizeof(material_io));
     api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &_property_editor_api,
                   sizeof(_property_editor_api));

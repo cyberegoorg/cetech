@@ -279,7 +279,7 @@ void CE_MODULE_LOAD(task)(struct ce_api_a0 *api,
     api->add_api("ce_task_a0", &_task_api, sizeof(_task_api));
 
     int core_count = ce_os_cpu_a0->count();
-//    core_count = 4;
+//    core_count = 2;
 
     static const uint32_t main_threads_count = 1;
     const uint32_t worker_count = core_count - main_threads_count;

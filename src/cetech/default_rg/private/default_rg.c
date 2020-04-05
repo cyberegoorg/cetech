@@ -9,7 +9,7 @@
 #include <celib/id.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/material/material.h>
 #include <cetech/debugui/debugui.h>
 #include <cetech/ecs/ecs.h>

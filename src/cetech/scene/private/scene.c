@@ -12,7 +12,7 @@
 #include <celib/cdb.h>
 
 #include "cetech/machine/machine.h"
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
@@ -34,7 +34,7 @@ int scenecompiler_init(struct ce_api_a0 *api);
 // GLobals
 //==============================================================================
 
-#define _G SceneResourceGlobals
+#define _G SceneAssetGlobals
 static struct _G {
     ce_cdb_t0 db;
     ce_alloc_t0 *allocator;
@@ -66,7 +66,7 @@ typedef struct ct_scene_obj_t {
 } ct_scene_obj_t;
 
 //==============================================================================
-// Resource
+// Asset
 //==============================================================================
 
 static void online(ce_cdb_t0 db,
@@ -137,12 +137,12 @@ static const char *display_icon() {
     return ICON_FA_SHARE_ALT_SQUARE;
 }
 
-static struct ct_entity_t0 load(uint64_t resource,
+static struct ct_entity_t0 load(uint64_t asset,
                                 ct_world_t0 world) {
 
     char *items = NULL;
     uint32_t items_count = 0;
-    ct_scene_a0->get_all_geometries(resource, &items, &items_count);
+    ct_scene_a0->get_all_geometries(asset, &items, &items_count);
 
     ct_entity_t0 ent[items_count + 1];
     ct_ecs_e_a0->create_entities(world, ent, items_count + 1);
@@ -189,7 +189,7 @@ static struct ct_entity_t0 load(uint64_t resource,
                                          .type = STATIC_MESH_COMPONENT,
                                          .data = &(ct_mesh_component) {
                                                  .material = material,
-                                                 .scene = resource,
+                                                 .scene = asset,
                                                  .mesh = ce_id_a0->id64(geom)
                                          }
                                  }
@@ -200,13 +200,13 @@ static struct ct_entity_t0 load(uint64_t resource,
 }
 
 
-static struct ct_resource_preview_i0 ct_resource_preview_api = {
+static struct ct_asset_preview_i0 ct_asset_preview_api = {
         .load = load,
 };
 
 static void *get_interface(uint64_t name_hash) {
-    if (name_hash == RESOURCE_PREVIEW_I0) {
-        return &ct_resource_preview_api;
+    if (name_hash == ASSET_PREVIEW_I0) {
+        return &ct_asset_preview_api;
     }
     return NULL;
 }
@@ -216,7 +216,7 @@ static const char *name() {
 }
 
 
-static struct ct_resource_i0 ct_resource_api = {
+static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
@@ -230,7 +230,7 @@ static struct ct_resource_i0 ct_resource_api = {
 //==============================================================================
 // Interface
 //==============================================================================
-static uint64_t resource_data(uint64_t name) {
+static uint64_t asset_data(uint64_t name) {
     ce_cdb_uuid_t0 rid = (ce_cdb_uuid_t0) {
             .id = name,
     };
@@ -241,7 +241,7 @@ static uint64_t resource_data(uint64_t name) {
 
 static uint64_t get_mesh_node(uint64_t scene,
                               uint64_t mesh) {
-    uint64_t res = resource_data(scene);
+    uint64_t res = asset_data(scene);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
@@ -267,7 +267,7 @@ static uint64_t get_mesh_node(uint64_t scene,
 static void get_all_geometries(uint64_t scene,
                                char **geometries,
                                uint32_t *count) {
-    uint64_t res = resource_data(scene);
+    uint64_t res = asset_data(scene);
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_GEOM_STR, NULL, NULL));
@@ -277,7 +277,7 @@ static void get_all_geometries(uint64_t scene,
 static void get_all_nodes(uint64_t scene,
                           char **geometries,
                           uint32_t *count) {
-    uint64_t res = resource_data(scene);
+    uint64_t res = asset_data(scene);
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), res);
 
     *geometries = (char *) (ce_cdb_a0->read_blob(reader, SCENE_NODE_STR, NULL, NULL));
@@ -442,7 +442,7 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                            int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_renderer_a0);
@@ -457,7 +457,7 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                             scene_import_prop, CE_ARRAY_LEN(scene_import_prop));
 
     CE_INIT_API(api, ce_memory_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_id_a0);
 
     _G = (struct _G) {
@@ -465,7 +465,7 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
 
     };
 
-    ce_api_a0->add_impl(CT_RESOURCE_I0_STR, &ct_resource_api, sizeof(ct_resource_api));
+    ce_api_a0->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
 
     api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
                   &property_editor_api, sizeof(property_editor_api));

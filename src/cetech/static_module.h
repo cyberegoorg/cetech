@@ -6,9 +6,8 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(metrics);
     CE_ADD_STATIC_MODULE(machine);
 
-    CE_ADD_STATIC_MODULE(resourcedb);
-    CE_ADD_STATIC_MODULE(resourcesystem);
-    CE_ADD_STATIC_MODULE(resourcecompiler);
+    CE_ADD_STATIC_MODULE(asset);
+    CE_ADD_STATIC_MODULE(asset_io);
 
     CE_ADD_STATIC_MODULE(ecs);
     CE_ADD_STATIC_MODULE(parent);

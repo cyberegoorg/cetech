@@ -25,9 +25,6 @@ extern "C" {
 #define SOURCE_ROOT \
     CE_ID64_0("source", 0x921f1370045bad6eULL)
 
-#define BUILD_ROOT \
-    CE_ID64_0("build", 0x4429661936ece1eaULL)
-
 #define CT_INPUT_TASK \
     CE_ID64_0("input_task", 0xba6140c0d9e00706ULL)
 

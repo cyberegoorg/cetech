@@ -9,7 +9,7 @@
 extern "C" {
 #include <cetech/debugui/icons_font_awesome.h>
 #include <cetech/node_graph/node_graph.h>
-#include <cetech/resource_editor/resource_editor.h>
+#include <cetech/asset_editor/asset_editor.h>
 #include <cetech/renderer/gfx.h>
 
 #include "../node_graph_editor.h"
@@ -653,7 +653,7 @@ static void draw_editor(uint64_t context_obj,
 }
 
 static uint64_t cdb_type() {
-    return CT_NODE_GRAPH_RESOURCE;
+    return CT_NODE_GRAPH_ASSET;
 }
 
 static const char *display_icon() {
@@ -665,7 +665,7 @@ static const char *display_name() {
 }
 
 
-static struct ct_resource_editor_i0 ct_resource_editor_api = {
+static struct ct_asset_editor_i0 ct_asset_editor_api = {
         .cdb_type = cdb_type,
         .open = open,
         .close = close,
@@ -698,9 +698,9 @@ void CE_MODULE_LOAD (node_graph_editor)(struct ce_api_a0 *api,
                  ct_node_graph_editor_a0,
                  sizeof(nge_api));
 
-    api->add_impl(CT_RESOURCE_EDITOR_I0_STR,
-                  &ct_resource_editor_api,
-                  sizeof(ct_resource_editor_i0));
+    api->add_impl(CT_ASSET_EDITOR_I0_STR,
+                  &ct_asset_editor_api,
+                  sizeof(ct_asset_editor_i0));
 }
 
 void CE_MODULE_UNLOAD (node_graph_editor)(struct ce_api_a0 *api,

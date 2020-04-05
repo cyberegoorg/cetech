@@ -1,5 +1,5 @@
-#ifndef CETECH_RESOURCE_UI_H
-#define CETECH_RESOURCE_UI_H
+#ifndef CETECH_ASSET_UI_H
+#define CETECH_ASSET_UI_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,9 +10,9 @@ extern "C" {
 #include <stdbool.h>
 
 
-#define CT_RESOURCE_UI_A0_STR "ct_editor_ui_a0"
+#define CT_ASSET_UI_A0_STR "ct_editor_ui_a0"
 
-#define CT_RESOURCE_UI_API \
+#define CT_ASSET_UI_API \
     CE_ID64_0("ct_editor_ui_a0", 0x864e3516a3c025aeULL)
 
 #define CT_LOCKED_OBJ \
@@ -94,11 +94,11 @@ struct ct_editor_ui_a0 {
                             uint32_t items_count,
                             uint32_t i);
 
-    void (*prop_resource)(uint64_t obj,
+    void (*prop_asset)(uint64_t obj,
                           const char *label,
                           const char *filter,
                           uint64_t property,
-                          uint64_t resource_type,
+                          uint64_t asset_type,
                           uint64_t context,
                           uint32_t i);
 
@@ -125,10 +125,10 @@ struct ct_editor_ui_a0 {
                             const uint64_t *props,
                             uint64_t props_n);
 
-    bool (*resource_select_modal)(const char *modal_id,
+    bool (*asset_select_modal)(const char *modal_id,
                                   uint64_t id,
-                                  uint64_t resource_type,
-                                  uint64_t *selected_resource,
+                                  uint64_t asset_type,
+                                  uint64_t *selected_asset,
                                   uint32_t *count);
 
     bool (*ui_prop_header)(const char *name);
@@ -162,4 +162,4 @@ CE_MODULE(ct_editor_ui_a0);
 };
 #endif
 
-#endif //CETECH_RESOURCE_UI_H
+#endif //CETECH_ASSET_UI_H

@@ -16,8 +16,8 @@ typedef struct ce_alloc_t0 ce_alloc_t0;
 typedef struct ce_vio_t0 ce_vio_t0;
 
 typedef enum ce_fs_open_mode_e0 {
-    FS_OPEN_READ,
-    FS_OPEN_WRITE,
+    FS_OPEN_READ = 1,
+    FS_OPEN_WRITE = 2,
 } ce_fs_open_mode_e0;
 
 //! Filesystem API V0

@@ -8,7 +8,7 @@
 #include <celib/macros.h>
 #include "celib/api.h"
 
-#include "cetech/resource/resource.h"
+#include "cetech/asset/asset.h"
 #include "cetech/ecs/ecs.h"
 
 #include "cetech/transform/transform.h"
@@ -120,11 +120,11 @@ static void property_editor(ce_cdb_t0 db,
                             uint64_t obj,
                             uint64_t context,
                             const char *filter) {
-    ct_editor_ui_a0->prop_resource(obj, "Scene", filter,
+    ct_editor_ui_a0->prop_asset(obj, "Scene", filter,
                                    PROP_SCENE_ID, PROP_SCENE_ID, context, obj);
     ct_editor_ui_a0->prop_str_combo(obj, "Mesh", filter, PROP_MESH, mesh_combo_items, obj);
     ct_editor_ui_a0->prop_str_combo(obj, "Node", filter, PROP_NODE, node_combo_items, obj);
-    ct_editor_ui_a0->prop_resource(obj, "Material", filter, MATERIAL_TYPE, MATERIAL_TYPE, context,
+    ct_editor_ui_a0->prop_asset(obj, "Material", filter, MATERIAL_TYPE, MATERIAL_TYPE, context,
                                    obj + 1);
 }
 
@@ -203,7 +203,7 @@ void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
     CE_INIT_API(api, ct_scene_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
-    CE_INIT_API(api, ct_resource_a0);
+    CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ct_renderer_a0);
 
 

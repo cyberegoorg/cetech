@@ -61,7 +61,7 @@ test_release:
     - build
 
   script:
-    - bin/linux64/cetech_develop -compile -src ./examples/develop/src -build ./examples/develop/build -renderer.type noop
+    - bin/linux64/cetech_develop -compile -src ./examples/develop/src -renderer.type noop
 
 test_debug:
   image: $CI_REGISTRY/cyberegoorg/cetech/toolchain:master
@@ -74,7 +74,7 @@ test_debug:
     - build
 
   script:
-    - bin/linux64/cetech_develop_debug -compile -src ./examples/develop/src -build ./examples/develop/build -renderer.type noop
+    - bin/linux64/cetech_develop_debug -compile -src ./examples/develop/src -renderer.type noop
 
 ################
 # Gitlab pages #

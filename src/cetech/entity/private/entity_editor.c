@@ -16,11 +16,11 @@
 #include <cetech/debugui/debugui.h>
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
-#include <cetech/resource/resource.h>
+#include <cetech/asset/asset.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/debugui/icons_font_awesome.h>
-#include <cetech/resource_editor/resource_editor.h>
+#include <cetech/asset_editor/asset_editor.h>
 #include <celib/containers/array.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
@@ -249,7 +249,7 @@ const char *display_name() {
 }
 
 
-static struct ct_resource_editor_i0 ct_resource_editor_api = {
+static struct ct_asset_editor_i0 ct_asset_editor_api = {
         .cdb_type = cdb_type,
         .open = open,
         .close = close,
@@ -275,7 +275,7 @@ void CE_MODULE_LOAD(entity_editor)(struct ce_api_a0 *api,
     _G = (struct _G) {
     };
 
-    api->add_impl(CT_RESOURCE_EDITOR_I0_STR, &ct_resource_editor_api, sizeof(ct_resource_editor_api));
+    api->add_impl(CT_ASSET_EDITOR_I0_STR, &ct_asset_editor_api, sizeof(ct_asset_editor_api));
 }
 
 void CE_MODULE_UNLOAD(entity_editor)(struct ce_api_a0 *api,

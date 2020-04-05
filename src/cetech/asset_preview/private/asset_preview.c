@@ -15,7 +15,7 @@
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/editor/dock.h>
-#include <cetech/resource/resourcedb.h>
+#include <cetech/asset_io/asset_io.h>
 
 #include "celib/id.h"
 #include "celib/memory/memory.h"
@@ -25,7 +25,7 @@
 
 #define _G AssetPreviewGlobals
 
-CE_MODULE(ct_resourcedb_a0);
+CE_MODULE(ct_assetdb_a0);
 
 typedef struct preview_instance {
     ct_world_t0 world;
@@ -66,19 +66,19 @@ static struct preview_instance *_new_preview() {
     return pi;
 }
 
-static struct ct_resource_preview_i0 *_get_asset_preview(uint64_t asset_type) {
-    ct_resource_i0 *resource_i;
-    resource_i = ct_resource_a0->get_interface(asset_type);
+static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
+    ct_asset_i0 *asset_i;
+    asset_i = ct_asset_a0->get_interface(asset_type);
 
-    if (!resource_i) {
+    if (!asset_i) {
         return NULL;
     }
 
-    if (!resource_i->get_interface) {
+    if (!asset_i->get_interface) {
         return NULL;
     }
 
-    return resource_i->get_interface(RESOURCE_PREVIEW_I0);
+    return asset_i->get_interface(ASSET_PREVIEW_I0);
 }
 
 static void set_asset(preview_instance *pi,
@@ -102,7 +102,7 @@ static void set_asset(preview_instance *pi,
         uint64_t prev_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(),
                                                  pi->selected_object);
 
-        struct ct_resource_preview_i0 *i;
+        struct ct_asset_preview_i0 *i;
         i = _get_asset_preview(prev_type);
 
         if (i) {
@@ -122,7 +122,7 @@ static void set_asset(preview_instance *pi,
 
         pi->type = type;
 
-        struct ct_resource_preview_i0 *i;
+        struct ct_asset_preview_i0 *i;
         i = _get_asset_preview(type);
         if (i) {
             if (i->load) {
@@ -142,7 +142,7 @@ static void _draw_preview(preview_instance *pi,
         return;
     }
 
-    ct_resource_preview_i0 *i;
+    ct_asset_preview_i0 *i;
     i = _get_asset_preview(pi->type);
 
     if (!i) {
@@ -196,7 +196,7 @@ static bool init() {
 
     _G.baground = pi;
 
-    pi->world = ct_ecs_a0->create_world("background resource preview");
+    pi->world = ct_ecs_a0->create_world("background asset preview");
 
     ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
 
@@ -230,7 +230,7 @@ static bool init() {
                              }
                      })));
 
-    ct_dock_a0->create_dock(RESOURCE_PREVIEW_I0, true);
+    ct_dock_a0->create_dock(ASSET_PREVIEW_I0, true);
     return true;
 }
 
@@ -254,8 +254,8 @@ static void update(float dt) {
     }
 }
 
-void set_background_resource(ce_cdb_uuid_t0 resource) {
-    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resource);
+void set_background_asset(ce_cdb_uuid_t0 asset) {
+    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), asset);
     set_asset(_G.baground, obj);
 }
 
@@ -263,42 +263,42 @@ void draw_background_texture(ce_vec2_t size) {
     _draw_preview(_G.baground, size);
 }
 
-static void resource_tooltip(ce_cdb_uuid_t0 resourceid,
+static void asset_tooltip(ce_cdb_uuid_t0 assetid,
                              const char *path,
                              ce_vec2_t size) {
     ct_debugui_a0->Text("%s", path);
 
 
-    uint64_t type = ct_resourcedb_a0->get_resource_type(resourceid);
+    uint64_t type = ct_asset_a0->get_asset_type(assetid);
 
-    ct_resource_i0 *ri = ct_resource_a0->get_interface(type);
+    ct_asset_i0 *ri = ct_asset_a0->get_interface(type);
 
     if (!ri || !ri->get_interface) {
         return;
     }
 
-    ct_resource_preview_i0 *ai = (ri->get_interface(RESOURCE_PREVIEW_I0));
+    ct_asset_preview_i0 *ai = (ri->get_interface(ASSET_PREVIEW_I0));
 
-    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), resourceid);
+    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), assetid);
 
     if (ai) {
         if (ai->tooltip) {
             ai->tooltip(obj, size);
         }
 
-        set_background_resource(resourceid);
+        set_background_asset(assetid);
         draw_background_texture(size);
     }
 }
 
-static struct ct_resource_preview_a0 asset_preview_api = {
-        .resource_tooltip = resource_tooltip,
+static struct ct_asset_preview_a0 asset_preview_api = {
+        .asset_tooltip = asset_tooltip,
 };
 
-struct ct_resource_preview_a0 *ct_resource_preview_a0 = &asset_preview_api;
+struct ct_asset_preview_a0 *ct_asset_preview_a0 = &asset_preview_api;
 
 static const char *dock_title() {
-    return "Resource preview";
+    return "Asset preview";
 }
 
 static const char *name(uint64_t dock) {
@@ -308,7 +308,7 @@ static const char *name(uint64_t dock) {
 static uint64_t open(uint64_t dock) {
     preview_instance *pi = _new_preview();
 
-    pi->world = ct_ecs_a0->create_world("resource preview");
+    pi->world = ct_ecs_a0->create_world("asset preview");
 
     ct_ecs_e_a0->create_entities(pi->world, &pi->camera_ent, 1);
     ct_ecs_c_a0->add(pi->world,
@@ -350,7 +350,7 @@ static uint64_t open(uint64_t dock) {
 
 
 static struct ct_dock_i0 dock_api = {
-        .type = RESOURCE_PREVIEW_I0,
+        .type = ASSET_PREVIEW_I0,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_dock,
