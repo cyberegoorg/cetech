@@ -13,7 +13,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
@@ -127,17 +127,9 @@ void render_primitives(ct_world_t0 world,
     }
 }
 
-static uint64_t cdb_type() {
-    return ce_id_a0->id64("primitive_mesh");
-}
-
 static const char *display_name() {
     return ICON_FA_HOUZZ " Primitive mesh";
 }
-
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = cdb_type,
-};
 
 static void render(ct_world_t0 world,
                    struct ct_rg_builder_t0 *builder) {
@@ -202,7 +194,6 @@ void CE_MODULE_LOAD(primitive_mesh)(struct ce_api_a0 *api,
     };
 
     api->add_impl(CT_ECS_COMPONENT_I0_STR, &ct_component_api, sizeof(ct_component_api));
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &property_editor_api, sizeof(property_editor_api));
 
     api->add_impl(CT_RENDERER_COMPONENT_I0_STR,
                   &ct_renderer_component_i, sizeof(ct_renderer_component_i));

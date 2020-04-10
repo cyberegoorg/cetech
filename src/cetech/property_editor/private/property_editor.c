@@ -11,8 +11,8 @@
 
 #include <cetech/asset/asset.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
-#include <cetech/debugui/icons_font_awesome.h>
+
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/editor/editor.h>
 #include <cetech/editor/dock.h>
@@ -26,6 +26,7 @@
 #include <celib/containers/buffer.h>
 #include <celib/yaml_cdb.h>
 #include <cetech/asset_io/asset_io.h>
+#include <cetech/ui/ui.h>
 
 #define WINDOW_NAME "Property editor"
 
@@ -37,160 +38,114 @@ static struct _G {
     bool visible;
 } _G;
 
-static void draw(ce_cdb_t0 db,
-                 uint64_t obj,
-                 uint64_t context);
+static uint64_t _combine_hash(uint64_t a,
+                              uint64_t b) {
+    return a ^ b;
+}
 
-static void _generic_prop_draw(ce_cdb_t0 db,
-                               uint64_t obj,
-                               uint64_t context,
-                               const char *filter) {
+
+typedef void (draw_aspect)(ce_cdb_t0 db,
+                           uint64_t obj,
+                           uint64_t context);
+
+typedef void (draw_menu_aspect)(uint64_t obj);
+
+static void draw_object(ce_cdb_t0 db,
+                        uint64_t obj,
+                        uint64_t context);
+
+static void _draw_property(ce_cdb_t0 db,
+                           uint64_t obj,
+                           uint64_t property,
+                           const ce_cdb_prop_def_t0 *def,
+                           uint64_t context) {
+
+    const ce_cdb_obj_o0 *o = ce_cdb_a0->read(db, obj);
+    ce_cdb_type_e0 type = ce_cdb_a0->prop_type(o, property);
+    switch (type) {
+        case CE_CDB_TYPE_REF:
+            ct_editor_ui_a0->prop_asset(obj, def->name, property,
+                                        def->obj_type, context, obj);
+            break;
+        case CE_CDB_TYPE_FLOAT:
+            ct_editor_ui_a0->prop_float(obj, def->name, property, (ui_float_p0) {});
+            break;
+
+        case CE_CDB_TYPE_UINT64:
+            ct_editor_ui_a0->prop_uin64(obj, def->name, property, (ui_uint64_p0) {});
+            break;
+
+        case CE_CDB_TYPE_BOOL:
+            ct_editor_ui_a0->prop_bool(obj, def->name, property);
+            break;
+        case CE_CDB_TYPE_STR:
+            ct_editor_ui_a0->prop_str(obj, def->name, property, obj);
+            break;
+        case CE_CDB_TYPE_SUBOBJECT: {
+            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+            uint64_t subobj = ce_cdb_a0->read_subobject(r, property, 0);
+            draw_object(db, subobj, context);
+            break;
+        }
+        case CE_CDB_TYPE_SET_SUBOBJECT: {
+            bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+                    .id=_combine_hash(obj, property),
+                    .text=def->name,
+                    .flags = CT_TREE_NODE_FLAGS_DefaultOpen});
+
+            if (open) {
+                const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+                uint64_t n = ce_cdb_a0->read_objset_num(r, property);
+                uint64_t k[n];
+                ce_cdb_a0->read_objset(r, property, k);
+                for (int j = 0; j < n; ++j) {
+                    uint64_t subobj = k[j];
+                    draw_object(db, subobj, context);
+                }
+                ct_ui_a0->tree_pop();
+            }
+        }
+            break;
+
+        default:
+            break;
+    }
+}
+
+static void _draw_object(ce_cdb_t0 db,
+                         uint64_t obj,
+                         uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(db, obj);
 
-    const ce_cdb_type_def_t0 *defs = ce_cdb_a0->obj_type_def(type);
+    draw_aspect *aspect = ce_cdb_a0->get_aspect(type, CT_PROPERTY_EDITOR_ASPECT);
+    if (aspect) {
+        aspect(db, obj, context);
+        return;
+    }
+
+    ce_cdb_prop_def_t0 *defs = NULL;
+    uint32_t n = 0;
+    ce_cdb_a0->obj_type_def(type, &defs, &n);
 
     if (!defs) {
         return;
     }
 
-    for (uint32_t i = 0; i < defs->num; ++i) {
-        const ce_cdb_prop_def_t0 *def = &defs->defs[i];
-        enum ce_cdb_type_e0 type = def->type;
+    for (uint32_t i = 0; i < n; ++i) {
+        const ce_cdb_prop_def_t0 *def = &defs[i];
         uint64_t prop_name = ce_id_a0->id64(def->name);
-
-        switch (type) {
-            case CE_CDB_TYPE_REF:
-                ct_editor_ui_a0->prop_asset(obj, def->name, filter, prop_name,
-                                               def->obj_type, context, obj);
-                break;
-            case CE_CDB_TYPE_FLOAT:
-                ct_editor_ui_a0->prop_float(obj, def->name, filter, prop_name, (ui_float_p0) {});
-                break;
-
-            case CE_CDB_TYPE_UINT64:
-                ct_editor_ui_a0->prop_uin64(obj, def->name, filter, prop_name, (ui_uint64_p0) {});
-                break;
-
-            case CE_CDB_TYPE_BOOL:
-                ct_editor_ui_a0->prop_bool(obj, def->name, filter, prop_name);
-                break;
-            case CE_CDB_TYPE_STR:
-                ct_editor_ui_a0->prop_str(obj, def->name, filter, prop_name, obj);
-                break;
-            case CE_CDB_TYPE_SUBOBJECT: {
-                const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-                uint64_t subobj = ce_cdb_a0->read_subobject(r, prop_name, 0);
-                draw(db, subobj, context);
-                break;
-            }
-            case CE_CDB_TYPE_SET_SUBOBJECT: {
-                bool open = ct_debugui_a0->TreeNodeEx(def->name,
-                                                      DebugUITreeNodeFlags_DefaultOpen);
-                if (open) {
-                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-                    uint64_t n = ce_cdb_a0->read_objset_num(r, prop_name);
-                    uint64_t k[n];
-                    ce_cdb_a0->read_objset(r, prop_name, k);
-                    for (int j = 0; j < n; ++j) {
-                        uint64_t subobj = k[j];
-                        draw(db, subobj, context);
-                    }
-                    ct_debugui_a0->TreePop();
-                }
-
-            }
-                break;
-
-            default:
-                break;
-        }
+        _draw_property(db, obj, prop_name, def, context);
     }
 }
 
-static char filter_text[128] = {};
-
-static void draw(ce_cdb_t0 db,
-                 uint64_t obj,
-                 uint64_t context) {
+static void draw_object(ce_cdb_t0 db,
+                        uint64_t obj,
+                        uint64_t context) {
     if (!obj) {
         return;
     }
 
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
-
-    uint64_t obj_type = ce_cdb_a0->obj_type(db, obj);
-
-    char filter[128] = {};
-    snprintf(filter, CE_ARRAY_LEN(filter), "*%s*", filter_text);
-    while (it.api) {
-        struct ct_property_editor_i0 *i = (it.api);
-
-        if (i && i->cdb_type && (i->cdb_type() == obj_type)) {
-
-            if (i->draw_ui) {
-                i->draw_ui(db, obj, context, filter);
-                return;
-            }
-            break;
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    _generic_prop_draw(db, obj, context, filter);
-}
-
-static ct_property_editor_i0 *get_interface(uint64_t obj) {
-    if (!obj) {
-        return NULL;
-    }
-
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
-
-    while (it.api) {
-        ct_property_editor_i0 *i = (it.api);
-
-        if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
-
-            return i;
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    return NULL;
-}
-
-static void draw_menu(uint64_t obj) {
-    if (!obj) {
-        return;
-    }
-
-    ce_api_entry_t0 it = ce_api_a0->first(CT_PROPERTY_EDITOR_I0);
-
-    while (it.api) {
-        struct ct_property_editor_i0 *i = (it.api);
-
-        if (i && i->cdb_type
-            && (i->cdb_type() == ce_cdb_a0->obj_type(ce_cdb_a0->db(), obj))) {
-
-            if (i->draw_menu) {
-                i->draw_menu(obj);
-            }
-            break;
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    char labelidi[128] = {'\0'};
-
-    ct_debugui_a0->InputText(labelidi,
-                             filter_text,
-                             CE_ARRAY_LEN(filter_text),
-                             0,
-                             0, NULL);
+    _draw_object(db, obj, context);
 }
 
 static void on_debugui(uint64_t content,
@@ -204,7 +159,7 @@ static void on_debugui(uint64_t content,
 
     bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_FILE" Asset");
     if (open && obj) {
-        if (ct_debugui_a0->Button("DDD", &CE_VEC2_ZERO)) {
+        if (ct_ui_a0->button(&(ct_ui_button_t0) {.text="DDDD"})) {
             char *buffer = NULL;
             ce_yaml_cdb_a0->dump_str(ce_cdb_a0->db(), &buffer, obj, 0);
             ce_log_a0->debug("DDD", "%s", buffer);
@@ -214,19 +169,17 @@ static void on_debugui(uint64_t content,
         ct_editor_ui_a0->ui_prop_body(obj);
         const ce_cdb_obj_o0 *reader_obj = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-        const char* filename = ct_asset_a0->asset_filename(ce_cdb_a0->obj_uid(ce_cdb_a0->db(), obj));
+        const char *filename = ct_asset_a0->asset_filename(
+                ce_cdb_a0->obj_uid(ce_cdb_a0->db(), obj));
         if (filename) {
             strcpy(buffer, filename);
 
             ct_editor_ui_a0->prop_label("File", 0, NULL, 0);
             ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
 
-            ct_debugui_a0->PushItemWidth(-1);
-            ct_debugui_a0->InputText("##NameAssetProp",
-                                     buffer, strlen(buffer),
-                                     DebugInputTextFlags_ReadOnly,
-                                     0, NULL);
-            ct_debugui_a0->PopItemWidth();
+            ct_ui_a0->push_item_width(-1);
+            ct_ui_a0->text(buffer);
+            ct_ui_a0->pop_item_width();
             ct_editor_ui_a0->prop_value_end();
         }
 
@@ -234,7 +187,8 @@ static void on_debugui(uint64_t content,
         if (instance_of) {
             char name[128] = {0};
 
-            const char* fn = ct_asset_a0->asset_filename(ce_cdb_a0->obj_uid(ce_cdb_a0->db(), instance_of));
+            const char *fn = ct_asset_a0->asset_filename(
+                    ce_cdb_a0->obj_uid(ce_cdb_a0->db(), instance_of));
             strcpy(buffer, fn);
 
             ct_editor_ui_a0->prop_label("Inst. of", 0, NULL, 0);
@@ -242,10 +196,11 @@ static void on_debugui(uint64_t content,
 
             sprintf(buffer, ICON_FA_ARROW_UP
                     "##%sprop_open_select_asset", name);
-            if (ct_debugui_a0->Button(buffer, &(ce_vec2_t) {0.0f})) {
+
+            if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=buffer})) {
                 ct_selected_object_a0->set_selected_object(context, instance_of);
             }
-            ct_debugui_a0->SameLine(0, 8);
+            ct_ui_a0->same_line(0, 8);
 
             if (name[0]) {
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", name);
@@ -253,29 +208,17 @@ static void on_debugui(uint64_t content,
                 snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", instance_of);
             }
 
-            ct_debugui_a0->PushItemWidth(-1);
-            ct_debugui_a0->InputText("##InstanceOfAssetProp",
-                                     buffer,
-                                     strlen(buffer),
-                                     DebugInputTextFlags_ReadOnly,
-                                     0, NULL);
-            ct_debugui_a0->PopItemWidth();
+            ct_ui_a0->push_item_width(-1);
+            ct_ui_a0->text(buffer);
+            ct_ui_a0->pop_item_width();
             ct_editor_ui_a0->prop_value_end();
         }
         ct_editor_ui_a0->ui_prop_body_end();
     }
     ct_editor_ui_a0->ui_prop_header_end(open);
 
-    draw(ce_cdb_a0->db(), obj, context);
+    draw_object(ce_cdb_a0->db(), obj, context);
 }
-
-static void on_menu(uint64_t content,
-                    uint64_t context,
-                    uint64_t selected_object) {
-    uint64_t obj = selected_object;
-    draw_menu(obj);
-}
-
 
 static const char *dock_title() {
     return ICON_FA_TABLE " " WINDOW_NAME;
@@ -291,13 +234,11 @@ static struct ct_dock_i0 dock_api = {
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
-        .draw_menu = on_menu,
 };
 
 
 struct ct_property_editor_a0 property_editor_api = {
-        .draw =draw,
-        .get_interface = get_interface,
+        .draw_object =draw_object,
 };
 
 struct ct_property_editor_a0 *ct_property_editor_a0 = &property_editor_api;

@@ -40,6 +40,12 @@
 
 #define UID_HASHMAP
 
+typedef struct type_def_t0 {
+    ce_cdb_prop_def_t0 *defs;
+    uint32_t num;
+    ce_hash_t aspects;
+} type_def_t0;
+
 typedef struct type_info_t {
     size_t size;
     size_t align;
@@ -77,7 +83,7 @@ typedef struct type_storage_t {
     ce_mpmc_queue_t0 to_free_idx;
 
     ce_hash_t prop_idx;
-    ce_cdb_type_def_t0 *prop_def;
+    type_def_t0 *prop_def;
     uint64_t *prop_name;
     uint8_t *prop_type;
     uint32_t *prop_offset;
@@ -182,7 +188,7 @@ typedef struct db_t {
 typedef struct type_defs_t {
     ce_hash_t def_map;
     uint64_t *type;
-    ce_cdb_type_def_t0 *defs;
+    type_def_t0 *defs;
 } type_defs_t;
 
 static struct _G {
@@ -417,7 +423,7 @@ void _remove_from_set(db_t *db,
 
 #define CE_ALIGN_PADDING(addr, align) (-((uint64_t)addr) & ((align) - 1))
 
-size_t _type_obj_size(ce_cdb_type_def_t0 *defs) {
+size_t _type_obj_size(type_def_t0 *defs) {
     size_t size = 0;
     for (int i = 0; i < defs->num; ++i) {
         type_info_t ti = _TYPE_INFO[defs->defs[i].type];
@@ -452,7 +458,7 @@ type_storage_t *_get_or_create_storage(db_t *db,
         ce_hash_add(&db->type_map, type, idx, _G.allocator);
         type_storage_t *storage = &db->type_storage[idx];
 
-        ce_cdb_type_def_t0 *defs = &_G.type_defs.defs[typedef_idx];
+        type_def_t0 *defs = &_G.type_defs.defs[typedef_idx];
 
         uint32_t type_size = _type_obj_size(defs);
 
@@ -578,13 +584,13 @@ void reg_obj_type(uint64_t type,
 
     if (idx == UINT32_MAX) {
         idx = ce_array_size(_G.type_defs.defs);
-        ce_array_push(_G.type_defs.defs, (ce_cdb_type_def_t0) {}, _G.allocator);
+        ce_array_push(_G.type_defs.defs, (type_def_t0) {}, _G.allocator);
 
         ce_hash_add(&_G.type_defs.def_map, type, idx, _G.allocator);
         ce_array_push(_G.type_defs.type, type, _G.allocator);
     }
 
-    ce_cdb_type_def_t0 *def = &_G.type_defs.defs[idx];
+    type_def_t0 *def = &_G.type_defs.defs[idx];
 
     def->num = n;
 
@@ -592,16 +598,31 @@ void reg_obj_type(uint64_t type,
     ce_array_push_n(def->defs, prop_def, sizeof(ce_cdb_prop_def_t0) * n, _G.allocator);
 }
 
-const ce_cdb_type_def_t0 *_get_prop_def(uint64_t type) {
+void _get_prop_def(uint64_t type,
+                   ce_cdb_prop_def_t0 **props,
+                   uint32_t *n) {
+    uint32_t idx = ce_hash_lookup(&_G.type_defs.def_map, type, UINT32_MAX);
+
+    if (idx == UINT32_MAX) {
+        *n = 0;
+        return;
+    }
+
+    type_def_t0 *def = &_G.type_defs.defs[idx];
+
+    *props = def->defs;
+    *n = def->num;
+}
+
+
+type_def_t0 *_get_type_def(uint64_t type) {
     uint32_t idx = ce_hash_lookup(&_G.type_defs.def_map, type, UINT32_MAX);
 
     if (idx == UINT32_MAX) {
         return NULL;
     }
 
-    ce_cdb_type_def_t0 *def = &_G.type_defs.defs[idx];
-
-    return def;
+    return &_G.type_defs.defs[idx];
 }
 
 void set_loader(ct_cdb_obj_loader_t0 loader) {
@@ -765,7 +786,8 @@ static struct ce_cdb_t0 create_db(uint64_t max_objects) {
 
 static void _init_from_defs(ce_cdb_t0 db,
                             object_t *obj,
-                            const ce_cdb_type_def_t0 *def);
+                            const ce_cdb_prop_def_t0 *def,
+                            uint32_t n);
 
 static uint64_t create_object_uid(ce_cdb_t0 db,
                                   ce_cdb_uuid_t0 uuid,
@@ -806,9 +828,13 @@ static uint64_t create_object_uid(ce_cdb_t0 db,
         obj->storage = storage;
         obj->typed_obj_idx = _new_typed_object(storage, type);
 
-        const ce_cdb_type_def_t0 *def = _get_prop_def(type);
+        ce_cdb_prop_def_t0 *def = NULL;
+        uint32_t n = 0;
+
+        _get_prop_def(type, &def, &n);
+
         if (def && init) {
-            _init_from_defs(db, obj, def);
+            _init_from_defs(db, obj, def, n);
         }
     }
 
@@ -1280,7 +1306,7 @@ void _dump(ce_cdb_t0 db,
             .obj.instance_of = instance_of_uid,
     }), allocator);
 
-    ce_cdb_type_def_t0 *defs = obj->storage->prop_def;
+    type_def_t0 *defs = obj->storage->prop_def;
 
     for (int i = 0; i < defs->num; ++i) {
         ce_cdb_prop_def_t0 *def = &defs->defs[i];
@@ -2938,14 +2964,16 @@ static uint64_t load(ce_cdb_t0 db,
     return root_obj;
 }
 
+
 void _init_from_defs(ce_cdb_t0 db,
                      object_t *obj,
-                     const ce_cdb_type_def_t0 *def) {
+                     const ce_cdb_prop_def_t0 *def,
+                     uint32_t n) {
 
     ce_cdb_obj_o0 *w = (ce_cdb_obj_o0 *) obj;
 
-    for (uint32_t i = 0; i < def->num; ++i) {
-        ce_cdb_prop_def_t0 *prop_def = &def->defs[i];
+    for (uint32_t i = 0; i < n; ++i) {
+        const ce_cdb_prop_def_t0 *prop_def = &def[i];
         uint64_t prop_name = ce_id_a0->id64(prop_def->name);
         ce_cdb_type_e0 t = prop_def->type;
 
@@ -2987,8 +3015,8 @@ void _init_from_defs(ce_cdb_t0 db,
     }
 }
 
-uint64_t _create_root_obj(const cnode_t *cnodes,
-                          ce_cdb_t0 tmp_db) {
+uint64_t _load_from_cnodes(const cnode_t *cnodes,
+                           ce_cdb_t0 tmp_db) {
 
 //    _log_cnodes(cnodes);
 
@@ -3011,59 +3039,59 @@ uint64_t _create_root_obj(const cnode_t *cnodes,
                 break;
             case CNODE_FLOAT: {
                 struct state_t *state = &states[state_top];
-                ce_cdb_a0->set_float(state->writer, node.key, node.value.f);
+                set_float(state->writer, node.key, node.value.f);
             }
                 break;
             case CNODE_UINT: {
                 struct state_t *state = &states[state_top];
-                ce_cdb_a0->set_uint64(state->writer, node.key, node.value.uint64);
+                set_uint64(state->writer, node.key, node.value.uint64);
             }
                 break;
             case CNODE_REF: {
                 struct state_t *state = &states[state_top];
-                uint64_t obj_ref = ce_cdb_a0->obj_from_uid(tmp_db, node.uuid);
+                uint64_t obj_ref = objectid_from_uid(tmp_db, node.uuid);
 
-                ce_cdb_a0->set_ref(state->writer, node.key, obj_ref);
+                set_ref(state->writer, node.key, obj_ref);
             }
                 break;
             case CNODE_STRING: {
                 struct state_t *state = &states[state_top];
-                ce_cdb_a0->set_str(state->writer, node.key, node.value.str);
+                set_string(state->writer, node.key, node.value.str);
             }
                 break;
             case CNODE_BOOL: {
                 struct state_t *state = &states[state_top];
-                ce_cdb_a0->set_bool(state->writer, node.key, node.value.b);
+                set_bool(state->writer, node.key, node.value.b);
             }
                 break;
             case CNODE_OBJ_BEGIN: {
                 uint64_t obj;
                 ce_cdb_uuid_t0 uuid = node.obj.uuid;
                 if (!uuid.id) {
-                    uuid = ce_cdb_a0->gen_uid(tmp_db);
+                    uuid = gen_uid(tmp_db);
                 }
 
                 if (node.obj.instance_of.id) {
                     CE_ASSERT(LOG_WHERE, node.obj.instance_of.id != uuid.id);
 
-                    uint64_t from_obj = ce_cdb_a0->obj_from_uid(tmp_db, node.obj.instance_of);
-                    obj = ce_cdb_a0->create_from_uid(tmp_db, from_obj, uuid);
+                    uint64_t from_obj = objectid_from_uid(tmp_db, node.obj.instance_of);
+                    obj = _create_from_uid(tmp_db, from_obj, uuid, true);
                 } else {
-                    obj = ce_cdb_a0->create_object_uid(tmp_db, uuid, node.obj.type, true);
+                    obj = create_object_uid(tmp_db, uuid, node.obj.type, true);
                 }
 
                 struct state_t *state = &states[state_top];
                 if (state->type == CNODE_OBJSET) {
                     struct state_t *parent_state = &states[state_top - 1];
-                    ce_cdb_a0->objset_add_obj(parent_state->writer,
+                    add_obj(parent_state->writer,
                                               cnodes[state->node_idx].key, obj);
                 } else if (node.key) {
-                    ce_cdb_a0->set_subobject(state->writer, node.key, obj);
+                    set_subobject(state->writer, node.key, obj);
                 }
 
                 struct state_t new_state = {
                         .type = CNODE_OBJ_BEGIN,
-                        .writer = ce_cdb_a0->write_begin(tmp_db, obj),
+                        .writer = write_begin(tmp_db, obj),
                         .node_idx = j,
                 };
                 ce_array_push(states, new_state, _G.allocator);
@@ -3072,7 +3100,7 @@ uint64_t _create_root_obj(const cnode_t *cnodes,
             case CNODE_OBJ_END: {
                 struct state_t *state = &states[state_top];
 
-                ce_cdb_a0->write_commit(state->writer);
+                write_commit(state->writer);
                 ce_array_pop_back(states);
             }
                 break;
@@ -3092,7 +3120,7 @@ uint64_t _create_root_obj(const cnode_t *cnodes,
         }
     }
 
-    return ce_cdb_a0->obj_from_uid(tmp_db, cnodes[0].obj.uuid);
+    return objectid_from_uid(tmp_db, cnodes[0].obj.uuid);
 }
 
 void _dump_cnodes(const cnode_t *cnodes,
@@ -3185,6 +3213,29 @@ const ce_cdb_prop_ev_t0 *_objs_changes(ce_cdb_t0 _db,
     return buffer->objs_change;
 }
 
+void *get_aspect(uint64_t type,
+                 uint64_t ascpet_type) {
+    type_def_t0 *type_def = _get_type_def(type);
+
+    if (!type_def) {
+        return NULL;
+    }
+
+    return (void *) ce_hash_lookup(&type_def->aspects, ascpet_type, 0);
+}
+
+void set_aspect(uint64_t type,
+                uint64_t ascpet_type,
+                void *aspect) {
+    type_def_t0 *type_def = _get_type_def(type);
+
+    if (!type_def) {
+        return;
+    }
+
+    ce_hash_add(&type_def->aspects, ascpet_type, (uint64_t) aspect, _G.allocator);
+}
+
 static struct ce_cdb_a0 cdb_api = {
         .create_db = create_db,
         .destroy_db = destroy_db,
@@ -3254,10 +3305,12 @@ static struct ce_cdb_a0 cdb_api = {
 
         .obj_from_uid = objectid_from_uid,
         .obj_uid = obj_uid,
-        .load_from_cnodes = _create_root_obj,
+        .load_from_cnodes = _load_from_cnodes,
         .dump_cnodes = _dump_cnodes,
         .changes = _changes,
         .objs_changes = _objs_changes,
+        .get_aspect = get_aspect,
+        .set_aspect = set_aspect,
 };
 
 struct ce_cdb_a0 *ce_cdb_a0 = &cdb_api;

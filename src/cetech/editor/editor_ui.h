@@ -49,37 +49,31 @@ typedef struct ui_uint64_p0 {
 struct ct_editor_ui_a0 {
     void (*prop_float)(uint64_t obj,
                        const char *label,
-                       const char *filter,
                        uint64_t property,
                        ui_float_p0 params);
 
     void (*prop_uin64)(uint64_t obj,
                        const char *label,
-                       const char *filter,
                        uint64_t property,
                        ui_uint64_p0 params);
 
     void (*prop_bool)(uint64_t obj,
                       const char *label,
-                      const char *filter,
                       uint64_t property);
 
     void (*prop_str)(uint64_t obj,
                      const char *label,
-                     const char *filter,
                      uint64_t property,
                      uint32_t i);
 
     void (*prop_filename)(uint64_t obj,
                           const char *label,
-                          const char *l_filter,
                           uint64_t property,
                           const char *filter,
                           uint32_t i);
 
     void (*prop_str_combo)(uint64_t obj,
                            const char *label,
-                           const char *filter,
                            uint64_t property,
                            void (*combo_items)(uint64_t,
                                                char **,
@@ -88,35 +82,30 @@ struct ct_editor_ui_a0 {
 
     void (*prop_str_combo2)(uint64_t obj,
                             const char *label,
-                            const char *filter,
                             uint64_t property,
                             const char *const *items,
                             uint32_t items_count,
                             uint32_t i);
 
     void (*prop_asset)(uint64_t obj,
-                          const char *label,
-                          const char *filter,
-                          uint64_t property,
-                          uint64_t asset_type,
-                          uint64_t context,
-                          uint32_t i);
+                       const char *label,
+                       uint64_t property,
+                       uint64_t asset_type,
+                       uint64_t context,
+                       uint32_t i);
 
     void (*prop_vec2)(uint64_t obj,
                       const char *label,
-                      const char *filter,
                       const uint64_t property[2],
                       ui_vec2_p0 params);
 
     void (*prop_vec3)(uint64_t obj,
                       const char *label,
-                      const char *filter,
                       const uint64_t property[3],
                       ui_vec3_p0 params);
 
     void (*prop_vec4)(uint64_t obj,
                       const char *label,
-                      const char *filter,
                       const uint64_t property[4],
                       ui_vec4_p0 params);
 
@@ -125,11 +114,10 @@ struct ct_editor_ui_a0 {
                             const uint64_t *props,
                             uint64_t props_n);
 
-    bool (*asset_select_modal)(const char *modal_id,
-                                  uint64_t id,
-                                  uint64_t asset_type,
-                                  uint64_t *selected_asset,
-                                  uint32_t *count);
+    bool (*asset_select_modal)(uint64_t modal_id,
+                               uint64_t id,
+                               uint64_t asset_type,
+                               uint64_t *selected_asset);
 
     bool (*ui_prop_header)(const char *name);
 

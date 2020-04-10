@@ -11,7 +11,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/asset/asset.h>
 #include <cetech/material/material.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/ecs/ecs.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/camera/camera.h>
@@ -203,7 +203,6 @@ void CE_MODULE_LOAD(default_render_graph)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_renderer_a0);
     CE_INIT_API(api, ct_rg_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ct_material_a0);

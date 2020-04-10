@@ -86,9 +86,8 @@ static struct ct_asset_i0 *asset_get_interface(uint64_t type) {
 void _save_to_cdb(ce_cdb_t0 db,
                   uint64_t obj,
                   const char *filename) {
-    const char *type_str = ce_id_a0->str_from_id64(ce_cdb_a0->obj_type(db, obj));
-    CE_ASSERT(LOG_WHERE, type_str);
-
+//    const char *type_str = ce_id_a0->str_from_id64(ce_cdb_a0->obj_type(db, obj));
+//    CE_ASSERT(LOG_WHERE, type_str);
 }
 
 static bool _save_to_file(ce_cdb_t0 db,

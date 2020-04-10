@@ -42,10 +42,10 @@ namespace ImGui
 
 } // namespace ImGui
 
-#include "cetech/debugui/private/ocornut-imgui/widgets/color_picker.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/color_wheel.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/dock.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/file_list.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/gizmo.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/memory_editor.h"
-#include "cetech/debugui/private/ocornut-imgui/widgets/range_slider.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/color_picker.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/color_wheel.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/dock.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/file_list.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/gizmo.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/memory_editor.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/widgets/range_slider.h"

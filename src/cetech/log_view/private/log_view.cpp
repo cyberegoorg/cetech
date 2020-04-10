@@ -6,17 +6,18 @@
 #include <celib/log.h>
 #include <cetech/log_view/log_view.h>
 #include <celib/containers/array.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include "celib/id.h"
 #include "celib/memory/memory.h"
 #include "celib/api.h"
 #include "celib/module.h"
 #include <cetech/editor/dock.h>
 
-#include <cetech/debugui/debugui.h>
 
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
+
+#include <cetech/ui_imgui/private/ocornut-imgui/imgui.h>
 #include <celib/os/thread.h>
+#include <cetech/ui/ui.h>
 
 #define WINDOW_NAME "Log view"
 #define LOG_FORMAT "[%d|%s] -> %s"
@@ -110,11 +111,12 @@ static void ui_level_mask() {
 
 
         if (i > 0) {
-            ct_debugui_a0->SameLine(0, -1);
+            ct_ui_a0->same_line(0, -1);
         }
 
-        if (ct_debugui_a0->RadioButton(buffer, active)) {
-            if (!active) {
+        ct_ui_checkbox_t0 checkbox = {.text=buffer};
+        if (ct_ui_a0->checkbox(&checkbox, &active)) {
+            if (active) {
                 _G.level_mask |= (1 << level);
             } else {
                 _G.level_mask &= ~(1 << level);
@@ -145,7 +147,7 @@ static void ui_log_items() {
         int len = strlen(line);
 
         ImGui::PushStyleColor(ImGuiCol_Text, _level_to_color[item->level][0]);
-        ct_debugui_a0->TextUnformatted(line, line + len);
+        ct_ui_a0->text_unformated(line, line + len);
         ImGui::PopStyleColor();
     }
 
@@ -183,7 +185,6 @@ void CE_MODULE_LOAD(log_view)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ce_log_a0);
 
     _G = {

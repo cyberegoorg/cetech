@@ -12,18 +12,19 @@
 #include <celib/cdb.h>
 
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/asset/asset.h>
 #include <cetech/ecs/ecs.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/explorer/explorer.h>
 
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/editor/editor_ui.h>
+#include <cetech/ui/ui.h>
 
 static void ui_entity_item_end() {
-    ct_debugui_a0->TreePop();
+    ct_ui_a0->tree_pop();
 }
 
 static void _spawn_to(uint64_t from,
@@ -62,13 +63,13 @@ void item_btns(uint64_t context,
     snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS
             "##add_%llu", obj);
 
-    bool add = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
+    bool add = ct_ui_a0->button(&(ct_ui_button_t0) {.text=label});
 
     if (add) {
         _add(obj);
     }
 
-    ct_debugui_a0->SameLine(0, 4);
+    ct_ui_a0->same_line(0, 4);
     snprintf(label, CE_ARRAY_LEN(label),
              ICON_FA_PLUS
                      " "
@@ -76,34 +77,29 @@ void item_btns(uint64_t context,
                      "##add_from%llu", obj);
 
 
-    bool add_from = ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f});
-
-    char modal_id[128] = {'\0'};
-    sprintf(modal_id, "select...##select_asset_%llu", obj);
+    bool add_from = ct_ui_a0->button(&(ct_ui_button_t0) {.text=label});
 
     uint64_t new_value = 0;
 
-    static uint32_t count = 1;
-    bool changed = ct_editor_ui_a0->asset_select_modal(modal_id,
-                                                          obj,
-                                                          ENTITY_TYPE,
-                                                          &new_value,
-                                                          &count);
+    bool changed = ct_editor_ui_a0->asset_select_modal(obj,
+                                                       obj,
+                                                       ENTITY_TYPE,
+                                                       &new_value);
     if (add_from) {
-        ct_debugui_a0->OpenPopup(modal_id);
+        ct_ui_a0->popup_open(obj);
     }
 
     if (changed && new_value) {
-        _spawn_to(new_value, obj, count);
+        _spawn_to(new_value, obj, 1);
     }
 
     uint64_t parent = ce_cdb_a0->parent(ce_cdb_a0->db(), obj);
 
     if (parent) {
-        ct_debugui_a0->SameLine(0, 4);
+        ct_ui_a0->same_line(0, 4);
         snprintf(label, CE_ARRAY_LEN(label), ICON_FA_MINUS
                 "##minus_%llu", obj);
-        if (ct_debugui_a0->Button(label, &(ce_vec2_t) {0.0f})) {
+        if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=label})) {
             ce_cdb_a0->destroy_object(ce_cdb_a0->db(), obj);
             ct_selected_object_a0->set_selected_object(context, parent);
         }
@@ -118,17 +114,17 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 
-    ImGuiTreeNodeFlags flags = 0 |
-                               DebugUITreeNodeFlags_OpenOnArrow |
-                               //                               DebugUITreeNodeFlags_OpenOnDoubleClick |
-                               //                               DebugUITreeNodeFlags_DefaultOpen;
-                               0;
+    enum ct_ui_tree_node_flag flags =
+            CT_TREE_NODE_FLAGS_OpenOnArrow |
+            //                               DebugUITreeNodeFlags_OpenOnDoubleClick |
+            //                               DebugUITreeNodeFlags_DefaultOpen;
+            0;
     uint64_t new_selected_object = 0;
 
     bool selected = selected_obj == obj;
 
     if (selected) {
-        flags |= DebugUITreeNodeFlags_Selected;
+        flags |= CT_TREE_NODE_FLAGS_Selected;
     }
 
 
@@ -136,7 +132,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     uint64_t component_n = ce_cdb_a0->read_objset_num(reader, ENTITY_COMPONENTS);
 
     if (!children_n && !component_n) {
-        flags |= DebugUITreeNodeFlags_Leaf;
+        flags |= CT_TREE_NODE_FLAGS_Leaf;
     }
 
     char name[128] = {0};
@@ -149,32 +145,35 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
     }
 
     char label[128] = {0};
-    snprintf(label, CE_ARRAY_LEN(label),
-             (ICON_FA_CUBE
-                     " ""%s##%llu"), name, uuid);
-    const bool open = ct_debugui_a0->TreeNodeEx(label, flags);
-    if (ct_debugui_a0->IsItemClicked(0)) {
+    snprintf(label, CE_ARRAY_LEN(label), (ICON_FA_CUBE" %s"), name);
+
+
+    const bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {.id=obj, .text=label});
+
+    if (ct_ui_a0->is_item_clicked(0)) {
         new_selected_object = obj;
     }
 
-    if (ct_debugui_a0->BeginDragDropSource(
-            DebugUIDragDropFlags_SourceAllowNullID)) {
+    if (ct_ui_a0->drag_drop_source_begin(CT_UI_DROP_FLAGS_SourceAllowNullID)) {
+        char text[128];
+        snprintf(text, CE_ARRAY_LEN(text), ICON_FA_CUBE" %s", name);
+        ct_ui_a0->text(text);
 
-        ct_debugui_a0->Text(ICON_FA_CUBE" %s", name);
+        ct_ui_a0->set_drag_drop_payload(&(ct_ui_drop_payload_t0) {
+                .type="entity",
+                .data= &obj,
+                .size = sizeof(uint64_t),
+                .cond = CT_UI_COND_Once,
+        });
 
-        ct_debugui_a0->SetDragDropPayload("entity",
-                                          &obj,
-                                          sizeof(uint64_t),
-                                          DebugUICond_Once);
-        ct_debugui_a0->EndDragDropSource();
+        ct_ui_a0->drag_drop_source_end();
     }
 
-    if (ct_debugui_a0->BeginDragDropTarget()) {
-        const struct DebugUIPayload *payload;
-        payload = ct_debugui_a0->AcceptDragDropPayload("entity", 0);
+    if (ct_ui_a0->drag_drop_target_begin()) {
+        const void *payload = ct_ui_a0->accept_drag_drop_payload("entity");
 
         if (payload) {
-            uint64_t drag_obj = *((uint64_t *) payload->Data);
+            uint64_t drag_obj = *((uint64_t *) payload);
 
             if (drag_obj && drag_obj != obj) {
                 uint64_t asset_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), drag_obj);
@@ -192,22 +191,20 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
             }
         }
 
-        ct_debugui_a0->EndDragDropTarget();
+        ct_ui_a0->drag_drop_target_end();
     }
 
-    if (ct_debugui_a0->BeginDragDropTarget()) {
-
-        const struct DebugUIPayload *payload;
-        payload = ct_debugui_a0->AcceptDragDropPayload("asset", 0);
+    if (ct_ui_a0->drag_drop_target_begin()) {
+        const void *payload = ct_ui_a0->accept_drag_drop_payload("asset");
 
         if (payload) {
-            uint64_t drag_obj = *((uint64_t *) payload->Data);
+            uint64_t drag_obj = *((uint64_t *) payload);
 
             if (drag_obj) {
                 _spawn_to(drag_obj, obj, 1);
             }
         }
-        ct_debugui_a0->EndDragDropTarget();
+        ct_ui_a0->drag_drop_target_end();
     }
 
     if (open) {
@@ -226,28 +223,24 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
             const char *component_display_name = component_i->display_name();
 
-            ImGuiTreeNodeFlags c_flags = DebugUITreeNodeFlags_Leaf;
+            enum ct_ui_tree_node_flag c_flags = CT_TREE_NODE_FLAGS_Leaf;
 
             bool c_selected;
             c_selected = selected_obj == component;
 
             if (c_selected) {
-                c_flags |= DebugUITreeNodeFlags_Selected;
+                c_flags |= CT_TREE_NODE_FLAGS_Selected;
             }
 
-            char c_label[128] = {0};
-            snprintf(c_label, CE_ARRAY_LEN(c_label), "##component_%llu", component);
-
-            //
-            snprintf(c_label, CE_ARRAY_LEN(c_label), "%s##component_%llu",
-                     component_display_name, component);
-
-            if (ct_debugui_a0->TreeNodeEx(c_label, c_flags)) {
-                if (ct_debugui_a0->IsItemClicked(0)) {
+            if (ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+                    .id=component,
+                    .text=component_display_name,
+                    .flags=c_flags})) {
+                if (ct_ui_a0->is_item_clicked(0)) {
                     new_selected_object = component;
                 }
 
-                ct_debugui_a0->TreePop();
+                ct_ui_a0->tree_pop();
             }
         }
     }
@@ -284,10 +277,6 @@ static void draw_menu(uint64_t selected_obj,
     }
 }
 
-static uint64_t cdb_type() {
-    return ENTITY_TYPE;
-}
-
 static uint64_t draw_ui(uint64_t top_level_obj,
                         uint64_t selected_obj,
                         uint64_t context) {
@@ -299,6 +288,8 @@ static uint64_t draw_ui(uint64_t top_level_obj,
         return 0;
     }
 
+    draw_menu(selected_obj, context);
+
     uint64_t ret = ui_entity_item_begin(selected_obj, top_level_obj, rand(), context);
 
     return ret;
@@ -309,19 +300,12 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_asset_a0);
     CE_INIT_API(api, ce_yaml_cdb_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
-    static struct ct_explorer_i0 entity_explorer = {
-            .cdb_type = cdb_type,
-            .draw_ui = draw_ui,
-            .draw_menu = draw_menu,
-    };
-
-    api->add_impl(CT_EXPLORER_I0_STR, &entity_explorer, sizeof(entity_explorer));
+    ce_cdb_a0->set_aspect(ENTITY_TYPE, CT_EXPLORER_ASPECT, draw_ui);
 }
 
 void CE_MODULE_UNLOAD(entity_explorer)(struct ce_api_a0 *api,

@@ -3,7 +3,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 
@@ -16,6 +16,8 @@
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/editor/dock.h>
 #include <cetech/asset_io/asset_io.h>
+#include <cetech/ui/ui.h>
+#include <celib/macros.h>
 
 #include "celib/id.h"
 #include "celib/memory/memory.h"
@@ -67,18 +69,7 @@ static struct preview_instance *_new_preview() {
 }
 
 static struct ct_asset_preview_i0 *_get_asset_preview(uint64_t asset_type) {
-    ct_asset_i0 *asset_i;
-    asset_i = ct_asset_a0->get_interface(asset_type);
-
-    if (!asset_i) {
-        return NULL;
-    }
-
-    if (!asset_i->get_interface) {
-        return NULL;
-    }
-
-    return asset_i->get_interface(ASSET_PREVIEW_I0);
+    return ce_cdb_a0->get_aspect(asset_type, CT_PREVIEW_ASPECT);
 }
 
 static void set_asset(preview_instance *pi,
@@ -165,17 +156,19 @@ static void _draw_preview(preview_instance *pi,
         bgfx_texture_handle_t th;
         th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
-        ct_debugui_a0->Image(th,
-                             &size,
-                             &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
-                             &(ce_vec4_t) {0.0f, 0.0f, 0.0f, 0.0f});
+        ct_ui_a0->image(&(struct ct_ui_image_t0) {
+                .user_texture_id = th.idx,
+                .size = size,
+                .tint_col = {1.0f, 1.0f, 1.0f, 1.0f},
+                .border_col ={0.0f, 0.0f, 0.0, 0.0f},
+        });
     }
 }
 
 static void draw_dock(uint64_t content,
                       uint64_t context,
                       uint64_t selected_object) {
-    _G.active = ct_debugui_a0->IsMouseHoveringWindow();
+    _G.active = ct_ui_a0->is_mouse_hovering_window();
 
     preview_instance *pi = (preview_instance *) content;
 
@@ -185,7 +178,7 @@ static void draw_dock(uint64_t content,
 
     set_asset(pi, selected_object);
 
-    ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
+    ce_vec2_t size = ct_ui_a0->get_content_region_avail();
     _draw_preview(pi, size);
 }
 
@@ -230,7 +223,7 @@ static bool init() {
                              }
                      })));
 
-    ct_dock_a0->create_dock(ASSET_PREVIEW_I0, true);
+    ct_dock_a0->create_dock(CT_PREVIEW_ASPECT, true);
     return true;
 }
 
@@ -238,7 +231,7 @@ static void update(float dt) {
     uint32_t n = ce_array_size(_G.instances);
     for (int i = 0; i < n; ++i) {
         struct preview_instance *pi = &_G.instances[i];
-        if(_G.baground == pi) {
+        if (_G.baground == pi) {
             continue;
         }
 
@@ -264,25 +257,20 @@ void draw_background_texture(ce_vec2_t size) {
 }
 
 static void asset_tooltip(ce_cdb_uuid_t0 assetid,
-                             const char *path,
-                             ce_vec2_t size) {
-    ct_debugui_a0->Text("%s", path);
+                          const char *path,
+                          ce_vec2_t size) {
+    ct_ui_a0->text(path);
 
 
     uint64_t type = ct_asset_a0->get_asset_type(assetid);
 
-    ct_asset_i0 *ri = ct_asset_a0->get_interface(type);
+    _get_asset_preview(type);
 
-    if (!ri || !ri->get_interface) {
-        return;
-    }
-
-    ct_asset_preview_i0 *ai = (ri->get_interface(ASSET_PREVIEW_I0));
-
-    uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), assetid);
+    ct_asset_preview_i0 *ai = _get_asset_preview(type);
 
     if (ai) {
         if (ai->tooltip) {
+            uint64_t obj = ce_cdb_a0->obj_from_uid(ce_cdb_a0->db(), assetid);
             ai->tooltip(obj, size);
         }
 
@@ -350,7 +338,7 @@ static uint64_t open(uint64_t dock) {
 
 
 static struct ct_dock_i0 dock_api = {
-        .type = ASSET_PREVIEW_I0,
+        .type = CT_PREVIEW_ASPECT,
         .display_title = dock_title,
         .name = name,
         .draw_ui = draw_dock,
@@ -369,7 +357,6 @@ void CE_MODULE_LOAD(asset_preview)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ce_cdb_a0);

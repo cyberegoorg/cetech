@@ -16,8 +16,8 @@ typedef struct ct_entity_t0 ct_entity_t0;
 #define CT_ASSET_PREVIEW_API \
     CE_ID64_0("ct_asset_preview_a0", 0x28baa6853c1c1a01ULL)
 
-#define ASSET_PREVIEW_I0 \
-    CE_ID64_0("ct_asset_preview_i0", 0xb3cba443e3ad0e60ULL)
+#define CT_PREVIEW_ASPECT \
+    CE_ID64_0("preview_aspect", 0x3bd694cda186a250ULL)
 
 typedef struct ct_asset_preview_i0 {
     void (*draw_raw)(uint64_t obj,

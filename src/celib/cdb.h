@@ -159,11 +159,6 @@ typedef struct ce_cdb_prop_def_t0 {
     uint64_t flags;
 } ce_cdb_prop_def_t0;
 
-typedef struct ce_cdb_type_def_t0 {
-    ce_cdb_prop_def_t0 *defs;
-    uint32_t num;
-} ce_cdb_type_def_t0;
-
 struct ce_cdb_a0 {
     void (*set_loader)(ct_cdb_obj_loader_t0 loader);
 
@@ -178,7 +173,9 @@ struct ce_cdb_a0 {
                          const ce_cdb_prop_def_t0 *prop_def,
                          uint32_t n);
 
-    const ce_cdb_type_def_t0 *(*obj_type_def)(uint64_t type);
+    void (*obj_type_def)(uint64_t type,
+                         ce_cdb_prop_def_t0 **props,
+                         uint32_t *n);
 
     ce_cdb_uuid_t0 (*gen_uid)(ce_cdb_t0 db);
 
@@ -382,7 +379,12 @@ struct ce_cdb_a0 {
     void (*dump_cnodes)(const cnode_t *cnodes,
                         char **outputs);
 
+    void *(*get_aspect)(uint64_t type,
+                        uint64_t ascpet_type);
 
+    void (*set_aspect)(uint64_t type,
+                       uint64_t ascpet_type,
+                       void *aspect);
 };
 
 CE_MODULE(ce_cdb_a0);

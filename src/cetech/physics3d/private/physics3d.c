@@ -14,12 +14,9 @@
 #include <cetech/physics3d/physics3d.h>
 #include <cetech/transform/transform.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 
 // World
-static uint64_t world_cdb_type() {
-    return ce_id_a0->id64("physics_world3d");
-}
 
 static const char *wolrd3d_display_name() {
     return "PhysicsWorld3D";
@@ -61,27 +58,20 @@ static struct ct_ecs_component_i0 world3d_component_i = {
         .from_cdb_obj = _world3d_from_cdb,
 };
 
-static void _wolrd3d_property_editor(ce_cdb_t0 db,
-                                     uint64_t obj,
-                                     uint64_t context,
-                                     const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD3D_GRAVITY_PROP, 0);
+//static void _wolrd3d_property_editor(ce_cdb_t0 db,
+//                                     uint64_t obj,
+//                                     uint64_t context,
+//                                     const char *filter) {
+//    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+//    uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD3D_GRAVITY_PROP, 0);
+//
+//    ct_editor_ui_a0->prop_vec3(gravity, "Gravity", filter,
+//                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
+//                               (ui_vec3_p0) {});
+//}
 
-    ct_editor_ui_a0->prop_vec3(gravity, "Gravity", filter,
-                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                               (ui_vec3_p0) {});
-}
-
-static struct ct_property_editor_i0 wolrd2_dproperty_editor_api = {
-        .cdb_type = world_cdb_type,
-        .draw_ui = _wolrd3d_property_editor,
-};
 
 // Velocity
-static uint64_t velocity3d_cdb_type() {
-    return ce_id_a0->id64("velocity3d");
-}
 
 static const char *velocity3d_display_name() {
     return "Velocity3D";
@@ -134,32 +124,25 @@ static struct ct_ecs_component_i0 velocity3d_component_i = {
         .from_cdb_obj = _velocity_from_cdb,
 };
 
-static void _velocity_property_editor(ce_cdb_t0 db,
-                                      uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+//static void _velocity_property_editor(ce_cdb_t0 db,
+//                                      uint64_t obj,
+//                                      uint64_t context,
+//                                      const char *filter) {
+//    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+//
+//    uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY3D_LINEAR_PROP, 0);
+//    ct_editor_ui_a0->prop_vec3(linear, "Linear", filter,
+//                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
+//                               (ui_vec3_p0) {});
+//
+//    uint64_t angular = ce_cdb_a0->read_subobject(r, VELOCITY3D_ANGULAR_PROP, 0);
+//    ct_editor_ui_a0->prop_vec3(angular, "Angular", filter,
+//                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
+//                               (ui_vec3_p0) {});
+//}
 
-    uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY3D_LINEAR_PROP, 0);
-    ct_editor_ui_a0->prop_vec3(linear, "Linear", filter,
-                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                               (ui_vec3_p0) {});
-
-    uint64_t angular = ce_cdb_a0->read_subobject(r, VELOCITY3D_ANGULAR_PROP, 0);
-    ct_editor_ui_a0->prop_vec3(angular, "Angular", filter,
-                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                               (ui_vec3_p0) {});
-}
-
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = velocity3d_cdb_type,
-        .draw_ui = _velocity_property_editor,
-};
 
 // collider
-static uint64_t collider3d_cdb_type() {
-    return ce_id_a0->id64("collider3d");
-}
 
 static const char *collider3d_display_name() {
     return "Collider3D";
@@ -230,9 +213,6 @@ static struct ct_ecs_component_i0 collider3d_component_i = {
 ///
 
 // mass
-static uint64_t mass3d_cdb_type() {
-    return ce_id_a0->id64("mass3d");
-}
 
 static const char *mass3d_display_name() {
     return "Mass3D";
@@ -263,86 +243,79 @@ static struct ct_ecs_component_i0 mass3d_component_i = {
         .from_cdb_obj = _mass3d_from_cdb,
 };
 
-static void _mass3d_property_editor(ce_cdb_t0 db,
-                                    uint64_t obj,
-                                    uint64_t context,
-                                    const char *filter) {
-    ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS3D_PROP, (ui_float_p0) {});
-}
+//static void _mass3d_property_editor(ce_cdb_t0 db,
+//                                    uint64_t obj,
+//                                    uint64_t context,
+//                                    const char *filter) {
+//    ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS3D_PROP, (ui_float_p0) {});
+//}
 
-static struct ct_property_editor_i0 mass3d_property_editor_api = {
-        .cdb_type = mass3d_cdb_type,
-        .draw_ui = _mass3d_property_editor,
-};
+
 //
 
-static const char *SHAPE_STR[] = {
-        "Box",
-        "Sphere",
-};
+//static const char *SHAPE_STR[] = {
+//        "Box",
+//        "Sphere",
+//};
 
-static uint64_t SHAPE_ID[] = {
-        COLLIDER3D_BOX,
-        COLLIDER3D_SPHERE,
-};
+//static uint64_t SHAPE_ID[] = {
+//        COLLIDER3D_BOX,
+//        COLLIDER3D_SPHERE,
+//};
 
-static uint32_t _shape_to_idx(uint64_t shape_type) {
-    for (int i = 0; i < CE_ARRAY_LEN(SHAPE_ID); ++i) {
-        if (SHAPE_ID[i] == shape_type) {
-            return i;
-        }
-    }
-    return UINT32_MAX;
-}
+//static uint32_t _shape_to_idx(uint64_t shape_type) {
+//    for (int i = 0; i < CE_ARRAY_LEN(SHAPE_ID); ++i) {
+//        if (SHAPE_ID[i] == shape_type) {
+//            return i;
+//        }
+//    }
+//    return UINT32_MAX;
+//}
 
-static uint64_t _idx_to_shape(int id) {
-    return SHAPE_ID[id];
-}
+//static uint64_t _idx_to_shape(int id) {
+//    return SHAPE_ID[id];
+//}
 
-static void _collider_property_editor(ce_cdb_t0 db,
-                                      uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t shape = ce_cdb_a0->read_subobject(r, COLLIDER3D_SHAPE_PROP, 0);
-    uint64_t shape_type = ce_cdb_a0->obj_type(db, shape);
+//static void _collider_property_editor(ce_cdb_t0 db,
+//                                      uint64_t obj,
+//                                      uint64_t context,
+//                                      const char *filter) {
+//    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
+//    uint64_t shape = ce_cdb_a0->read_subobject(r, COLLIDER3D_SHAPE_PROP, 0);
+//    uint64_t shape_type = ce_cdb_a0->obj_type(db, shape);
+//
+//    int cur_item = _shape_to_idx(shape_type);
+//    if (ct_debugui_a0->Combo("Type", &cur_item, SHAPE_STR, CE_ARRAY_LEN(SHAPE_STR), -1)) {
+//        shape_type = _idx_to_shape(cur_item);
+//        uint64_t new_shape = ce_cdb_a0->create_object(db, shape_type);
+//
+//        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
+//        ce_cdb_a0->set_subobject(w, COLLIDER3D_SHAPE_PROP, new_shape);
+//        ce_cdb_a0->write_commit(w);
+//    }
+//
+//    switch (shape_type) {
+//        case COLLIDER3D_BOX: {
+//            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(db, shape);
+//            uint64_t half_size = ce_cdb_a0->read_subobject(shape_r,
+//                                                           COLLIDER3D_BOX_HALF,
+//                                                           0);
+//
+//            ct_editor_ui_a0->prop_vec3(half_size, "Half size", filter,
+//                                       (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
+//                                       (ui_vec3_p0) {});
+//        }
+//            break;
+//
+//        case COLLIDER3D_SPHERE: {
+//            ct_editor_ui_a0->prop_float(shape, "Radius", filter,
+//                                        COLLIDER3D_SPHERE_RADIUS,
+//                                        (ui_float_p0) {});
+//        }
+//            break;
+//    }
+//}
 
-    int cur_item = _shape_to_idx(shape_type);
-    if (ct_debugui_a0->Combo("Type", &cur_item, SHAPE_STR, CE_ARRAY_LEN(SHAPE_STR), -1)) {
-        shape_type = _idx_to_shape(cur_item);
-        uint64_t new_shape = ce_cdb_a0->create_object(db, shape_type);
-
-        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, obj);
-        ce_cdb_a0->set_subobject(w, COLLIDER3D_SHAPE_PROP, new_shape);
-        ce_cdb_a0->write_commit(w);
-    }
-
-    switch (shape_type) {
-        case COLLIDER3D_BOX: {
-            const ce_cdb_obj_o0 *shape_r = ce_cdb_a0->read(db, shape);
-            uint64_t half_size = ce_cdb_a0->read_subobject(shape_r,
-                                                           COLLIDER3D_BOX_HALF,
-                                                           0);
-
-            ct_editor_ui_a0->prop_vec3(half_size, "Half size", filter,
-                                       (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                                       (ui_vec3_p0) {});
-        }
-            break;
-
-        case COLLIDER3D_SPHERE: {
-            ct_editor_ui_a0->prop_float(shape, "Radius", filter,
-                                        COLLIDER3D_SPHERE_RADIUS,
-                                        (ui_float_p0) {});
-        }
-            break;
-    }
-}
-
-static struct ct_property_editor_i0 _collider_property_editor_api = {
-        .cdb_type = collider3d_cdb_type,
-        .draw_ui = _collider_property_editor,
-};
 //
 
 static struct ct_system_group_i0 physics_group = {
@@ -379,18 +352,6 @@ void CE_MODULE_LOAD(physics3d)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &mass3d_component_i, sizeof(mass3d_component_i));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &wolrd2_dproperty_editor_api, sizeof(wolrd2_dproperty_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &property_editor_api, sizeof(property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &_collider_property_editor_api, sizeof(_collider_property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &mass3d_property_editor_api, sizeof(mass3d_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(PHYSICS3D_WORLD_COMPONENT,
                             wolrd3d_component_prop, CE_ARRAY_LEN(wolrd3d_component_prop));

@@ -13,13 +13,13 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/asset/asset.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/asset_editor/asset_editor.h>
 #include <celib/containers/array.h>
 #include <cetech/controlers/controlers.h>
@@ -28,6 +28,7 @@
 #include <cetech/controlers/mouse.h>
 #include <celib/log.h>
 #include <float.h>
+#include <cetech/ui/ui.h>
 
 #define _G entity_editor_globals
 
@@ -44,34 +45,54 @@ static struct _G {
     entity_editor *editors;
 } _G;
 
+enum OPERATION {
+    TRANSLATE,
+    ROTATE,
+    SCALE,
+};
+
 static void draw_menu(uint64_t context_obj) {
     entity_editor *editor = (entity_editor *) context_obj;
 
     static enum OPERATION operation;
-    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_ALT, (int *) &operation, TRANSLATE);
 
-    ct_debugui_a0->SameLine(0, 0);
-    ct_debugui_a0->RadioButton2(ICON_FA_UNDO, (int *) &operation, ROTATE);
+    ct_ui_a0->radio_button2(&(ct_ui_radio_buttton_t0) {
+            .id=context_obj,
+            .text=ICON_FA_ARROWS_ALT,
+            .value=TRANSLATE}, (int32_t *) &operation);
 
-    ct_debugui_a0->SameLine(0, 0);
-    ct_debugui_a0->RadioButton2(ICON_FA_ARROWS_H, (int *) &operation, SCALE);
+    ct_ui_a0->same_line(0, 0);
+    ct_ui_a0->radio_button2(&(ct_ui_radio_buttton_t0) {
+            .id=context_obj,
+            .text=ICON_FA_UNDO,
+            .value=ROTATE}, (int32_t *) &operation);
 
-    ct_debugui_a0->SameLine(0, -1);
 
-    ct_debugui_a0->Text("%s", "C:");
-    ct_debugui_a0->SameLine(0, -1);
+    ct_ui_a0->same_line(0, 0);
+    ct_ui_a0->radio_button2(&(ct_ui_radio_buttton_t0) {
+            .id=context_obj,
+            .text=ICON_FA_ARROWS_H,
+            .value=SCALE}, (int32_t *) &operation);
+
+    ct_ui_a0->same_line(0, -1);
+
+    ct_ui_a0->text("C:");
+    ct_ui_a0->same_line(0, -1);
 
     ct_camera_component *camera = ct_ecs_c_a0->get_one(editor->world,
                                                        CT_CAMERA_COMPONENT, editor->camera_ent,
                                                        true);
-    int cur_item = 0;
+    int32_t cur_item = 0;
 
     if (camera->camera_type == CAMERA_TYPE_ORTHO) {
         cur_item = 1;
     }
 
-    if (ct_debugui_a0->Combo("", &cur_item,
-                             (const char *[]) {"perspective", "ortho"}, 2, -1)) {
+    if (ct_ui_a0->combo(&(ct_ui_combo_t0) {
+            .label="",
+            .items= (const char *[]) {"perspective", "ortho"},
+            .items_count=2
+    }, &cur_item)) {
         if (cur_item == 0) {
             camera->camera_type = CAMERA_TYPE_PERSPECTIVE;
         } else if (cur_item == 1) {
@@ -88,10 +109,10 @@ static void draw_editor(uint64_t context_obj,
         return;
     }
 
-    ce_vec2_t size = ct_debugui_a0->GetContentRegionAvail();
+    ce_vec2_t size = ct_ui_a0->get_content_region_avail();
 //    size.y -= ct_debugui_a0->GetTextLineHeightWithSpacing();
 
-    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
+    bool is_mouse_hovering = ct_ui_a0->is_mouse_hovering_window();
     editor->mouse_hovering = is_mouse_hovering;
 
     viewport_component *viewport = ct_ecs_c_a0->get_one(editor->world, VIEWPORT_COMPONENT,
@@ -104,10 +125,13 @@ static void draw_editor(uint64_t context_obj,
     bgfx_texture_handle_t th;
     th = builder->get_texture(builder, RG_OUTPUT_TEXTURE);
 
-    ct_debugui_a0->Image(th,
-                         &size,
-                         &(ce_vec4_t) {1.0f, 1.0f, 1.0f, 1.0f},
-                         &(ce_vec4_t) {0.0f, 0.0f, 0.0, 0.0f});
+    ct_ui_a0->image(&(struct ct_ui_image_t0) {
+            .user_texture_id = th.idx,
+            .size = size,
+            .tint_col = {1.0f, 1.0f, 1.0f, 1.0f},
+            .border_col ={0.0f, 0.0f, 0.0, 0.0f},
+    });
+
 }
 
 static struct entity_editor *_new_editor() {
@@ -265,7 +289,6 @@ void CE_MODULE_LOAD(entity_editor)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ce_cdb_a0);

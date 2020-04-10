@@ -6,11 +6,10 @@
 #ifndef IMGUI_H_HEADER_GUARD
 #define IMGUI_H_HEADER_GUARD
 
-//#include <bgfx/bgfx.h>
 #include <bgfx/c99/bgfx.h>
-#include "../ocornut-imgui/imgui.h"
-#include "cetech/debugui/private/iconfontheaders/icons_kenney.h"
-#include "cetech/debugui/icons_font_awesome.h"
+#include "cetech/ui_imgui/private/ocornut-imgui/imgui.h"
+#include "cetech/ui_imgui/private/iconfontheaders/icons_kenney.h"
+#include <cetech/ui/icons_font_awesome.h>
 
 #define IMGUI_MBUT_LEFT   0x01
 #define IMGUI_MBUT_RIGHT  0x02

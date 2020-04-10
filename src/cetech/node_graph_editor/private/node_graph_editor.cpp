@@ -7,7 +7,7 @@
 #include <celib/api.h>
 
 extern "C" {
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/node_graph/node_graph.h>
 #include <cetech/asset_editor/asset_editor.h>
 #include <cetech/renderer/gfx.h>
@@ -16,19 +16,20 @@ extern "C" {
 };
 
 
-#include <cetech/debugui/private/ocornut-imgui/imgui.h>
+#include <cetech/ui_imgui/private/ocornut-imgui/imgui.h>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 
-#include "cetech/debugui/private/ocornut-imgui/imgui_internal.h"
+#include <cetech/ui_imgui/private/ocornut-imgui/imgui_internal.h>
 
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 #include <cetech/ecs/ecs.h>
 #include <fnmatch.h>
 #include <cetech/editor/selcted_object.h>
 #include <celib/math/math.h>
+#include <cetech/ui/ui.h>
 
 
 #define _G node_graph_editor_globals
@@ -72,32 +73,32 @@ static uint64_t _new_node(uint64_t graph,
 
 static char modal_buffer[128] = {};
 
-static void add_node_modal(const char *modal_id,
+static void add_node_modal(uint64_t modal_id,
                            uint64_t obj) {
-
 
     bool open = true;
     ce_vec2_t size = {512, 512};
-    ct_debugui_a0->SetNextWindowSize(&size,
-                                     static_cast<DebugUICond>(0));
-    if (ct_debugui_a0->BeginPopupModal(modal_id, &open, 0)) {
+    ct_ui_a0->set_next_window_size(size);
+
+    const ct_ui_modal_popup_t0 modal = {.text="select...", .id=modal_id};
+
+    if (ct_ui_a0->modal_popup_begin(&modal, &open)) {
         struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
-            ct_debugui_a0->CloseCurrentPopup();
-            ct_debugui_a0->EndPopup();
+            ct_ui_a0->popup_close_current();
+            ct_ui_a0->popup_end();
             return;
         }
 
         char labelidi[128] = {'\0'};
         sprintf(labelidi, "##modal_node_add_input%llu", obj);
 
-        ct_debugui_a0->InputText(labelidi,
-                                 modal_buffer,
-                                 CE_ARRAY_LEN(modal_buffer),
-                                 0,
-                                 0, NULL);
+        static ct_ui_input_text_t0 input_component = {.id=ct_ui_a0->generate_id()};
 
+        ct_ui_a0->input_text(&input_component,
+                             modal_buffer,
+                             CE_ARRAY_LEN(modal_buffer));
 
         struct ce_api_entry_t0 it = ce_api_a0->first(CT_NODE_I0);
         while (it.api) {
@@ -126,9 +127,8 @@ static void add_node_modal(const char *modal_id,
                     }
                 }
 
-
-                bool add = ct_debugui_a0->Selectable(label, false, 0,
-                                                     &CE_VEC2_ZERO);
+                ct_ui_selectable_t0 selectable_add = {.text=label};
+                bool add = ct_ui_a0->selectable(&selectable_add);
 
                 if (add) {
                     _new_node(obj, i->type());
@@ -139,7 +139,7 @@ static void add_node_modal(const char *modal_id,
             it = ce_api_a0->next(it);
         }
 
-        ct_debugui_a0->EndPopup();
+        ct_ui_a0->modal_popup_end();
     }
 }
 

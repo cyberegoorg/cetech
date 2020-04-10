@@ -82,10 +82,9 @@ set(SOURCE_FILES
         src/cetech/asset/private/asset.c
         src/cetech/asset_io/private/asset_io.c
         src/cetech/kernel/private/kernel.c
-        src/cetech/debugui/private/bgfx_imgui/imgui.cpp
-        src/cetech/debugui/private/ocornut-imgui/imgui.cpp
-        src/cetech/debugui/private/ocornut-imgui/imgui_draw.cpp
-        src/cetech/debugui/private/debugui.cpp
+        src/cetech/ui_imgui/private/bgfx_imgui/imgui.cpp
+        src/cetech/ui_imgui/private/ocornut-imgui/imgui.cpp
+        src/cetech/ui_imgui/private/ocornut-imgui/imgui_draw.cpp
 
         src/cetech/machine/private/machine_sdl2.c
 
@@ -139,6 +138,9 @@ set(SOURCE_FILES
 
         src/cetech/parent/private/parent.c
         src/cetech/metrics/private/metrics.c
+
+        src/cetech/ui_imgui/private/ui_imgui.cpp
+
         #        src/cetech/mono/private/mono.c
         )
 

@@ -16,7 +16,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
@@ -108,10 +108,6 @@ void render_rectangles(ct_world_t0 world,
     }
 }
 
-static uint64_t rectangle_renderer_cdb_type() {
-    return ce_id_a0->id64("rectangle_renderer");
-}
-
 static const char *rectangle_renderer_display_name() {
     return ICON_FA_HOUZZ " Rectangle renderer";
 }
@@ -123,10 +119,6 @@ static const char *rectangle_renderer_display_name() {
 //    ct_debugui_a0->LabelText("ffffff", "%s","dddddddddddasdsadasdasdas");
 //}
 
-static struct ct_property_editor_i0 rectangle_renderer_property_editor_api = {
-        .cdb_type = rectangle_renderer_cdb_type,
-//        .draw_ui = draw_ui,
-};
 
 static void render(ct_world_t0 world,
                    struct ct_rg_builder_t0 *builder) {
@@ -198,8 +190,6 @@ void CE_MODULE_LOAD(rectangle_render)(struct ce_api_a0 *api,
 
     api->add_impl(CT_ECS_COMPONENT_I0_STR, &ct_component_api, sizeof(ct_component_api));
     api->add_impl(CT_RENDERER_COMPONENT_I0_STR, &rectangle_renderer_i, sizeof(rectangle_renderer_i));
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR, &rectangle_renderer_property_editor_api,
-                  sizeof(rectangle_renderer_property_editor_api));
 
     ct_gfx_a0->bgfx_vertex_layout_begin(&pt_vertex_decl,
                                       ct_gfx_a0->bgfx_get_renderer_type());
@@ -233,6 +223,5 @@ void CE_MODULE_UNLOAD(rectangle_render)(struct ce_api_a0 *api,
     CE_UNUSED(api);
 
     api->remove_impl(CT_RENDERER_COMPONENT_I0, &rectangle_renderer_i);
-    api->remove_impl(CT_PROPERTY_EDITOR_I0, &rectangle_renderer_property_editor_api);
     api->remove_impl(CT_ECS_COMPONENT_I0, &ct_component_api);
 }

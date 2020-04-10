@@ -27,7 +27,7 @@
 #include <celib/config.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/asset_io/asset_io.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <celib/os/path.h>
 #include <celib/os/process.h>
 #include <celib/os/vio.h>

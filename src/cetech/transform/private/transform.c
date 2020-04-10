@@ -16,7 +16,7 @@
 
 #include "cetech/ecs/ecs.h"
 #include <cetech/transform/transform.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 
 #include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
@@ -102,10 +102,6 @@ static const ce_cdb_prop_def_t0 position_c_prop[] = {
 };
 
 
-static uint64_t _position_cdb_type() {
-    return POSITION_COMPONENT;
-}
-
 static void _position_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
                                       uint64_t context,
@@ -113,16 +109,10 @@ static void _position_property_editor(ce_cdb_t0 db,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
 
-    ct_editor_ui_a0->prop_vec3(pos, "Position", filter,
+    ct_editor_ui_a0->prop_vec3(pos, "Position",
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
                                (ui_vec3_p0) {});
 }
-
-static struct ct_property_editor_i0 position_property_editor_api = {
-        .cdb_type = _position_cdb_type,
-        .draw_ui = _position_property_editor,
-};
-
 
 //
 // Rot COMP
@@ -159,10 +149,6 @@ static const ce_cdb_prop_def_t0 rotation_c_prop[] = {
         },
 };
 
-static uint64_t _rotation_cdb_type() {
-    return ROTATION_COMPONENT;
-}
-
 static void _rotation_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
                                       uint64_t context,
@@ -170,15 +156,10 @@ static void _rotation_property_editor(ce_cdb_t0 db,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
 
-    ct_editor_ui_a0->prop_vec3(pos, "Rotation", filter,
+    ct_editor_ui_a0->prop_vec3(pos, "Rotation",
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
                                (ui_vec3_p0) {});
 }
-
-static struct ct_property_editor_i0 rotation_property_editor_api = {
-        .cdb_type = _rotation_cdb_type,
-        .draw_ui = _rotation_property_editor,
-};
 
 //
 // SCALE COMP
@@ -211,10 +192,6 @@ static const ce_cdb_prop_def_t0 scale_c_prop[] = {
 };
 
 
-static uint64_t _scale_cdb_type() {
-    return SCALE_COMPONENT;
-}
-
 static void _scale_property_editor(ce_cdb_t0 db,
                                    uint64_t obj,
                                    uint64_t context,
@@ -222,15 +199,10 @@ static void _scale_property_editor(ce_cdb_t0 db,
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
 
-    ct_editor_ui_a0->prop_vec3(pos, "Scale", filter,
+    ct_editor_ui_a0->prop_vec3(pos, "Scale",
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
                                (ui_vec3_p0) {});
 }
-
-static struct ct_property_editor_i0 scale_property_editor_api = {
-        .cdb_type = _scale_cdb_type,
-        .draw_ui = _scale_property_editor,
-};
 
 //
 
@@ -386,7 +358,7 @@ static void transform_system(ct_world_t0 world,
         ct_entity_t0 ent = {graph.output[i]};
 
         ct_parent_c *parent = ct_ecs_c_a0->get_one(world, CT_PARENT_COMPONENT, ent, false);
-        if(!parent) {
+        if (!parent) {
             continue;
         }
 
@@ -404,7 +376,7 @@ static void transform_system(ct_world_t0 world,
         ct_local_to_parent_c *local = ct_ecs_c_a0->get_one(world, LOCAL_TO_PARENT_COMPONENT, ent,
                                                            false);
 
-        if(!local) {
+        if (!local) {
             continue;
         }
 
@@ -480,18 +452,14 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_COMPONENT_I0_STR, &scale_c_api, sizeof(scale_c_api));
 
     ce_cdb_a0->reg_obj_type(POSITION_COMPONENT, position_c_prop, CE_ARRAY_LEN(position_c_prop));
+    ce_cdb_a0->set_aspect(POSITION_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _position_property_editor);
+
     ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT, rotation_c_prop, CE_ARRAY_LEN(rotation_c_prop));
+    ce_cdb_a0->set_aspect(ROTATION_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _rotation_property_editor);
+
     ce_cdb_a0->reg_obj_type(SCALE_COMPONENT, scale_c_prop, CE_ARRAY_LEN(scale_c_prop));
+    ce_cdb_a0->set_aspect(SCALE_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _scale_property_editor);
     ///
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &position_property_editor_api, sizeof(position_property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &rotation_property_editor_api, sizeof(rotation_property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &scale_property_editor_api, sizeof(scale_property_editor_api));
 
     ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,
                             vec2_prop, CE_ARRAY_LEN(vec2_prop));

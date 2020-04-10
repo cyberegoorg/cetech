@@ -15,12 +15,10 @@
 #include <cetech/transform/transform.h>
 
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
+#include <cetech/ui/ui.h>
 
 // World
-static uint64_t world_cdb_type() {
-    return ce_id_a0->id64("physics_world2d");
-}
 
 static const char *wolrd2d_display_name() {
     return "PhysicsWorld2D";
@@ -63,25 +61,16 @@ static struct ct_ecs_component_i0 world2d_component_i = {
 
 static void _wolrd2d_property_editor(ce_cdb_t0 db,
                                      uint64_t obj,
-                                     uint64_t context,
-                                     const char *filter) {
+                                     uint64_t context) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD2D_GRAVITY_PROP, 0);
 
-    ct_editor_ui_a0->prop_vec2(gravity, "Gravity", filter,
+    ct_editor_ui_a0->prop_vec2(gravity, "Gravity",
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
                                (ui_vec2_p0) {});
 }
 
-static struct ct_property_editor_i0 wolrd2_dproperty_editor_api = {
-        .cdb_type = world_cdb_type,
-        .draw_ui = _wolrd2d_property_editor,
-};
-
 // Velocity
-static uint64_t velocity2d_cdb_type() {
-    return ce_id_a0->id64("velocity2d");
-}
 
 static const char *velocity2d_display_name() {
     return "Velocity2D";
@@ -129,27 +118,18 @@ static struct ct_ecs_component_i0 velocity2d_component_i = {
 
 static void _velocity_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
+                                      uint64_t context) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY2D_LINEAR_PROP, 0);
 
-    ct_editor_ui_a0->prop_vec2(linear, "Linear", filter,
+    ct_editor_ui_a0->prop_vec2(linear, "Linear",
                                (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
                                (ui_vec2_p0) {});
 
-    ct_editor_ui_a0->prop_float(obj, "Angular", filter, VELOCITY2D_ANGULAR_PROP, (ui_float_p0) {});
+    ct_editor_ui_a0->prop_float(obj, "Angular", VELOCITY2D_ANGULAR_PROP, (ui_float_p0) {});
 }
-
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = velocity2d_cdb_type,
-        .draw_ui = _velocity_property_editor,
-};
 
 // collider
-static uint64_t collider2d_cdb_type() {
-    return ce_id_a0->id64("collider2d");
-}
 
 static const char *collider2d_display_name() {
     return "Collider2D";
@@ -206,9 +186,6 @@ static struct ct_ecs_component_i0 collider2d_component_i = {
 ///
 
 // mass
-static uint64_t mass2d_cdb_type() {
-    return ce_id_a0->id64("mass2d");
-}
 
 static const char *mass2d_display_name() {
     return "Mass2D";
@@ -241,15 +218,11 @@ static struct ct_ecs_component_i0 mass2d_component_i = {
 
 static void _mass2d_property_editor(ce_cdb_t0 db,
                                     uint64_t obj,
-                                    uint64_t context,
-                                    const char *filter) {
-    ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS2D_PROP, (ui_float_p0) {});
+                                    uint64_t context) {
+    ct_editor_ui_a0->prop_float(obj, "Mass", MASS2D_PROP, (ui_float_p0) {});
 }
 
-static struct ct_property_editor_i0 mass2d_property_editor_api = {
-        .cdb_type = mass2d_cdb_type,
-        .draw_ui = _mass2d_property_editor,
-};
+
 //
 
 
@@ -273,8 +246,7 @@ static uint64_t _idx_to_shape(int id) {
 
 static void _collider_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
+                                      uint64_t context) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t shape = ce_cdb_a0->read_subobject(r, PHYSICS_COLLIDER2D_SHAPE_PROP, 0);
     uint64_t shape_type = ce_cdb_a0->obj_type(db, shape);
@@ -284,7 +256,13 @@ static void _collider_property_editor(ce_cdb_t0 db,
     };
 
     int cur_item = _shape_to_id(shape_type);
-    if (ct_debugui_a0->Combo("Type", &cur_item, shape_str, CE_ARRAY_LEN(shape_str), -1)) {
+
+
+    if (ct_ui_a0->combo(&(ct_ui_combo_t0) {
+            .label="Type",
+            .items=shape_str,
+            .items_count= CE_ARRAY_LEN(shape_str)
+    }, &cur_item)) {
         shape_type = _idx_to_shape(cur_item);
         uint64_t new_shape = ce_cdb_a0->create_object(db, shape_type);
 
@@ -300,17 +278,14 @@ static void _collider_property_editor(ce_cdb_t0 db,
                                                            PHYSICS_COLLIDER2D_RECTANGLE_HALF_SIZE,
                                                            0);
 
-            ct_editor_ui_a0->prop_vec2(half_size, "Half size", filter,
+            ct_editor_ui_a0->prop_vec2(half_size, "Half size",
                                        (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y}, (ui_vec2_p0) {});
         }
             break;
     }
 }
 
-static struct ct_property_editor_i0 _collider_property_editor_api = {
-        .cdb_type = collider2d_cdb_type,
-        .draw_ui = _collider_property_editor,
-};
+
 //
 
 static struct ct_system_group_i0 physics_group = {
@@ -348,34 +323,31 @@ void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_COMPONENT_I0_STR,
                   &mass2d_component_i, sizeof(mass2d_component_i));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &wolrd2_dproperty_editor_api, sizeof(wolrd2_dproperty_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &property_editor_api, sizeof(property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &_collider_property_editor_api, sizeof(_collider_property_editor_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &mass2d_property_editor_api, sizeof(mass2d_property_editor_api));
-
     ce_cdb_a0->reg_obj_type(PHYSICS_WORLD2D_COMPONENT,
                             wolrd2d_component_prop, CE_ARRAY_LEN(wolrd2d_component_prop));
+    ce_cdb_a0->set_aspect(PHYSICS_WORLD2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT,
+                          _wolrd2d_property_editor);
 
     ce_cdb_a0->reg_obj_type(VELOCITY2D_COMPONENT,
                             body2d_component_prop, CE_ARRAY_LEN(body2d_component_prop));
+    ce_cdb_a0->set_aspect(VELOCITY2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT,
+                          _velocity_property_editor);
 
     ce_cdb_a0->reg_obj_type(MASS2D_COMPONENT,
                             mass2d_component_prop, CE_ARRAY_LEN(mass2d_component_prop));
+    ce_cdb_a0->set_aspect(MASS2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _mass2d_property_editor);
 
     ce_cdb_a0->reg_obj_type(COLLIDER2D_COMPONENT,
                             collider2d_component_prop,
                             CE_ARRAY_LEN(collider2d_component_prop));
 
+    ce_cdb_a0->set_aspect(COLLIDER2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT,
+                          _collider_property_editor);
+
     ce_cdb_a0->reg_obj_type(COLLIDER2D_RECTANGLE,
                             collider2d_rectangle_prop,
                             CE_ARRAY_LEN(collider2d_rectangle_prop));
+
 }
 
 void CE_MODULE_UNLOAD(physics2d)(struct ce_api_a0 *api,

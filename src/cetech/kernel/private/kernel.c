@@ -20,7 +20,7 @@
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/static_module.h>
 #include <cetech/asset_io/asset_io.h>
 #include <cetech/ecs/ecs.h>
@@ -120,7 +120,6 @@ bool cetech_kernel_init(int argc,
 
     CE_INIT_API(ce_api_a0, ct_asset_a0);
     CE_INIT_API(ce_api_a0, ct_machine_a0);
-    CE_INIT_API(ce_api_a0, ct_debugui_a0);
     CE_INIT_API(ce_api_a0, ct_renderer_a0);
 
     ce_cdb_a0->set_loader(ct_asset_a0->cdb_loader);
@@ -287,6 +286,7 @@ static void cetech_kernel_start() {
         ce_cdb_a0->tick();
 
         ct_metrics_a0->end();
+
     }
 
     _shutdown(&_G.initg);

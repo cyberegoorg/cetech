@@ -26,11 +26,12 @@
 
 #include "bgfx/c99/bgfx.h"
 
-#include <cetech/debugui/debugui.h>
+
 #include "cetech/render_graph/render_graph.h"
 #include <cetech/renderer/gfx.h>
 #include <cetech/transform/transform.h>
 #include <cetech/metrics/metrics.h>
+#include <cetech/ui/ui.h>
 
 //==============================================================================
 // GLobals
@@ -275,7 +276,7 @@ static void render_begin(float dt) {
 }
 
 static void render(float dt) {
-    ct_debugui_a0->render();
+    ct_ui_a0->render();
 
     const bgfx_stats_t *s = bgfx_get_stats();
 

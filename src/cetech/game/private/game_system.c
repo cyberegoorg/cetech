@@ -6,10 +6,11 @@
 #include <cetech/renderer/renderer.h>
 
 #include <cetech/kernel/kernel.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/ecs/ecs.h>
 #include <cetech/transform/transform.h>
 #include <cetech/camera/camera.h>
+#include <cetech/ui/ui.h>
 
 #include "../game_system.h"
 
@@ -113,7 +114,7 @@ struct ct_game_system_a0 *ct_game_system_a0 = &game_system_api;
 static struct ct_kernel_task_i0 game_task = {
         .name = CT_GAME_TASK,
         .update = game_update,
-        .update_after = CT_KERNEL_AFTER(CT_INPUT_TASK, CT_DEBUGUI_TASK),
+        .update_after = CT_KERNEL_AFTER(CT_INPUT_TASK, CT_UI_TASK),
         .init = game_init,
         .shutdown = game_shutdown,
 };

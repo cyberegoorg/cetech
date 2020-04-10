@@ -59,8 +59,6 @@ typedef struct ct_asset_i0 {
 
     const char *(*display_icon)();
 
-    void *(*get_interface)(uint64_t name_hash);
-
     void (*online)(ce_cdb_t0 db,
                    uint64_t obj);
 

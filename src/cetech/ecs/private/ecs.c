@@ -25,14 +25,15 @@
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/kernel/kernel.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/editor.h>
 #include <cetech/game/game_system.h>
 #include <cetech/parent/parent.h>
 #include <cetech/editor/dock.h>
-#include <cetech/debugui/debugui.h>
+
 #include <celib/containers/buffer.h>
 #include <cetech/asset_io/asset_io.h>
+#include <cetech/ui/ui.h>
 
 //==============================================================================
 // Globals
@@ -1508,7 +1509,7 @@ void *asset_get_interface(uint64_t type) {
             .load = load,
     };
 
-    if (type == ASSET_PREVIEW_I0) {
+    if (type == CT_PREVIEW_ASPECT) {
         return &ct_asset_preview_i0;
     };
 
@@ -1527,7 +1528,6 @@ static struct ct_asset_i0 ct_asset_api = {
         .name = name,
         .cdb_type = cdb_type,
         .display_icon = display_icon,
-        .get_interface = asset_get_interface,
 };
 
 static bool supported_extension(const char *extension) {
@@ -1952,7 +1952,7 @@ static void _sync_task(float dt) {
                                 continue;
                             }
 
-                             _add_components_from_obj(world, db, ent, comp_obj);
+                            _add_components_from_obj(world, db, ent, comp_obj);
                         }
                     }
                 }
@@ -2051,7 +2051,7 @@ static const char *ecs_debuger_name(uint64_t dock) {
 static void ecs_debuger_draw(uint64_t content,
                              uint64_t context,
                              uint64_t selected_object) {
-    int cur_item = 0;
+    int32_t cur_item = 0;
     const char **worlds_str = NULL;
     for (int i = 0; i < ce_array_size(_G.world_array); ++i) {
         ct_world_t0 w = _G.world_array[i].world;
@@ -2064,7 +2064,12 @@ static void ecs_debuger_draw(uint64_t content,
         ce_array_push(worlds_str, wi->name, _G.allocator);
     }
 
-    if (ct_debugui_a0->Combo("world", &cur_item, worlds_str, ce_array_size(worlds_str), -1)) {
+
+    if (ct_ui_a0->combo(&(ct_ui_combo_t0) {
+            .label="world",
+            .items=worlds_str,
+            .items_count=ce_array_size(worlds_str)
+    }, &cur_item)) {
         ecs_dbg.w = _G.world_array[cur_item].world;
     }
 
@@ -2087,7 +2092,7 @@ static void ecs_debuger_draw(uint64_t content,
                 ce_buffer_printf(&str_buff, _G.allocator, "empty");
             }
 
-            ct_debugui_a0->Selectable(str_buff, false, 0, &CE_VEC2_ZERO);
+            ct_ui_a0->selectable(&(ct_ui_selectable_t0) {.text=str_buff});
             ce_array_clean(str_buff);
         }
 

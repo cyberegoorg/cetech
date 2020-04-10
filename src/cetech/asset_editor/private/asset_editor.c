@@ -12,17 +12,19 @@
 
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/camera/camera.h>
 #include <cetech/transform/transform.h>
 #include <cetech/editor/editor.h>
 #include <cetech/asset/asset.h>
+#include <cetech/renderer/gfx.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
 #include <cetech/editor/dock.h>
 #include <celib/containers/array.h>
 #include <cetech/asset_editor/asset_editor.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/ui/ui.h>
 
 #define _G editor_globals
 
@@ -140,8 +142,8 @@ static void draw_editor(uint64_t content,
         return;
     }
 
-    bool is_mouse_hovering = ct_debugui_a0->IsMouseHoveringWindow();
-    bool click = ct_debugui_a0->IsMouseClicked(0, false);
+    bool is_mouse_hovering = ct_ui_a0->is_mouse_hovering_window();
+    bool click = ct_ui_a0->is_mouse_clicked(0, false);
 
     if (is_mouse_hovering && click) {
         uint64_t obj = editor->selected_object;
@@ -177,7 +179,7 @@ static void draw_editor_menu(uint64_t content,
 //    }
 
     if (i && i->draw_menu) {
-        ct_debugui_a0->SameLine(0, -1);
+        ct_ui_a0->same_line(0, -1);
         i->draw_menu(editor->context_obj);
     }
 }
@@ -232,9 +234,9 @@ static struct ct_editor_module_i0 editor_module_api = {
 };
 
 static uint64_t dock_flags() {
-    return DebugUIWindowFlags_NoNavInputs |
-           DebugUIWindowFlags_NoScrollbar |
-           DebugUIWindowFlags_NoScrollWithMouse;
+    return CT_UI_WINDOW_FLAGS_NoNavInputs |
+           CT_UI_WINDOW_FLAGS_NoScrollbar |
+           CT_UI_WINDOW_FLAGS_NoScrollWithMouse;
 }
 
 
@@ -254,7 +256,6 @@ void CE_MODULE_LOAD(editor)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ce_cdb_a0);

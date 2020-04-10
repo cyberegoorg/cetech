@@ -14,7 +14,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/editor/editor.h>
 #include <cetech/camera/camera.h>
 #include <cetech/editor/action_manager.h>
@@ -24,8 +24,9 @@
 #include <cetech/editor/dock.h>
 #include <string.h>
 #include <cetech/game/game_system.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/metrics/metrics.h>
+#include <cetech/ui/ui.h>
 
 #define _G plaground_global
 
@@ -35,28 +36,34 @@ static struct _G {
 
 static float draw_main_menu() {
     float menu_height = 0;
-    static bool debug = false;
-
-    if (ct_debugui_a0->BeginMainMenuBar()) {
-        if (ct_debugui_a0->BeginMenu("File", true)) {
-            if (ct_debugui_a0->MenuItem("Reload", "Alt+r", false, true)) {
+    static bool debug = false;;
+    if (ct_ui_a0->begin_main_menu_bar()) {
+        if (ct_ui_a0->menu_begin(&(ct_ui_menu_t0) {.text="File"})) {
+            if (ct_ui_a0->menu_item(&(ct_ui_menu_item_t0) {.text="Reload", .shortcut= "Alt+r}"})) {
                 ce_module_a0->reload_all();
             }
 
-            if (ct_debugui_a0->MenuItem2("Debug", "F9", &debug, true)) {
+
+            if (ct_ui_a0->menu_item_checkbox(&(ct_ui_menu_item_t0) {
+                    .text="Debug",
+                    .shortcut= "F9"
+            }, &debug)) {
                 ct_renderer_a0->set_debug(debug);
             }
 
-            if (ct_debugui_a0->MenuItem(ICON_FA_WINDOW_CLOSE" ""Quit", "Alt+F4", false, true)) {
+
+            if (ct_ui_a0->menu_item(&(ct_ui_menu_item_t0) {
+                    .text=ICON_FA_WINDOW_CLOSE" ""Quit",
+                    .shortcut= "Alt+F4}"})) {
                 ct_kernel_a0->quit();
 
             }
 
-            ct_debugui_a0->EndMenu();
+            ct_ui_a0->menu_end();
         }
 
-        if (ct_debugui_a0->BeginMenu("Edit", true)) {
-            ct_debugui_a0->EndMenu();
+        if (ct_ui_a0->menu_begin(&(ct_ui_menu_t0) {.text="Edit"})) {
+            ct_ui_a0->menu_end();
         }
 
         ce_api_entry_t0 it = ce_api_a0->first(CT_EDITOR_MODULE_I0);
@@ -72,22 +79,24 @@ static float draw_main_menu() {
 
         ct_dock_a0->draw_menu();
 
-        if (ct_debugui_a0->BeginMenu("Help", true)) {
-            if (ct_debugui_a0->MenuItem("About", NULL, false, true)) {
+        if (ct_ui_a0->menu_begin(&(ct_ui_menu_t0) {.text="Help"})) {
+            if (ct_ui_a0->menu_item(&(ct_ui_menu_item_t0) {.text="About"})) {
             }
-            ct_debugui_a0->EndMenu();
+            ct_ui_a0->menu_end();
         }
 
-        float v[2];
-        ct_debugui_a0->GetWindowSize(v);
-        menu_height = v[1];
+        ce_vec2_t v = ct_ui_a0->get_window_size();
+        menu_height = v.y;
 
-        float w = v[0];
+        float w = v.x;
         float dt = ct_metrics_a0->get_float(ce_id_a0->id64("dt"));
-        ct_debugui_a0->SameLine(w - 120, 0);
-        ct_debugui_a0->Text("FPS: %.0f | DT: %.0f ms", 1.0f / dt, dt * 1000);
+        ct_ui_a0->same_line(w - 120, 0);
 
-        ct_debugui_a0->EndMainMenuBar();
+        char text[32];
+        snprintf(text, 32, "FPS: %.0f | DT: %.0f ms", 1.0f / dt, dt * 1000);
+        ct_ui_a0->text(text);
+
+        ct_ui_a0->end_main_menu_bar();
     }
     return menu_height;
 }
@@ -124,12 +133,12 @@ static void editor_task(float dt) {
     ce_vec2_t pos = {0.0f, menu_height};
     ce_vec2_t size = {(float) w, h - 25.0f};
 
-    ct_debugui_a0->RootDock(pos, size);
+    ct_ui_a0->dock_root(pos, size);
 
     ct_dock_a0->draw_all();
 
     if (_G.load_layout) {
-        ct_debugui_a0->LoadDock("core/default.dock_layout");
+        ct_ui_a0->dock_load("core/default.dock_layout");
         _G.load_layout = false;
     }
 
@@ -153,7 +162,7 @@ struct ct_kernel_task_i0 render_task = {
         .update = editor_task,
         .init = on_init,
         .shutdown = on_shutdown,
-        .update_after = CT_KERNEL_AFTER(CT_DEBUGUI_TASK, CT_INPUT_TASK),
+        .update_after = CT_KERNEL_AFTER(CT_UI_TASK, CT_INPUT_TASK),
         .update_before = CT_KERNEL_BEFORE(CT_GAME_TASK, CT_RENDER_TASK),
 };
 
@@ -164,7 +173,6 @@ void CE_MODULE_LOAD(playground)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_renderer_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ct_camera_a0);
     CE_INIT_API(api, ce_fs_a0);

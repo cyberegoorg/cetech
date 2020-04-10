@@ -16,7 +16,7 @@
 #include "cetech/ecs/ecs.h"
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/static_mesh.h>
@@ -204,13 +204,6 @@ static struct ct_asset_preview_i0 ct_asset_preview_api = {
         .load = load,
 };
 
-static void *get_interface(uint64_t name_hash) {
-    if (name_hash == ASSET_PREVIEW_I0) {
-        return &ct_asset_preview_api;
-    }
-    return NULL;
-}
-
 static const char *name() {
     return "scene";
 }
@@ -223,7 +216,6 @@ static struct ct_asset_i0 ct_asset_api = {
         .online = online,
         .offline = offline,
 //        .compilator = scene_compiler,
-        .get_interface = get_interface,
 };
 
 
@@ -430,13 +422,8 @@ static void draw_property(ce_cdb_t0 db,
         return;
     }
 
-    ct_editor_ui_a0->prop_filename(import, "Input", filter, SCENE_INPUT_PROP, "gltf", 0);
+    ct_editor_ui_a0->prop_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
 }
-
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = cdb_type,
-        .draw_ui = draw_property,
-};
 
 void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                            int reload) {
@@ -449,6 +436,8 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     _init_api(api);
 
     ce_cdb_a0->reg_obj_type(SCENE_TYPE, scene_prop, CE_ARRAY_LEN(scene_prop));
+    ce_cdb_a0->set_aspect(SCENE_TYPE, CT_PROPERTY_EDITOR_ASPECT, draw_property);
+    ce_cdb_a0->set_aspect(SCENE_TYPE, CT_PREVIEW_ASPECT, &ct_asset_preview_api);
 
     ce_cdb_a0->reg_obj_type(SCENE_GEOM_OBJ_TYPE,
                             scene_geom_obj_prop, CE_ARRAY_LEN(scene_geom_obj_prop));
@@ -466,9 +455,6 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     };
 
     ce_api_a0->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
-
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &property_editor_api, sizeof(property_editor_api));
 
     scenecompiler_init(api);
 }

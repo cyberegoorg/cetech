@@ -10,7 +10,7 @@
 
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/editor_ui.h>
 #include <cetech/property_editor/property_editor.h>
 
@@ -71,10 +71,6 @@ static struct ct_camera_a0 camera_api = {
 struct ct_camera_a0 *ct_camera_a0 = &camera_api;
 
 ///
-static uint64_t cdb_type() {
-    return CT_CAMERA_COMPONENT;
-}
-
 static const char *display_name() {
     return ICON_FA_CAMERA " Camera";
 }
@@ -119,7 +115,7 @@ static void _draw_camera_property(ce_cdb_t0 db,
                                   uint64_t context,
                                   const char *filter) {
 
-    ct_editor_ui_a0->prop_str_combo2(obj, "Camera type",filter,
+    ct_editor_ui_a0->prop_str_combo2(obj, "Camera type",
                                      PROP_CAMERA_TYPE,
                                      (const char *[]) {"perspective", "ortho"}, 2, obj);
 
@@ -127,18 +123,13 @@ static void _draw_camera_property(ce_cdb_t0 db,
     const char *camea_type_str = ce_cdb_a0->read_str(r, PROP_CAMERA_TYPE, "");
     uint64_t camera_type = ce_id_a0->id64(camea_type_str);
 
-    ct_editor_ui_a0->prop_float(obj, "Near", filter,PROP_NEAR, (ui_float_p0) {});
-    ct_editor_ui_a0->prop_float(obj, "Far", filter,PROP_FAR, (ui_float_p0) {});
+    ct_editor_ui_a0->prop_float(obj, "Near", PROP_NEAR, (ui_float_p0) {});
+    ct_editor_ui_a0->prop_float(obj, "Far", PROP_FAR, (ui_float_p0) {});
 
     if (camera_type == CAMERA_TYPE_PERSPECTIVE) {
-        ct_editor_ui_a0->prop_float(obj, "Fov", filter,PROP_FOV, (ui_float_p0) {});
+        ct_editor_ui_a0->prop_float(obj, "Fov", PROP_FOV, (ui_float_p0) {});
     }
 }
-
-static struct ct_property_editor_i0 property_editor_api = {
-        .cdb_type = cdb_type,
-        .draw_ui = _draw_camera_property,
-};
 
 static ce_cdb_prop_def_t0 camera_component_prop[] = {
         {.name = "camera_type", .type = CE_CDB_TYPE_STR, .value.str = "perspective"},
@@ -172,13 +163,11 @@ void CE_MODULE_LOAD(camera)(struct ce_api_a0 *api,
                   &ct_active_camera_component,
                   sizeof(ct_active_camera_component));
 
-    api->add_impl(CT_PROPERTY_EDITOR_I0_STR,
-                  &property_editor_api,
-                  sizeof(property_editor_api));
-
     ce_cdb_a0->reg_obj_type(CT_CAMERA_COMPONENT,
                             camera_component_prop,
                             CE_ARRAY_LEN(camera_component_prop));
+    ce_cdb_a0->set_aspect(CT_CAMERA_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _draw_camera_property);
+
 
     ce_cdb_a0->reg_obj_type(CT_ACTIVE_CAMERA_COMPONENT, NULL, 0);
 }

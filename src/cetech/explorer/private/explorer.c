@@ -12,13 +12,14 @@
 
 
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <cetech/editor/dock.h>
 #include <cetech/explorer/explorer.h>
 #include <cetech/asset/asset.h>
 
-#include <cetech/debugui/icons_font_awesome.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/ui/ui.h>
 
 #define WINDOW_NAME "Explorer"
 
@@ -29,20 +30,8 @@ static struct _G {
     ce_alloc_t0 *allocator;
 } _G;
 
-static struct ct_explorer_i0 *_get_explorer_by_type(uint64_t type) {
-    ce_api_entry_t0 it = ce_api_a0->first(CT_EXPLORER_I0);
-
-    while (it.api) {
-        struct ct_explorer_i0 *i = (it.api);
-
-        if (i->cdb_type && (i->cdb_type() == type)) {
-            return it.api;
-        }
-
-        it = ce_api_a0->next(it);
-    }
-
-    return NULL;
+static ct_explorer_draw_ui_t *_get_explorer_by_type(uint64_t type) {
+    return ce_cdb_a0->get_aspect(type, CT_EXPLORER_ASPECT);
 }
 
 static uint64_t draw(uint64_t selected_obj,
@@ -53,26 +42,11 @@ static uint64_t draw(uint64_t selected_obj,
         top_level = locked_object;
     }
 
-    ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(), top_level));
-    if (i && i->draw_ui) {
-        return i->draw_ui(top_level, selected_obj, context);
+    ct_explorer_draw_ui_t *draw_ui = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(), top_level));
+    if (draw_ui) {
+        return draw_ui(top_level, selected_obj, context);
     }
     return 0;
-}
-
-static void draw_menu(uint64_t content,
-                      uint64_t context,
-                      uint64_t selected_object) {
-    uint64_t top_level_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(),
-                                                  selected_object);
-
-    ct_explorer_i0 *i;
-    i = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(),
-                                                  top_level_obj));
-    if (i && i->draw_menu) {
-        i->draw_menu(selected_object, context);
-    }
 }
 
 static void on_debugui(uint64_t content,
@@ -82,7 +56,7 @@ static void on_debugui(uint64_t content,
         return;
     }
 
-    ct_debugui_a0->Separator();
+    ct_ui_a0->separator();
 
     uint64_t new_selected_object = draw(selected_object, context);
     if (new_selected_object) {
@@ -109,12 +83,11 @@ static uint64_t dock_flags() {
 }
 
 static struct ct_dock_i0 dock_api = {
-        .type = CT_EXPLORER_I0,
+        .type = CT_EXPLORER_ASPECT,
         .ui_flags = dock_flags,
         .name = name,
         .display_title = dock_title,
         .draw_ui = on_debugui,
-        .draw_menu = draw_menu,
 };
 
 void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
@@ -122,7 +95,6 @@ void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
-    CE_INIT_API(api, ct_debugui_a0);
     CE_INIT_API(api, ce_cdb_a0);
     CE_INIT_API(api, ct_asset_a0);
 
@@ -133,7 +105,7 @@ void CE_MODULE_LOAD(level_inspector)(struct ce_api_a0 *api,
 
     api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
 
-    ct_dock_a0->create_dock(CT_EXPLORER_I0, true);
+    ct_dock_a0->create_dock(CT_EXPLORER_ASPECT, true);
 }
 
 void CE_MODULE_UNLOAD(level_inspector)(struct ce_api_a0 *api,

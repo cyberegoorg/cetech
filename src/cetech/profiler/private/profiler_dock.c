@@ -9,8 +9,9 @@
 #include <celib/id.h>
 #include <cetech/editor/dock.h>
 #include <cetech/renderer/gfx.h>
-#include <cetech/debugui/debugui.h>
+
 #include <float.h>
+#include <cetech/ui/ui.h>
 
 #include "cetech/metrics/metrics.h"
 
@@ -36,13 +37,13 @@ static void draw_menu(uint64_t content,
                       uint64_t selected_object) {
     bool is_recording = ct_metrics_a0->is_recording();
 
-    if (ct_debugui_a0->Checkbox("Record", &is_recording)) {
+    if (ct_ui_a0->checkbox(&(ct_ui_checkbox_t0) {.text="Record"}, &is_recording)) {
         if (is_recording) ct_metrics_a0->start_record();
         else ct_metrics_a0->stop_record();
     }
 
-    ct_debugui_a0->SameLine(0, 0);
-    if (ct_debugui_a0->Button("Clear", &CE_VEC2_ZERO)) {
+    ct_ui_a0->same_line(0, 0);
+    if (ct_ui_a0->button(&(ct_ui_button_t0) {.text="Clear", .size=CE_VEC2_ZERO})) {
         ct_metrics_a0->clear_record();
     }
 }
@@ -51,41 +52,81 @@ static void draw_dock(uint64_t content,
                       uint64_t context,
                       uint64_t selected_object) {
 
-    float w = ct_debugui_a0->GetContentRegionAvail().x;
+    float w = ct_ui_a0->get_content_region_avail().x;
 
     ce_vec2_t plot_size = {w, 20};
     float dt = ct_metrics_a0->get_float(ce_id_a0->id64("dt"));
-    ct_debugui_a0->Text("dt: %f", dt);
+
+    char text[32];
+    snprintf(text, 32, "dt: %f", dt);
+    ct_ui_a0->text(text);
 
     uint32_t frames_n = ct_metrics_a0->recorded_frames_num();
     const float *float_buffer;
 
-    if (ct_debugui_a0->TreeNodeEx("CPU", DebugUITreeNodeFlags_DefaultOpen)) {
+    if (ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+            .id=content,
+            .text="CPU",
+            .flags = CT_TREE_NODE_FLAGS_DefaultOpen})) {
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("dt"));
-        ct_debugui_a0->PlotLines("", float_buffer, frames_n,
-                                 0, "dt", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
+
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+            .id=content,
+            .overlay_text="dt",
+            .values=float_buffer,
+            .values_count=frames_n,
+            .graph_size = plot_size,
+            .scale_min=FLT_MAX,
+            .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("memory.system"));
-        ct_debugui_a0->PlotLines("", float_buffer, frames_n,
-                                 0, "memory", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+                .id=content,
+                .overlay_text="memory",
+                .values=float_buffer,
+                .values_count=frames_n,
+                .graph_size = plot_size,
+                .scale_min=FLT_MAX,
+                .scale_max=FLT_MAX});
 
-        ct_debugui_a0->TreePop();
+        ct_ui_a0->tree_pop();
     }
 
-    if (ct_debugui_a0->TreeNodeEx("Renderer", DebugUITreeNodeFlags_DefaultOpen)) {
+    if (ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+            .id=content,
+            .text="Renderer",
+            .flags = CT_TREE_NODE_FLAGS_DefaultOpen})) {
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_submit"));
-        ct_debugui_a0->PlotLines("", float_buffer, frames_n,
-                                 0, "wait_submit", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+                .id=content,
+                .overlay_text="wait_submit",
+                .values=float_buffer,
+                .values_count=frames_n,
+                .graph_size = plot_size,
+                .scale_min=FLT_MAX,
+                .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_render"));
-        ct_debugui_a0->PlotLines("", float_buffer, frames_n,
-                                 0, "wait_render", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+                .id=content,
+                .overlay_text="wait_render",
+                .values=float_buffer,
+                .values_count=frames_n,
+                .graph_size = plot_size,
+                .scale_min=FLT_MAX,
+                .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.num_draw"));
-        ct_debugui_a0->PlotLines("", float_buffer, frames_n,
-                                 0, "num_draw", FLT_MAX, FLT_MAX, &plot_size, sizeof(float));
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+                .id=content,
+                .overlay_text="num_draw",
+                .values=float_buffer,
+                .values_count=frames_n,
+                .graph_size = plot_size,
+                .scale_min=FLT_MAX,
+                .scale_max=FLT_MAX});
 
-        ct_debugui_a0->TreePop();
+        ct_ui_a0->tree_pop();
     }
 }
 
@@ -105,7 +146,7 @@ void CE_MODULE_LOAD(profiler)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_log_a0);
     CE_INIT_API(api, ct_dock_a0);
     CE_INIT_API(api, ct_metrics_a0);
-    CE_INIT_API(api, ct_debugui_a0);
+    CE_INIT_API(api, ct_ui_a0);
 
     _G = (struct _G) {
             .alloc = ce_memory_a0->system,

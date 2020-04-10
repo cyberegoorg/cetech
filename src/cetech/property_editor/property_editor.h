@@ -13,32 +13,17 @@ extern "C" {
 #define CT_PROP_EDITOR_API \
     CE_ID64_0("ct_property_editor_a0", 0x10996d5471937b8aULL)
 
-
-#define CT_PROPERTY_EDITOR_I0_STR "ct_property_editor_i0"
-
 #define CT_PROPERTY_EDITOR_I0 \
     CE_ID64_0("ct_property_editor_i0", 0x50566f03b5eacb95ULL)
 
-typedef struct ce_cdb_uuid_t0 ct_asset_id_t0;
 
-typedef struct ct_property_editor_i0 {
-    uint64_t (*cdb_type)();
-
-    void (*draw_ui)(ce_cdb_t0 db,
-                    uint64_t obj,
-                    uint64_t context,
-                    const char *filter);
-
-    void (*draw_menu)(uint64_t obj);
-} ct_property_editor_i0;
-
+#define CT_PROPERTY_EDITOR_ASPECT \
+    CE_ID64_0("ct_property_editor_aspect", 0x5e2c5567004ac231ULL)
 
 struct ct_property_editor_a0 {
-    void (*draw)(ce_cdb_t0 db,
-                 uint64_t obj,
-                 uint64_t context);
-
-    ct_property_editor_i0 *(*get_interface)(uint64_t obj);
+    void (*draw_object)(ce_cdb_t0 db,
+                        uint64_t obj,
+                        uint64_t context);
 };
 
 CE_MODULE(ct_property_editor_a0);
