@@ -84,7 +84,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
         return 0;
     }
 
-    ct_ui_a0->columns(2, true);
+    ct_ui_a0->columns(selected_obj, 2, true);
     ct_ui_a0->next_column();
     ct_ui_a0->next_column();
 
@@ -180,7 +180,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     ct_ui_a0->next_column();
     ct_ui_a0->next_column();
 
-    ct_ui_a0->columns(1, true);
+    ct_ui_a0->columns(modal_id, 1, true);
 
     return new_selected_object;
 }
@@ -217,7 +217,7 @@ static void _node_property_draw(ce_cdb_t0 db,
     }
 
 
-    bool open = ct_editor_ui_a0->ui_prop_header("Inputs");
+    bool open = ct_editor_ui_a0->ui_prop_header("Inputs", obj);
 
     if (open) {
         uint64_t inputs_o = ce_cdb_a0->read_subobject(node_r, CT_NODE_GRAPH_NODE_INPUTS, 0);

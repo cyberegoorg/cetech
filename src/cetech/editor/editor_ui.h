@@ -119,7 +119,7 @@ struct ct_editor_ui_a0 {
                                uint64_t asset_type,
                                uint64_t *selected_asset);
 
-    bool (*ui_prop_header)(const char *name);
+    bool (*ui_prop_header)(const char *name, uint64_t id);
 
     void (*ui_prop_header_end)(bool open);
 
@@ -141,7 +141,6 @@ struct ct_editor_ui_a0 {
     void (*begin_disabled)();
 
     void (*end_disabled)();
-
 };
 
 CE_MODULE(ct_editor_ui_a0);

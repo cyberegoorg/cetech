@@ -200,10 +200,7 @@ void draw_property(ce_cdb_t0 db,
         char layer_label[128] = {};
         snprintf(layer_label, CE_ARRAY_LEN(layer_label), "Layer %s", layer_name);
 
-        bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
-                .id=layer,
-                .text=layer_label,
-                .flags = CT_TREE_NODE_FLAGS_DefaultOpen});
+        bool open = ct_editor_ui_a0->ui_prop_header(layer_label, layer);
         if (open) {
             ct_editor_ui_a0->prop_str(layer, "Layer name", MATERIAL_LAYER_NAME, i);
             ct_editor_ui_a0->prop_asset(layer, "Shader",
@@ -234,8 +231,6 @@ void draw_property(ce_cdb_t0 db,
                     ui_color4(var, filter);
                 }
             }
-
-            ct_ui_a0->tree_pop();
         }
     }
 }

@@ -68,7 +68,7 @@ static void draw_component(ce_cdb_t0 db,
     snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", c->display_name());
 
     float w = ct_ui_a0->get_content_region_avail().x;
-    bool open = ct_editor_ui_a0->ui_prop_header(buffer);
+    bool open = ct_editor_ui_a0->ui_prop_header(buffer, obj);
     ct_ui_a0->same_line(w - 20, 0);
 
     ct_ui_a0->push_id(obj);
@@ -86,9 +86,8 @@ static void draw_component(ce_cdb_t0 db,
     ct_editor_ui_a0->ui_prop_header_end(open);
 }
 
-static void _entity_ui(uint64_t obj,
-                       const char *filter) {
-    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity");
+static void _entity_ui(uint64_t obj) {
+    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity", obj);
 
     if (open) {
         ct_editor_ui_a0->ui_prop_body(obj);
@@ -206,15 +205,14 @@ void draw_menu(uint64_t obj) {
 
 static void draw_ui(ce_cdb_t0 db,
                     uint64_t obj,
-                    uint64_t context,
-                    const char *filter) {
+                    uint64_t context) {
     if (!obj) {
         return;
     }
 
     draw_menu(obj);
 
-    _entity_ui(obj, filter);
+    _entity_ui(obj);
 
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
 

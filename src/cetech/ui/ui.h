@@ -18,23 +18,15 @@ extern "C" {
 
 enum ct_ui_hovered_flag_e0 {
     CT_UI_HOVERED_FLAGS_DEFAULT = 0,
-
     CT_UI_HOVERED_FLAGS_ChildWindows = 1 << 0,
-
     CT_UI_HOVERED_FLAGS_RootWindow = 1 << 1,
-
     CT_UI_HOVERED_FLAGS_AnyWindow = 1 << 2,
-
     CT_UI_HOVERED_FLAGS_AllowWhenBlockedByPopup = 1 << 3,
-
     CT_UI_HOVERED_FLAGS_AllowWhenBlockedByActiveItem = 1 < 5,
-
     CT_UI_HOVERED_FLAGS_AllowWhenOverlapped = 1 << 6,
-
     CT_UI_HOVERED_FLAGS_RectOnly = CT_UI_HOVERED_FLAGS_AllowWhenBlockedByPopup
                                    | CT_UI_HOVERED_FLAGS_AllowWhenBlockedByActiveItem
                                    | CT_UI_HOVERED_FLAGS_AllowWhenOverlapped,
-
     CT_UI_HOVERED_FLAGS_RootAndChildWindows = CT_UI_HOVERED_FLAGS_RootWindow
                                               | CT_UI_HOVERED_FLAGS_ChildWindows
 };
@@ -53,11 +45,8 @@ enum ct_ui_drag_drop_0 {
 
 enum ct_ui_cond_e0 {
     CT_UI_COND_Always = 1 << 0,
-
     CT_UI_COND_Once = 1 << 1,
-
     CT_UI_COND_FirstUseEver = 1 << 2,
-
     CT_UI_COND_Appearing = 1 << 3
 };
 
@@ -247,6 +236,12 @@ typedef struct ct_ui_tree_node_ex_t0 {
     enum ct_ui_tree_node_flag flags;
 } ct_ui_tree_node_ex_t0;
 
+typedef struct ct_ui_collapsing_header_t0 {
+    uint64_t id;
+    const char *text;
+    enum ct_ui_tree_node_flag flags;
+} ct_ui_collapsing_header_t0;
+
 typedef struct ct_ui_color_edit_t0 {
     uint64_t id;
 } ct_ui_color_edit_t0;
@@ -391,7 +386,8 @@ struct ct_ui_a0 {
     void (*set_next_window_size)(ce_vec2_t size);
 
     //
-    void (*columns)(uint32_t count,
+    void (*columns)(uint64_t id,
+                    uint32_t count,
                     bool border);
 
     //
@@ -460,6 +456,8 @@ struct ct_ui_a0 {
 
     //
     bool (*tree_node_ex)(const ct_ui_tree_node_ex_t0 *node);
+
+    bool (*collapsing_header)(const ct_ui_collapsing_header_t0 *header);
 
     //
     void (*push_id)(uint64_t id);

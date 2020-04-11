@@ -101,7 +101,6 @@ static const ce_cdb_prop_def_t0 position_c_prop[] = {
         },
 };
 
-
 static void _position_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
                                       uint64_t context,

@@ -112,16 +112,6 @@ static const char *display_name() {
     return ICON_FA_HOUZZ " Static mesh";
 }
 
-static void property_editor(ce_cdb_t0 db,
-                            uint64_t obj,
-                            uint64_t context,
-                            const char *filter) {
-    ct_editor_ui_a0->prop_asset(obj, "Scene", PROP_SCENE_ID, PROP_SCENE_ID, context, obj);
-    ct_editor_ui_a0->prop_str_combo(obj, "Mesh", PROP_MESH, mesh_combo_items, obj);
-    ct_editor_ui_a0->prop_str_combo(obj, "Node", PROP_NODE, node_combo_items, obj);
-    ct_editor_ui_a0->prop_asset(obj, "Material", MATERIAL_TYPE, MATERIAL_TYPE, context, obj + 1);
-}
-
 void render(ct_world_t0 world,
             struct ct_rg_builder_t0 *builder) {
 
@@ -207,7 +197,6 @@ void CE_MODULE_LOAD(static_mesh)(struct ce_api_a0 *api,
     ce_cdb_a0->reg_obj_type(STATIC_MESH_COMPONENT,
                             static_mesh_component_prop,
                             CE_ARRAY_LEN(static_mesh_component_prop));
-    ce_cdb_a0->set_aspect(STATIC_MESH_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, property_editor);
 
 }
 

@@ -104,7 +104,7 @@ static void _create_from_modal(uint64_t modal_id) {
         }
 
 
-        ct_ui_a0->columns(2, true);
+        ct_ui_a0->columns(modal_id, 2, true);
 
         ct_ui_a0->text("Name");
         ct_ui_a0->next_column();
@@ -176,7 +176,7 @@ static void _create_from_modal(uint64_t modal_id) {
                              CE_ARRAY_LEN(modal_buffer_from));
         ct_ui_a0->next_column();
 
-        ct_ui_a0->columns(1, true);
+        ct_ui_a0->columns(modal_id, 1, true);
 
         ct_ui_a0->text(ICON_FA_SEARCH);
         ct_ui_a0->same_line(0, -1);

@@ -171,9 +171,9 @@ static void _prop_label(const char *label,
                         uint64_t props_n) {
 //    ct_ui_a0->same_line(0, 8);
     ct_ui_a0->text(label);
-
+    ct_ui_a0->next_column();
 //    ct_ui_a0->next_column();
-    ct_ui_a0->same_line(0, -1);
+//    ct_ui_a0->same_line(0, -1);
 //    ct_debugui_a0->Indent(0);
 }
 
@@ -191,6 +191,7 @@ static void _prop_value_end() {
 //    ct_ui_a0->same_line(0, 2);
 //    ct_ui_a0->next_column();
 //    ct_debugui_a0->Unindent(0);
+    ct_ui_a0->next_column();
 }
 
 static void ui_float(uint64_t obj,
@@ -593,18 +594,18 @@ static bool asset_select_modal(uint64_t modal_id,
     return changed;
 }
 
-static bool ui_prop_header(const char *name) {
-//    bool open = ct_debugui_a0->CollapsingHeader(name, DebugUITreeNodeFlags_DefaultOpen);
+static bool ui_prop_header(const char *name,
+                           uint64_t id) {
+//    ct_ui_a0->separator();
 
-    ct_ui_a0->separator();
-
-
-    bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
-            .id=(uint64_t) name,
+    bool open = ct_ui_a0->collapsing_header(&(ct_ui_collapsing_header_t0) {
+            .id=id,
             .text=name,
             .flags = CT_TREE_NODE_FLAGS_DefaultOpen});
 
     if (open) {
+        ct_ui_a0->columns(id, 2, true);
+
 //        ct_debugui_a0->Indent(0);
     }
 
@@ -613,8 +614,9 @@ static bool ui_prop_header(const char *name) {
 
 static void ui_prop_header_end(bool open) {
     if (open) {
+        ct_ui_a0->columns(random(), 1, false);
 //        ct_debugui_a0->Unindent(0);
-        ct_ui_a0->tree_pop();
+//        ct_ui_a0->tree_pop();
     }
 }
 

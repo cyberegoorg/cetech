@@ -148,9 +148,13 @@ ce_vec2_t get_window_size() {
     return _vec2_from(ImGui::GetWindowSize());
 }
 
-void columns(uint32_t count,
+void columns(uint64_t id,
+             uint32_t count,
              bool border) {
-    ImGui::Columns(count, NULL, border);
+    char label[128];
+    snprintf(label, CE_ARRAY_LEN(label), "###%llx", id);
+
+    ImGui::Columns(count, label, border);
 }
 
 bool input_text(const ct_ui_input_text_t0 *input,
@@ -436,6 +440,13 @@ bool tree_node_ex(const ct_ui_tree_node_ex_t0 *node) {
     return ImGui::TreeNodeEx(label, node->flags);
 }
 
+bool collapsing_header(const ct_ui_collapsing_header_t0 *header) {
+    char label[128];
+    snprintf(label, CE_ARRAY_LEN(label), "%s##%llx", header->text, header->id);
+
+    return ImGui::CollapsingHeader(label, header->flags);
+}
+
 
 bool radio_button2(const ct_ui_radio_buttton_t0 *btn,
                    int32_t *v) {
@@ -665,7 +676,9 @@ static struct ct_ui_a0 ui_api = {
         .pop_item_flag = pop_item_flag,
         .pop_style_var = pop_style_var,
         .pop_style_color = pop_style_color,
+
         .tree_node_ex = tree_node_ex,
+        .collapsing_header = collapsing_header,
 
         .push_id = push_id,
         .pop_id = pop_id,

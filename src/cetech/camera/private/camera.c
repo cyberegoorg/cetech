@@ -112,16 +112,15 @@ static struct ct_ecs_component_i0 ct_active_camera_component = {
 ///
 static void _draw_camera_property(ce_cdb_t0 db,
                                   uint64_t obj,
-                                  uint64_t context,
-                                  const char *filter) {
-
-    ct_editor_ui_a0->prop_str_combo2(obj, "Camera type",
-                                     PROP_CAMERA_TYPE,
-                                     (const char *[]) {"perspective", "ortho"}, 2, obj);
+                                  uint64_t context) {
 
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     const char *camea_type_str = ce_cdb_a0->read_str(r, PROP_CAMERA_TYPE, "");
     uint64_t camera_type = ce_id_a0->id64(camea_type_str);
+
+    ct_editor_ui_a0->prop_str_combo2(obj, "Camera type",
+                                     PROP_CAMERA_TYPE,
+                                     (const char *[]) {"perspective", "ortho"}, 2, obj);
 
     ct_editor_ui_a0->prop_float(obj, "Near", PROP_NEAR, (ui_float_p0) {});
     ct_editor_ui_a0->prop_float(obj, "Far", PROP_FAR, (ui_float_p0) {});

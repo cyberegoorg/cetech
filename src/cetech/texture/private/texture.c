@@ -272,9 +272,7 @@ static ct_asset_dcc_io_i0 texture_io = {
 ////
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
-                          uint64_t context,
-                          const char *filter) {
-
+                          uint64_t context){
     ct_editor_ui_a0->prop_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
     ct_editor_ui_a0->prop_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
     ct_editor_ui_a0->prop_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);

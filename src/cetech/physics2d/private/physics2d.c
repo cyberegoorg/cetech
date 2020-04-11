@@ -59,17 +59,6 @@ static struct ct_ecs_component_i0 world2d_component_i = {
         .from_cdb_obj = _world2d_from_cdb,
 };
 
-static void _wolrd2d_property_editor(ce_cdb_t0 db,
-                                     uint64_t obj,
-                                     uint64_t context) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD2D_GRAVITY_PROP, 0);
-
-    ct_editor_ui_a0->prop_vec2(gravity, "Gravity",
-                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
-                               (ui_vec2_p0) {});
-}
-
 // Velocity
 
 static const char *velocity2d_display_name() {
@@ -115,19 +104,6 @@ static struct ct_ecs_component_i0 velocity2d_component_i = {
         .size = sizeof(ct_velocity2d_c),
         .from_cdb_obj = _velocity_from_cdb,
 };
-
-static void _velocity_property_editor(ce_cdb_t0 db,
-                                      uint64_t obj,
-                                      uint64_t context) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY2D_LINEAR_PROP, 0);
-
-    ct_editor_ui_a0->prop_vec2(linear, "Linear",
-                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
-                               (ui_vec2_p0) {});
-
-    ct_editor_ui_a0->prop_float(obj, "Angular", VELOCITY2D_ANGULAR_PROP, (ui_float_p0) {});
-}
 
 // collider
 
@@ -215,12 +191,6 @@ static struct ct_ecs_component_i0 mass2d_component_i = {
         .size = sizeof(ct_mass2d_c),
         .from_cdb_obj = _mass2d_from_cdb,
 };
-
-static void _mass2d_property_editor(ce_cdb_t0 db,
-                                    uint64_t obj,
-                                    uint64_t context) {
-    ct_editor_ui_a0->prop_float(obj, "Mass", MASS2D_PROP, (ui_float_p0) {});
-}
 
 
 //
@@ -325,17 +295,12 @@ void CE_MODULE_LOAD(physics2d)(struct ce_api_a0 *api,
 
     ce_cdb_a0->reg_obj_type(PHYSICS_WORLD2D_COMPONENT,
                             wolrd2d_component_prop, CE_ARRAY_LEN(wolrd2d_component_prop));
-    ce_cdb_a0->set_aspect(PHYSICS_WORLD2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT,
-                          _wolrd2d_property_editor);
 
     ce_cdb_a0->reg_obj_type(VELOCITY2D_COMPONENT,
                             body2d_component_prop, CE_ARRAY_LEN(body2d_component_prop));
-    ce_cdb_a0->set_aspect(VELOCITY2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT,
-                          _velocity_property_editor);
 
     ce_cdb_a0->reg_obj_type(MASS2D_COMPONENT,
                             mass2d_component_prop, CE_ARRAY_LEN(mass2d_component_prop));
-    ce_cdb_a0->set_aspect(MASS2D_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _mass2d_property_editor);
 
     ce_cdb_a0->reg_obj_type(COLLIDER2D_COMPONENT,
                             collider2d_component_prop,
