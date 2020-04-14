@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <celib/yaml_cdb.h>
 #include <celib/math/math.h>
 
@@ -12,10 +12,6 @@ typedef struct gamepad_controler_component {
 
 #define GAMEPAD_COMPONENT \
     CE_ID64_0("gamepad_controller", 0x49293316c5688da9ULL)
-
-static const char *gamepad_controler_display_name() {
-    return "Gamepad controler";
-}
 
 #define GAMEPAD_ID \
     CE_ID64_0("gamepad_id", 0xc5ea6dc1179d6f0aULL)
@@ -39,7 +35,7 @@ static void _gamepad_controler_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 gamepad_controler_component_i = {
-        .display_name = gamepad_controler_display_name,
+        .display_name = "Gamepad controler",
         .cdb_type = GAMEPAD_COMPONENT,
         .size = sizeof(gamepad_controler_component),
         .from_cdb_obj = _gamepad_controler_on_spawn,

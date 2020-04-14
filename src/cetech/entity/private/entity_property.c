@@ -17,7 +17,7 @@
 #include <cetech/ecs/ecs.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/explorer/explorer.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/ui/icons_font_awesome.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
@@ -65,45 +65,45 @@ static void draw_component(ce_cdb_t0 db,
 
 
     char buffer[128] = {};
-    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", c->display_name());
+    snprintf(buffer, CE_ARRAY_LEN(buffer), "%s", c->display_name);
 
-    float w = ct_ui_a0->get_content_region_avail().x;
-    bool open = ct_editor_ui_a0->ui_prop_header(buffer, obj);
-    ct_ui_a0->same_line(w - 20, 0);
-
-    ct_ui_a0->push_id(obj);
-    if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=ICON_FA_MINUS})) {
-        ce_cdb_a0->destroy_object(db, obj);
-    }
-    ct_ui_a0->pop_id();
+//    float w = ct_ui_a0->get_content_region_avail().x;
+    bool open = ct_property_editor_a0->ui_header_begin(buffer, obj);
 
     if (open) {
-        ct_editor_ui_a0->ui_prop_body(obj);
-        ct_property_editor_a0->draw_object(db, obj, context);
+        ct_ui_a0->push_id(obj);
+        if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=ICON_FA_MINUS})) {
+            ce_cdb_a0->destroy_object(db, obj);
+        }
+        ct_ui_a0->pop_id();
 
-        ct_editor_ui_a0->ui_prop_body_end();
+        ct_ui_a0->separator();
+
+        ct_property_editor_a0->ui_body_begin(obj);
+        ct_property_editor_a0->draw_object(db, obj, context);
+        ct_property_editor_a0->ui_body_end(obj);
     }
-    ct_editor_ui_a0->ui_prop_header_end(open);
+    ct_property_editor_a0->ui_header_end(open, obj);
 }
 
 static void _entity_ui(uint64_t obj) {
-    bool open = ct_editor_ui_a0->ui_prop_header(ICON_FA_CUBE" Entity", obj);
+    bool open = ct_property_editor_a0->ui_header_begin(ICON_FA_CUBE" Entity", obj);
 
     if (open) {
-        ct_editor_ui_a0->ui_prop_body(obj);
+        ct_property_editor_a0->ui_body_begin(obj);
 
-        ct_editor_ui_a0->prop_label("UID", 0, NULL, 0);
-        ct_editor_ui_a0->prop_value_begin(0, NULL, 0);
+        ct_property_editor_a0->ui_label("UID", 0, NULL, 0);
+        ct_property_editor_a0->ui_value_begin(0, NULL, 0);
         char buffer[128] = {};
         snprintf(buffer, CE_ARRAY_LEN(buffer), "0x%llx", obj);
         ct_ui_a0->text(buffer);
-        ct_editor_ui_a0->prop_value_end();
+        ct_property_editor_a0->ui_value_end();
 
-        ct_editor_ui_a0->prop_str(obj, "Name", ENTITY_NAME, 11111111);
+        ct_property_editor_a0->ui_str(obj, "Name", ENTITY_NAME, 11111111);
 
-        ct_editor_ui_a0->ui_prop_body_end();
+        ct_property_editor_a0->ui_body_end(obj);
     }
-    ct_editor_ui_a0->ui_prop_header_end(open);
+    ct_property_editor_a0->ui_header_end(open, obj);
 }
 
 
@@ -156,7 +156,7 @@ static void _add_comp_popup(ce_cdb_t0 db,
 
             uint64_t component_type = i->cdb_type;
             if (i->display_name && !_component_exist(db, obj, component_type)) {
-                const char *label = i->display_name();
+                const char *label = i->display_name;
 
                 if (modal_buffer[0]) {
                     char filter[256] = {};

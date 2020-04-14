@@ -20,7 +20,7 @@
 
 #include <celib/memory/allocator.h>
 #include <cetech/ui/icons_font_awesome.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
@@ -108,10 +108,6 @@ void node_combo_items(uint64_t obj,
     ct_scene_a0->get_all_nodes(scene_id, items, items_count);
 }
 
-static const char *display_name() {
-    return ICON_FA_HOUZZ " Static mesh";
-}
-
 void render(ct_world_t0 world,
             struct ct_rg_builder_t0 *builder) {
 
@@ -157,7 +153,8 @@ static void _mesh_render_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
-        .display_name = display_name,
+        .icon = ICON_FA_HOUZZ,
+        .display_name = "Static mesh",
         .cdb_type = STATIC_MESH_COMPONENT,
         .size = sizeof(ct_mesh_component),
         .from_cdb_obj = _mesh_render_on_spawn,

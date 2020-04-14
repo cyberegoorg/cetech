@@ -20,7 +20,7 @@
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/transform/transform.h>
 #include <cetech/mesh/static_mesh.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/parent/parent.h>
 
@@ -422,7 +422,7 @@ static void draw_property(ce_cdb_t0 db,
         return;
     }
 
-    ct_editor_ui_a0->prop_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
+    ct_property_editor_a0->ui_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
 }
 
 void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,

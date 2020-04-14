@@ -169,7 +169,7 @@ static void draw_editor_menu(uint64_t content,
         return;
     }
 
-//    uint64_t locked_object = 0; //ct_editor_ui_a0->lock_selected_obj(dock, editor->selected_object);
+//    uint64_t locked_object = 0; //ct_property_editor_a0->lock_selected_obj(dock, editor->selected_object);
 //
 //    editor->locked = false;
 //

@@ -20,7 +20,7 @@
 
 #include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/ui/ui.h>
 
 static void ui_entity_item_end() {
@@ -81,10 +81,10 @@ void item_btns(uint64_t context,
 
     uint64_t new_value = 0;
 
-    bool changed = ct_editor_ui_a0->asset_select_modal(obj,
-                                                       obj,
-                                                       ENTITY_TYPE,
-                                                       &new_value);
+    bool changed = ct_property_editor_a0->ui_asset_select_modal(obj,
+                                                                obj,
+                                                                ENTITY_TYPE,
+                                                                &new_value);
     if (add_from) {
         ct_ui_a0->popup_open(obj);
     }
@@ -221,7 +221,14 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
                 continue;
             }
 
-            const char *component_display_name = component_i->display_name();
+            const char *component_display_name = component_i->display_name;
+            const char *component_icon = component_i->icon ? component_i->icon
+                                                           : ICON_FA_PUZZLE_PIECE;
+
+            char item_text[128];
+            snprintf(item_text, CE_ARRAY_LEN(item_text), "%s %s",
+                     component_icon, component_display_name);
+
 
             enum ct_ui_tree_node_flag c_flags = CT_TREE_NODE_FLAGS_Leaf;
 
@@ -234,7 +241,7 @@ static uint64_t ui_entity_item_begin(uint64_t selected_obj,
 
             if (ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
                     .id=component,
-                    .text=component_display_name,
+                    .text=item_text,
                     .flags=c_flags})) {
                 if (ct_ui_a0->is_item_clicked(0)) {
                     new_selected_object = component;

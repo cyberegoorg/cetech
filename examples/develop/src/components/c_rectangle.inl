@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <celib/yaml_cdb.h>
 #include <celib/math/math.h>
 
@@ -15,10 +15,6 @@ typedef struct rectangle_component {
 
 #define RECTANGLE_HALF_SIZE_PROP \
     CE_ID64_0("half_size", 0xfae83ca4619fb60aULL)
-
-static const char *rectangle_display_name() {
-    return "Rectangle";
-}
 
 static void _rectangle_on_spawn(ct_world_t0 world,
                                 ce_cdb_t0 db,
@@ -49,7 +45,7 @@ static const ce_cdb_prop_def_t0 rectangle_component_prop[] = {
 };
 
 static struct ct_ecs_component_i0 rectangle_component_i = {
-        .display_name = rectangle_display_name,
+        .display_name = "Rectangle",
         .cdb_type = RECTANGLE_COMPONENT,
         .size = sizeof(rectangle_component),
         .from_cdb_obj = _rectangle_on_spawn,

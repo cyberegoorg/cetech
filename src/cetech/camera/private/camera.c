@@ -11,7 +11,7 @@
 #include <cetech/renderer/renderer.h>
 #include <cetech/renderer/gfx.h>
 #include <cetech/ui/icons_font_awesome.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 
 #include "celib/id.h"
@@ -71,10 +71,6 @@ static struct ct_camera_a0 camera_api = {
 struct ct_camera_a0 *ct_camera_a0 = &camera_api;
 
 ///
-static const char *display_name() {
-    return ICON_FA_CAMERA " Camera";
-}
-
 static void _camera_on_spawn(ct_world_t0 world,
                              ce_cdb_t0 db,
                              uint64_t obj,
@@ -93,19 +89,17 @@ static void _camera_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
-        .display_name = display_name,
+        .icon = ICON_FA_CAMERA,
+        .display_name = "Camera",
         .cdb_type = CT_CAMERA_COMPONENT,
         .size = sizeof(ct_camera_component),
         .from_cdb_obj = _camera_on_spawn,
 };
 
 ////
-static const char *active_camera_display_name() {
-    return ICON_FA_CAMERA " Active camera";
-}
-
 static struct ct_ecs_component_i0 ct_active_camera_component = {
-        .display_name = active_camera_display_name,
+        .icon = ICON_FA_CAMERA,
+        .display_name = "Active camera",
         .cdb_type = CT_ACTIVE_CAMERA_COMPONENT,
 };
 
@@ -118,15 +112,15 @@ static void _draw_camera_property(ce_cdb_t0 db,
     const char *camea_type_str = ce_cdb_a0->read_str(r, PROP_CAMERA_TYPE, "");
     uint64_t camera_type = ce_id_a0->id64(camea_type_str);
 
-    ct_editor_ui_a0->prop_str_combo2(obj, "Camera type",
-                                     PROP_CAMERA_TYPE,
-                                     (const char *[]) {"perspective", "ortho"}, 2, obj);
+    ct_property_editor_a0->ui_str_combo2(obj, "Camera type",
+                                         PROP_CAMERA_TYPE,
+                                         (const char *[]) {"perspective", "ortho"}, 2, obj);
 
-    ct_editor_ui_a0->prop_float(obj, "Near", PROP_NEAR, (ui_float_p0) {});
-    ct_editor_ui_a0->prop_float(obj, "Far", PROP_FAR, (ui_float_p0) {});
+    ct_property_editor_a0->ui_float(obj, "Near", PROP_NEAR, (ui_float_p0) {});
+    ct_property_editor_a0->ui_float(obj, "Far", PROP_FAR, (ui_float_p0) {});
 
     if (camera_type == CAMERA_TYPE_PERSPECTIVE) {
-        ct_editor_ui_a0->prop_float(obj, "Fov", PROP_FOV, (ui_float_p0) {});
+        ct_property_editor_a0->ui_float(obj, "Fov", PROP_FOV, (ui_float_p0) {});
     }
 }
 

@@ -2084,7 +2084,7 @@ static void ecs_debuger_draw(uint64_t content,
             for (int j = 0; j < archetype->component_n; ++j) {
                 uint64_t component_name = archetype->name[j];
                 ct_ecs_component_i0 *ci = get_component_interface(component_name);
-                const char *display_name = ci->display_name ? ci->display_name() : NULL;
+                const char *display_name = ci->display_name;
                 ce_buffer_printf(&str_buff, _G.allocator, "%s | ", display_name);
             }
 

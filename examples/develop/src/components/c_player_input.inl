@@ -1,5 +1,5 @@
 
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <celib/yaml_cdb.h>
 #include <stdlib.h>
 #include <celib/math/math.h>
@@ -24,9 +24,6 @@ typedef struct player_input_component {
     ce_vec2_t shoot_dir;
 } player_input_component;
 
-static const char *player_input_display_name() {
-    return "Player input";
-}
 
 static void _player_input_on_spawn(ct_world_t0 world,
                                    ce_cdb_t0 db,
@@ -51,7 +48,7 @@ static void _player_input_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 player_input_component_i = {
-        .display_name = player_input_display_name,
+        .display_name = "Player input",
         .cdb_type = PLAYER_INPUT_COMPONENT,
         .size = sizeof(player_input_component),
         .from_cdb_obj = _player_input_on_spawn,

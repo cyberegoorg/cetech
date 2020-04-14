@@ -2328,7 +2328,6 @@ static uint64_t prop_count(const ce_cdb_obj_o0 *reader) {
 
 
     return ce_array_size(obj->storage->prop_name);
-
 }
 
 

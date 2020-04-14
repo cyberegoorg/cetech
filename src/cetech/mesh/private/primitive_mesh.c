@@ -127,10 +127,6 @@ void render_primitives(ct_world_t0 world,
     }
 }
 
-static const char *display_name() {
-    return ICON_FA_HOUZZ " Primitive mesh";
-}
-
 static void render(ct_world_t0 world,
                    struct ct_rg_builder_t0 *builder) {
 
@@ -164,7 +160,8 @@ static void _rectangle_renderer_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
-        .display_name = display_name,
+        .icon=ICON_FA_HOUZZ,
+        .display_name = "Primitive mesh",
         .cdb_type = PRIMITIVE_MESH_COMPONENT,
         .size = sizeof(ct_primitive_mesh_c),
         .from_cdb_obj = _rectangle_renderer_on_spawn,

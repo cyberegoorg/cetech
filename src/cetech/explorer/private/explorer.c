@@ -34,19 +34,121 @@ static ct_explorer_draw_ui_t *_get_explorer_by_type(uint64_t type) {
     return ce_cdb_a0->get_aspect(type, CT_EXPLORER_ASPECT);
 }
 
-static uint64_t draw(uint64_t selected_obj,
-                     uint64_t context) {
-    uint64_t top_level = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
-    uint64_t locked_object = 0;//ce_cdb_a0->read_ref(reader, CT_LOCKED_OBJ, 0);
-    if (locked_object) {
-        top_level = locked_object;
+bool _is_leaf(ce_cdb_t0 db,
+              uint64_t obj) {
+    const ce_cdb_obj_o0 *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const uint64_t n = ce_cdb_a0->prop_count(rs_reader);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(rs_reader);
+
+    for (int i = 0; i < n; ++i) {
+        uint64_t prop = keys[i];
+        ce_cdb_type_e0 type = ce_cdb_a0->prop_type(rs_reader, prop);
+
+        if ((type == CE_CDB_TYPE_SUBOBJECT)
+            || (type == CE_CDB_TYPE_SET_SUBOBJECT)) {
+            return false;
+        }
     }
 
-    ct_explorer_draw_ui_t *draw_ui = _get_explorer_by_type(ce_cdb_a0->obj_type(ce_cdb_a0->db(), top_level));
-    if (draw_ui) {
-        return draw_ui(top_level, selected_obj, context);
+    return true;
+}
+
+uint64_t draw_ui_generic(uint64_t obj,
+                         uint64_t selected_object,
+                         uint64_t context) {
+    const ce_cdb_obj_o0 *rs_reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
+    const uint64_t n = ce_cdb_a0->prop_count(rs_reader);
+    const uint64_t *keys = ce_cdb_a0->prop_keys(rs_reader);
+
+    uint64_t new_selected = 0;
+    for (uint32_t i = 0; i < n; ++i) {
+        ce_cdb_type_e0 type = ce_cdb_a0->prop_type(rs_reader, keys[i]);
+
+        const char *text = ce_id_a0->str_from_id64(keys[i]);
+
+        if (type == CE_CDB_TYPE_SUBOBJECT) {
+            uint64_t sub_obj = ce_cdb_a0->read_subobject(rs_reader, keys[i], 0);
+
+            bool is_lef = _is_leaf(ce_cdb_a0->db(), sub_obj);
+            enum ct_ui_tree_node_flag flag = is_lef ? CT_TREE_NODE_FLAGS_Leaf : 0;
+
+
+            const bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+                    .id=obj,
+                    .text=text,
+                    .flags = flag,
+            });
+
+
+            if (ct_ui_a0->is_item_clicked(0)) {
+                new_selected = sub_obj;
+            }
+
+            if (open) {
+                uint64_t new_obj = draw_ui_generic(sub_obj, selected_object, context);
+                if (new_obj) {
+                    new_selected = new_obj;
+                }
+
+                ct_ui_a0->tree_pop();
+            }
+        } else if (type == CE_CDB_TYPE_SET_SUBOBJECT) {
+            const bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+                    .id=obj,
+                    .text=text});
+            if (open) {
+                uint64_t obj_set_num = ce_cdb_a0->read_objset_num(rs_reader, keys[i]);
+                uint64_t obj_set[obj_set_num];
+                ce_cdb_a0->read_objset(rs_reader, keys[i], obj_set);
+
+                for (int j = 0; j < obj_set_num; ++j) {
+                    uint64_t sub_obj = obj_set[j];
+                    uint64_t sub_obj_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), sub_obj);
+
+                    bool is_lef = _is_leaf(ce_cdb_a0->db(), sub_obj);
+                    enum ct_ui_tree_node_flag flag = is_lef ? CT_TREE_NODE_FLAGS_Leaf : 0;
+
+
+                    const bool sub_open = ct_ui_a0->tree_node_ex(
+                            &(ct_ui_tree_node_ex_t0) {
+                                    .id=sub_obj,
+                                    .text=ce_id_a0->str_from_id64(sub_obj_type),
+                                    .flags = flag});
+
+                    if (ct_ui_a0->is_item_clicked(0)) {
+                        new_selected = sub_obj;
+                    }
+
+                    if (sub_open) {
+                        u_int64_t new_obj = draw_ui_generic(obj_set[j],
+                                                            selected_object,
+                                                            context);
+                        if (new_obj) {
+                            new_selected = new_obj;
+                        }
+                        ct_ui_a0->tree_pop();
+                    }
+                }
+                ct_ui_a0->tree_pop();
+            }
+        }
     }
-    return 0;
+
+    return new_selected;
+}
+
+static uint64_t draw(uint64_t selected_obj,
+                     uint64_t context) {
+    const uint64_t root_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
+    const uint64_t root_obj_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), root_obj);
+    ct_explorer_draw_ui_t *draw_ui = _get_explorer_by_type(root_obj_type);
+
+    if (draw_ui) {
+        return draw_ui(root_obj, selected_obj, context);
+    }
+
+
+    return draw_ui_generic(root_obj, selected_obj, context);
 }
 
 static void on_debugui(uint64_t content,
@@ -60,12 +162,7 @@ static void on_debugui(uint64_t content,
 
     uint64_t new_selected_object = draw(selected_object, context);
     if (new_selected_object) {
-//        ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), dock);
-//        ce_cdb_a0->set_ref(w, PROP_DOCK_SELECTED_OBJ, new_selected_object);
-//        ce_cdb_a0->write_commit(w);
-
-        ct_selected_object_a0->set_selected_object(context,
-                                                   new_selected_object);
+        ct_selected_object_a0->set_selected_object(context, new_selected_object);
     }
 }
 

@@ -41,7 +41,7 @@ struct ct_gfx_a0 {
 
     void (*bgfx_vertex_layout_end)(bgfx_vertex_layout_t *_decl);
 
-    void (*bgfx_vertex_pack)(const float _input[4],
+    void (* bgfx_vertex_pack)(const float _input[4],
                              bool _inputNormalized,
                              bgfx_attrib_t _attr,
                              const bgfx_vertex_layout_t *_decl,

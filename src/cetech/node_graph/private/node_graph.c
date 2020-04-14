@@ -13,7 +13,7 @@
 #include <cetech/node_graph_editor/node_graph_editor.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/property_editor/property_editor.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/ui/ui.h>
 
 #include "../node_graph.h"
@@ -217,7 +217,7 @@ static void _node_property_draw(ce_cdb_t0 db,
     }
 
 
-    bool open = ct_editor_ui_a0->ui_prop_header("Inputs", obj);
+    bool open = ct_property_editor_a0->ui_header_begin("Inputs", obj);
 
     if (open) {
         uint64_t inputs_o = ce_cdb_a0->read_subobject(node_r, CT_NODE_GRAPH_NODE_INPUTS, 0);
@@ -232,20 +232,20 @@ static void _node_property_draw(ce_cdb_t0 db,
                     break;
 
                 case CT_NODE_PIN_FLOAT:
-                    ct_editor_ui_a0->prop_float(inputs_o, def->name, def->prop, (ui_float_p0) {});
+                    ct_property_editor_a0->ui_float(inputs_o, def->name, def->prop, (ui_float_p0) {});
                     break;
 
                 case CT_NODE_PIN_STRING:
-                    ct_editor_ui_a0->prop_str(inputs_o, def->name, def->prop, i);
+                    ct_property_editor_a0->ui_str(inputs_o, def->name, def->prop, i);
                     break;
 
                 case CT_NODE_PIN_BOOL:
-                    ct_editor_ui_a0->prop_bool(inputs_o, def->name, def->prop);
+                    ct_property_editor_a0->ui_bool(inputs_o, def->name, def->prop);
                     break;
             }
         }
     }
-    ct_editor_ui_a0->ui_prop_header_end(open);
+    ct_property_editor_a0->ui_header_end(open, obj);
 }
 
 static struct ct_node_graph_a0 ng_api = {

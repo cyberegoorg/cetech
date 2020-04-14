@@ -9,7 +9,7 @@
 #include <celib/log.h>
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/physics2d/physics2d.h>
 #include <cetech/transform/transform.h>
@@ -19,11 +19,6 @@
 #include <cetech/ui/ui.h>
 
 // World
-
-static const char *wolrd2d_display_name() {
-    return "PhysicsWorld2D";
-}
-
 static const ce_cdb_prop_def_t0 wolrd2d_component_prop[] = {
         {
                 .name = "gravity",
@@ -53,18 +48,13 @@ static void _world2d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 world2d_component_i = {
-        .display_name = wolrd2d_display_name,
+        .display_name = "Velocity2D",
         .cdb_type = PHYSICS_WORLD2D_COMPONENT,
         .size = sizeof(ct_physics_world2d_c),
         .from_cdb_obj = _world2d_from_cdb,
 };
 
 // Velocity
-
-static const char *velocity2d_display_name() {
-    return "Velocity2D";
-}
-
 static const ce_cdb_prop_def_t0 body2d_component_prop[] = {
         {
                 .name = "linear",
@@ -99,18 +89,13 @@ static void _velocity_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 velocity2d_component_i = {
-        .display_name = velocity2d_display_name,
+        .display_name = "PhysicsWorld2D",
         .cdb_type = VELOCITY2D_COMPONENT,
         .size = sizeof(ct_velocity2d_c),
         .from_cdb_obj = _velocity_from_cdb,
 };
 
 // collider
-
-static const char *collider2d_display_name() {
-    return "Collider2D";
-}
-
 static const ce_cdb_prop_def_t0 collider2d_component_prop[] = {
         {
                 .name = "shape",
@@ -154,7 +139,7 @@ static void _collider2d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 collider2d_component_i = {
-        .display_name = collider2d_display_name,
+        .display_name = "Collider2D",
         .cdb_type = COLLIDER2D_COMPONENT,
         .size = sizeof(ct_collider2d_c),
         .from_cdb_obj = _collider2d_from_cdb,
@@ -162,11 +147,6 @@ static struct ct_ecs_component_i0 collider2d_component_i = {
 ///
 
 // mass
-
-static const char *mass2d_display_name() {
-    return "Mass2D";
-}
-
 static const ce_cdb_prop_def_t0 mass2d_component_prop[] = {
         {
                 .name = "mass",
@@ -186,7 +166,7 @@ static void _mass2d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 mass2d_component_i = {
-        .display_name = mass2d_display_name,
+        .display_name = "Mass2D",
         .cdb_type = MASS2D_COMPONENT,
         .size = sizeof(ct_mass2d_c),
         .from_cdb_obj = _mass2d_from_cdb,
@@ -201,7 +181,6 @@ static int _shape_to_id(uint64_t shape_type) {
         case COLLIDER2D_RECTANGLE: {
             return 0;
         }
-            break;
     }
 
     return 0;
@@ -248,8 +227,8 @@ static void _collider_property_editor(ce_cdb_t0 db,
                                                            PHYSICS_COLLIDER2D_RECTANGLE_HALF_SIZE,
                                                            0);
 
-            ct_editor_ui_a0->prop_vec2(half_size, "Half size",
-                                       (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y}, (ui_vec2_p0) {});
+            ct_property_editor_a0->ui_vec2(half_size, "Half size",
+                                           (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y}, (ui_vec2_p0) {});
         }
             break;
     }

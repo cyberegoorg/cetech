@@ -27,7 +27,7 @@
 #include <cetech/asset_io/asset_io.h>
 #include <cetech/editor/selcted_object.h>
 
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/controlers/controlers.h>
 #include <cetech/controlers/keyboard.h>
 #include <celib/os/path.h>

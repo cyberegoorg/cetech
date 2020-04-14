@@ -17,7 +17,7 @@
 #include <cetech/renderer/gfx.h>
 #include <cetech/material/material.h>
 #include <cetech/ui/icons_font_awesome.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/render_graph/render_graph.h>
 #include <cetech/default_rg/default_rg.h>
@@ -108,10 +108,6 @@ void render_rectangles(ct_world_t0 world,
     }
 }
 
-static const char *rectangle_renderer_display_name() {
-    return ICON_FA_HOUZZ " Rectangle renderer";
-}
-
 //static void draw_ui(ce_cdb_t0 db,
 //                    uint64_t obj,
 //                    uint64_t context,
@@ -157,7 +153,8 @@ static void _rectangle_renderer_on_spawn(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 ct_component_api = {
-        .display_name = rectangle_renderer_display_name,
+        .icon = ICON_FA_HOUZZ,
+        .display_name = "Rectangle renderer",
         .cdb_type = RECTANGLE_RENDERER_COMPONENT,
         .size = sizeof(rectangle_renderer_t),
         .from_cdb_obj = _rectangle_renderer_on_spawn,

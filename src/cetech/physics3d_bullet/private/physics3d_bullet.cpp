@@ -92,26 +92,18 @@ typedef struct body_component {
     btRigidBody *body;
 } body_component;
 
-static const char *bullet_world_dispaly_name() {
-    return "Bullet world";
-}
-
 static struct ct_ecs_component_i0 bullet_world_component_i = {
         .cdb_type = BULLET_WORLD_COMPONENT,
         .size = sizeof(bullet_world_component),
         .is_system_state = true,
-        .display_name = bullet_world_dispaly_name,
+        .display_name = "Bullet world",
 };
-
-static const char *bullet_body_dispaly_name() {
-    return "Bullet body";
-}
 
 static struct ct_ecs_component_i0 body_component_i = {
         .cdb_type = BODY_COMPONENT,
         .size = sizeof(body_component),
         .is_system_state = true,
-        .display_name = bullet_body_dispaly_name,
+        .display_name = "Bullet body",
 };
 
 static inline btVector3 _to_bvect(ce_vec3_t v) {

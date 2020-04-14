@@ -16,7 +16,7 @@
 #include <cetech/renderer/gfx.h>
 
 #include <cetech/editor/selcted_object.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <celib/containers/hash.h>
 #include <cetech/ui/ui.h>
 
@@ -142,7 +142,7 @@ bool context_btn(dock_t *dock) {
                      "##dock_context_btn_prev_selected%llx", (uint64_t) dock);
 
     if (!has_prev) {
-        ct_editor_ui_a0->begin_disabled();
+        ct_property_editor_a0->ui_disabled_begin();
     }
 
     if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=title})) {
@@ -150,7 +150,7 @@ bool context_btn(dock_t *dock) {
     };
 
     if (!has_prev) {
-        ct_editor_ui_a0->end_disabled();
+        ct_property_editor_a0->ui_disabled_end();
     }
 
     ct_ui_a0->same_line(0, 4);
@@ -160,7 +160,7 @@ bool context_btn(dock_t *dock) {
                      "##dock_context_btn_next_selected%llx", (uint64_t) dock);
 
     if (!has_next) {
-        ct_editor_ui_a0->begin_disabled();
+        ct_property_editor_a0->ui_disabled_begin();
     }
 
     if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=title})) {
@@ -168,7 +168,7 @@ bool context_btn(dock_t *dock) {
     };
 
     if (!has_next) {
-        ct_editor_ui_a0->end_disabled();
+        ct_property_editor_a0->ui_disabled_end();
     }
 
     return change;

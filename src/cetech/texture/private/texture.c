@@ -24,7 +24,7 @@
 #include <cetech/renderer/gfx.h>
 
 #include <cetech/kernel/kernel.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/asset_io/asset_io.h>
 #include <cetech/property_editor/property_editor.h>
@@ -273,9 +273,9 @@ static ct_asset_dcc_io_i0 texture_io = {
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
                           uint64_t context){
-    ct_editor_ui_a0->prop_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
-    ct_editor_ui_a0->prop_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
-    ct_editor_ui_a0->prop_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);
+    ct_property_editor_a0->ui_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
+    ct_property_editor_a0->ui_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
+    ct_property_editor_a0->ui_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);
 }
 
 static void tooltip(uint64_t asset,

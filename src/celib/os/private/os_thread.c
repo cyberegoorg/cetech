@@ -57,7 +57,8 @@ uint64_t thread_actual_id() {
 #include <unistd.h>
 void thread_yield() {
 #if CE_PLATFORM_OSX || CE_PLATFORM_LINUX
-    usleep(0);// sched_yield();
+//    usleep(0);
+    sched_yield();
 #else
 #error "Implement this"
 #endif

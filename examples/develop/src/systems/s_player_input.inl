@@ -1,5 +1,5 @@
 
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <celib/yaml_cdb.h>
 #include <stdlib.h>
 #include <celib/math/math.h>

@@ -79,7 +79,6 @@ void init_static_modules() {
     CE_ADD_STATIC_MODULE(log_view);
     CE_ADD_STATIC_MODULE(entity_editor);
     CE_ADD_STATIC_MODULE(editor);
-    CE_ADD_STATIC_MODULE(sourcedb_ui);
     CE_ADD_STATIC_MODULE(game_view);
 }
 

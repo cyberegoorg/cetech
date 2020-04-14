@@ -120,7 +120,6 @@ set(SOURCE_FILES
         src/cetech/property_editor/private/property_editor.c
         src/cetech/log_view/private/log_view.cpp
         src/cetech/editor/private/action_manager.c
-        src/cetech/editor/private/editor_ui.c
         src/cetech/game/private/game_system.c
         src/cetech/game/private/game_view.c
         src/cetech/entity/private/entity_explorer.c

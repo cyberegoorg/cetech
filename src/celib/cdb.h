@@ -380,10 +380,10 @@ struct ce_cdb_a0 {
                         char **outputs);
 
     void *(*get_aspect)(uint64_t type,
-                        uint64_t ascpet_type);
+                        uint64_t aspect_type);
 
     void (*set_aspect)(uint64_t type,
-                       uint64_t ascpet_type,
+                       uint64_t aspect_type,
                        void *aspect);
 };
 

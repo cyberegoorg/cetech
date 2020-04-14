@@ -9,7 +9,7 @@
 #include <celib/log.h>
 
 #include <cetech/ecs/ecs.h>
-#include <cetech/editor/editor_ui.h>
+#include <cetech/property_editor/property_editor.h>
 #include <cetech/property_editor/property_editor.h>
 #include <cetech/physics3d/physics3d.h>
 #include <cetech/transform/transform.h>
@@ -17,10 +17,6 @@
 
 
 // World
-
-static const char *wolrd3d_display_name() {
-    return "PhysicsWorld3D";
-}
 
 static const ce_cdb_prop_def_t0 wolrd3d_component_prop[] = {
         {
@@ -52,7 +48,7 @@ static void _world3d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 world3d_component_i = {
-        .display_name = wolrd3d_display_name,
+        .display_name = "PhysicsWorld3D",
         .cdb_type = PHYSICS3D_WORLD_COMPONENT,
         .size = sizeof(ct_physics_world3d_c),
         .from_cdb_obj = _world3d_from_cdb,
@@ -65,18 +61,13 @@ static struct ct_ecs_component_i0 world3d_component_i = {
 //    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
 //    uint64_t gravity = ce_cdb_a0->read_subobject(r, PHYSICS_WORLD3D_GRAVITY_PROP, 0);
 //
-//    ct_editor_ui_a0->prop_vec3(gravity, "Gravity", filter,
+//    ct_property_editor_a0->ui_vec3(gravity, "Gravity", filter,
 //                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
 //                               (ui_vec3_p0) {});
 //}
 
 
 // Velocity
-
-static const char *velocity3d_display_name() {
-    return "Velocity3D";
-}
-
 static const ce_cdb_prop_def_t0 body3d_component_prop[] = {
         {
                 .name = "linear",
@@ -118,7 +109,7 @@ static void _velocity_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 velocity3d_component_i = {
-        .display_name = velocity3d_display_name,
+        .display_name = "Velocity3D",
         .cdb_type = VELOCITY3D_COMPONENT,
         .size = sizeof(ct_velocity3d_c),
         .from_cdb_obj = _velocity_from_cdb,
@@ -131,22 +122,18 @@ static struct ct_ecs_component_i0 velocity3d_component_i = {
 //    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
 //
 //    uint64_t linear = ce_cdb_a0->read_subobject(r, VELOCITY3D_LINEAR_PROP, 0);
-//    ct_editor_ui_a0->prop_vec3(linear, "Linear", filter,
+//    ct_property_editor_a0->ui_vec3(linear, "Linear", filter,
 //                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
 //                               (ui_vec3_p0) {});
 //
 //    uint64_t angular = ce_cdb_a0->read_subobject(r, VELOCITY3D_ANGULAR_PROP, 0);
-//    ct_editor_ui_a0->prop_vec3(angular, "Angular", filter,
+//    ct_property_editor_a0->ui_vec3(angular, "Angular", filter,
 //                               (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
 //                               (ui_vec3_p0) {});
 //}
 
 
 // collider
-
-static const char *collider3d_display_name() {
-    return "Collider3D";
-}
 
 static const ce_cdb_prop_def_t0 collider3d_component_prop[] = {
         {
@@ -205,7 +192,7 @@ static void _collider3d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 collider3d_component_i = {
-        .display_name = collider3d_display_name,
+        .display_name = "Collider3D",
         .cdb_type = COLLIDER3D_COMPONENT,
         .size = sizeof(ct_collider3d_c),
         .from_cdb_obj = _collider3d_from_cdb,
@@ -213,11 +200,6 @@ static struct ct_ecs_component_i0 collider3d_component_i = {
 ///
 
 // mass
-
-static const char *mass3d_display_name() {
-    return "Mass3D";
-}
-
 static const ce_cdb_prop_def_t0 mass3d_component_prop[] = {
         {
                 .name = "mass",
@@ -237,7 +219,7 @@ static void _mass3d_from_cdb(ct_world_t0 world,
 }
 
 static struct ct_ecs_component_i0 mass3d_component_i = {
-        .display_name = mass3d_display_name,
+        .display_name = "Mass3D",
         .cdb_type = MASS3D_COMPONENT,
         .size = sizeof(ct_mass3d_c),
         .from_cdb_obj = _mass3d_from_cdb,
@@ -247,7 +229,7 @@ static struct ct_ecs_component_i0 mass3d_component_i = {
 //                                    uint64_t obj,
 //                                    uint64_t context,
 //                                    const char *filter) {
-//    ct_editor_ui_a0->prop_float(obj, "Mass", filter, MASS3D_PROP, (ui_float_p0) {});
+//    ct_property_editor_a0->ui_float(obj, "Mass", filter, MASS3D_PROP, (ui_float_p0) {});
 //}
 
 
@@ -301,14 +283,14 @@ static struct ct_ecs_component_i0 mass3d_component_i = {
 //                                                           COLLIDER3D_BOX_HALF,
 //                                                           0);
 //
-//            ct_editor_ui_a0->prop_vec3(half_size, "Half size", filter,
+//            ct_property_editor_a0->ui_vec3(half_size, "Half size", filter,
 //                                       (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
 //                                       (ui_vec3_p0) {});
 //        }
 //            break;
 //
 //        case COLLIDER3D_SPHERE: {
-//            ct_editor_ui_a0->prop_float(shape, "Radius", filter,
+//            ct_property_editor_a0->ui_float(shape, "Radius", filter,
 //                                        COLLIDER3D_SPHERE_RADIUS,
 //                                        (ui_float_p0) {});
 //        }

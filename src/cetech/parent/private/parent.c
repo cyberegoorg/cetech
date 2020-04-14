@@ -300,37 +300,25 @@ static struct ct_system_i0 parent_system_i0 = {
 };
 
 // Parent
-const char *parent_display_name() {
-    return "Parent";
-}
-
 static struct ct_ecs_component_i0 parent_c_api = {
         .cdb_type = CT_PARENT_COMPONENT,
         .size = sizeof(ct_parent_c),
-        .display_name = parent_display_name,
+        .display_name = "Parent",
 };
 
 // Previous parent
-const char *previous_parent_display_name() {
-    return "Previous parent";
-}
-
 static struct ct_ecs_component_i0 previous_parent_c_api = {
         .cdb_type = CT_PREVIOUS_PARENT_COMPONENT,
         .size = sizeof(ct_previous_parent_c),
         .is_system_state = true,
-        .display_name = previous_parent_display_name,
+        .display_name = "Previous parent",
 };
 
 // child
-const char *child_parent_display_name() {
-    return "Child";
-}
-
 static struct ct_ecs_component_i0 child_c_api = {
         .cdb_type = CT_CHILD_COMPONENT,
         .size = sizeof(ct_child_c),
-        .display_name = child_parent_display_name,
+        .display_name = "Child",
         .is_system_state = true,
 };
 

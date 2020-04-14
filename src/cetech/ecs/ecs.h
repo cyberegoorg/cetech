@@ -101,8 +101,9 @@ typedef struct ct_ecs_component_i0 {
     bool is_system_state;
     uint64_t cdb_type;
     uint64_t size;
+    const char *icon;
 
-    const char *(*display_name)();
+    const char *display_name;
 
     void (*from_cdb_obj)(ct_world_t0 world,
                          ce_cdb_t0 db,
