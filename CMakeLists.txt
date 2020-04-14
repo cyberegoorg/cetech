@@ -202,8 +202,8 @@ set(RELEASE_LIBS
         nfd.a
 
         SDL2.a
-        yaml_static.a
-        Box2D.a
+        yaml.a
+        box2d.a
         #        monosgen-2.0.a
         celib
 

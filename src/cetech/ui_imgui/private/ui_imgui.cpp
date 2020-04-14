@@ -702,7 +702,7 @@ void CE_MODULE_LOAD(ui_imgui)(struct ce_api_a0 *api,
 
     api->add_impl(CT_KERNEL_TASK_I0_STR, &debugui_task, sizeof(debugui_task));
 
-    imguiCreate(12);
+    imguiCreate(18);
 
     ct_controler_i0 *keyboard;
     keyboard = ct_controlers_a0->get(CONTROLER_KEYBOARD);

@@ -269,9 +269,9 @@ struct OcornutImguiContext {
             config.MergeMode = false;
 //			config.MergeGlyphCenterV = true;
 
-            float ddpi;
             float font_scale = 1;
-            if (SDL_GetDisplayDPI(0, &ddpi, nullptr, nullptr) == 0) font_scale = ddpi / 96;
+//            float ddpi;
+//            if (SDL_GetDisplayDPI(0, &ddpi, nullptr, nullptr) == 0) font_scale = ddpi / 96;
 
 
             const ImWchar *ranges = io.Fonts->GetGlyphRangesCyrillic();

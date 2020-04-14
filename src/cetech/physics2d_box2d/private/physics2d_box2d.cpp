@@ -16,7 +16,7 @@
 
 #include "cetech/physics2d/physics2d.h"
 
-#include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 #include <cetech/default_rg/default_rg.h>
 #include <celib/math/math.h>
 
@@ -52,13 +52,13 @@ struct DebugDraw : b2Draw {
     }
 
     void DrawCircle(const b2Vec2 &center,
-                    float32 radius,
+                    float radius,
                     const b2Color &color) override {
 
     }
 
     void DrawSolidCircle(const b2Vec2 &center,
-                         float32 radius,
+                         float radius,
                          const b2Vec2 &axis,
                          const b2Color &color) override {
 
@@ -84,7 +84,7 @@ struct DebugDraw : b2Draw {
     }
 
     void DrawPoint(const b2Vec2 &p,
-                   float32 size,
+                   float size,
                    const b2Color &color) override {
     }
 
@@ -727,7 +727,7 @@ static void render(ct_world_t0 world,
     uint8_t viewid = builder->get_layer_viewid(builder, _GBUFFER);
 
     ct_dd_a0->begin(viewid);
-    w->w->DrawDebugData();
+    w->w->DebugDraw();
     ct_dd_a0->end();
 }
 
