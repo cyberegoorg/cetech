@@ -272,6 +272,7 @@ static ct_asset_dcc_io_i0 texture_io = {
 ////
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
+                          const char* title,
                           uint64_t context){
     ct_property_editor_a0->ui_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
     ct_property_editor_a0->ui_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);

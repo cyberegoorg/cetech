@@ -14,6 +14,7 @@
 #include <cetech/physics3d/physics3d.h>
 #include <cetech/transform/transform.h>
 #include <cetech/renderer/gfx.h>
+#include <cetech/cdb_types/cdb_types.h>
 
 
 // World

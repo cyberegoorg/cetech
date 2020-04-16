@@ -180,7 +180,7 @@ static uint64_t draw_ui(uint64_t top_level_obj,
     ct_ui_a0->next_column();
     ct_ui_a0->next_column();
 
-    ct_ui_a0->columns(modal_id, 1, true);
+    ct_ui_a0->columns_end();
 
     return new_selected_object;
 }
@@ -205,6 +205,7 @@ static struct ct_node_i0 *get_interface(uint64_t type) {
 
 static void _node_property_draw(ce_cdb_t0 db,
                                 uint64_t obj,
+                                const char* title,
                                 uint64_t context) {
     const ce_cdb_obj_o0 *node_r = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
 

@@ -71,17 +71,19 @@ static void draw_component(ce_cdb_t0 db,
     bool open = ct_property_editor_a0->ui_header_begin(buffer, obj);
 
     if (open) {
+        ct_property_editor_a0->ui_body_begin(0);
+        ct_property_editor_a0->draw_object(db, obj, buffer, context);
+        ct_property_editor_a0->ui_body_end(0);
+
         ct_ui_a0->push_id(obj);
-        if (ct_ui_a0->button(&(ct_ui_button_t0) {.text=ICON_FA_MINUS})) {
+        if (ct_ui_a0->button(&(ct_ui_button_t0) {
+                .text=ICON_FA_MINUS" Remove component",
+                .size=(ce_vec2_t){.x=-1}
+        })) {
             ce_cdb_a0->destroy_object(db, obj);
         }
         ct_ui_a0->pop_id();
 
-        ct_ui_a0->separator();
-
-        ct_property_editor_a0->ui_body_begin(obj);
-        ct_property_editor_a0->draw_object(db, obj, context);
-        ct_property_editor_a0->ui_body_end(obj);
     }
     ct_property_editor_a0->ui_header_end(open, obj);
 }
@@ -90,7 +92,7 @@ static void _entity_ui(uint64_t obj) {
     bool open = ct_property_editor_a0->ui_header_begin(ICON_FA_CUBE" Entity", obj);
 
     if (open) {
-        ct_property_editor_a0->ui_body_begin(obj);
+        ct_property_editor_a0->ui_body_begin(0);
 
         ct_property_editor_a0->ui_label("UID", 0, NULL, 0);
         ct_property_editor_a0->ui_value_begin(0, NULL, 0);
@@ -101,7 +103,7 @@ static void _entity_ui(uint64_t obj) {
 
         ct_property_editor_a0->ui_str(obj, "Name", ENTITY_NAME, 11111111);
 
-        ct_property_editor_a0->ui_body_end(obj);
+        ct_property_editor_a0->ui_body_end(0);
     }
     ct_property_editor_a0->ui_header_end(open, obj);
 }
@@ -131,7 +133,7 @@ static bool _component_exist(ce_cdb_t0 db,
 static void _add_comp_popup(ce_cdb_t0 db,
                             uint64_t modal_id,
                             uint64_t obj) {
-    if (ct_ui_a0->popup_begin(&(ct_ui_popup_t0){.id=modal_id})) {
+    if (ct_ui_a0->popup_begin(&(ct_ui_popup_t0) {.id=modal_id})) {
         struct ct_controler_i0 *kb = ct_controlers_a0->get(CONTROLER_KEYBOARD);
 
         if (kb->button_pressed(0, kb->button_index("escape"))) {
@@ -167,7 +169,7 @@ static void _add_comp_popup(ce_cdb_t0 db,
                     }
                 }
 
-                bool add = ct_ui_a0->selectable(&(ct_ui_selectable_t0){.text=label});
+                bool add = ct_ui_a0->selectable(&(ct_ui_selectable_t0) {.text=label});
 
                 if (add) {
                     uint64_t component = ce_cdb_a0->create_object(db, component_type);
@@ -205,6 +207,7 @@ void draw_menu(uint64_t obj) {
 
 static void draw_ui(ce_cdb_t0 db,
                     uint64_t obj,
+                    const char* title,
                     uint64_t context) {
     if (!obj) {
         return;

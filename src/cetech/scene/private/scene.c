@@ -411,20 +411,6 @@ static const ce_cdb_prop_def_t0 scene_geom_obj_prop[] = {
         },
 };
 
-static void draw_property(ce_cdb_t0 db,
-                          uint64_t obj,
-                          uint64_t context,
-                          const char *filter) {
-    const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(), obj);
-    uint64_t import = ce_cdb_a0->read_subobject(reader, SCENE_IMPORT_PROP, 0);
-
-    if (!import) {
-        return;
-    }
-
-    ct_property_editor_a0->ui_filename(import, "Input", SCENE_INPUT_PROP, "gltf", 0);
-}
-
 void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
                            int reload) {
     CE_UNUSED(reload);
@@ -436,7 +422,6 @@ void CE_MODULE_LOAD(scene)(struct ce_api_a0 *api,
     _init_api(api);
 
     ce_cdb_a0->reg_obj_type(SCENE_TYPE, scene_prop, CE_ARRAY_LEN(scene_prop));
-    ce_cdb_a0->set_aspect(SCENE_TYPE, CT_PROPERTY_EDITOR_ASPECT, draw_property);
     ce_cdb_a0->set_aspect(SCENE_TYPE, CT_PREVIEW_ASPECT, &ct_asset_preview_api);
 
     ce_cdb_a0->reg_obj_type(SCENE_GEOM_OBJ_TYPE,

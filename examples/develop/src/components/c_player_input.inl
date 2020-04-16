@@ -3,6 +3,7 @@
 #include <celib/yaml_cdb.h>
 #include <stdlib.h>
 #include <celib/math/math.h>
+#include <cetech/cdb_types/cdb_types.h>
 
 // component
 #define PLAYER_INPUT_COMPONENT \

@@ -23,6 +23,8 @@
 #include <celib/containers/array.h>
 #include <cetech/asset_preview/asset_preview.h>
 #include <cetech/editor/selcted_object.h>
+#include <cetech/transform/transform.h>
+#include <cetech/cdb_types/cdb_types.h>
 
 #include "include/nfd/nfd.h"
 
@@ -38,12 +40,13 @@ static struct _G {
 
 static uint64_t _combine_hash(uint64_t a,
                               uint64_t b) {
-    return a ^ b;
+    return a ^ b * 11;
 }
 
 
 typedef void (draw_aspect)(ce_cdb_t0 db,
                            uint64_t obj,
+                           const char *title,
                            uint64_t context);
 
 typedef void (draw_menu_aspect)(uint64_t obj);
@@ -178,12 +181,11 @@ static void ui_label(const char *label,
                      uint64_t obj,
                      const uint64_t *props,
                      uint64_t props_n) {
-//    ct_ui_a0->same_line(0, 8);
-    ct_ui_a0->text(label);
+    if (label) {
+        ct_ui_a0->text(label);
+    }
+
     ct_ui_a0->next_column();
-//    ct_ui_a0->next_column();
-//    ct_ui_a0->same_line(0, -1);
-//    ct_debugui_a0->Indent(0);
 }
 
 
@@ -196,10 +198,9 @@ static void ui_value_begin(uint64_t obj,
     }
 }
 
-static void ui_value_end() {
-//    ct_ui_a0->same_line(0, 2);
-//    ct_ui_a0->next_column();
-//    ct_debugui_a0->Unindent(0);
+static void ui_value_end(uint64_t obj,
+                         const uint64_t *props,
+                         uint64_t props_n) {
     ct_ui_a0->next_column();
 }
 
@@ -235,7 +236,7 @@ static void ui_float(uint64_t obj,
         ce_cdb_a0->set_float(w, prop, value_new);
         ce_cdb_a0->write_commit(w);
     }
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 }
 
 static void ui_uint64(uint64_t obj,
@@ -273,7 +274,7 @@ static void ui_uint64(uint64_t obj,
         ce_cdb_a0->set_uint64(w, prop, value_new);
         ce_cdb_a0->write_commit(w);
     }
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 }
 
 static void ui_bool(uint64_t obj,
@@ -300,7 +301,7 @@ static void ui_bool(uint64_t obj,
         ce_cdb_a0->write_commit(w);
     }
 
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 
 }
 
@@ -337,7 +338,7 @@ static void ui_str(uint64_t obj,
                                    buffer,
                                    CE_ARRAY_LEN(buffer));
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 
     if (change) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -398,7 +399,7 @@ static void ui_filename(uint64_t obj,
     ct_ui_a0->pop_item_width();
 
 
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 
     if (str != NULL) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
@@ -462,7 +463,7 @@ static void ui_str_combo(uint64_t obj,
     }, &current_item);
 
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 
 
     if (change) {
@@ -520,7 +521,7 @@ static void ui_str_combo2(uint64_t obj,
     }, &current_item);
 
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
 
 
     if (change) {
@@ -532,7 +533,6 @@ static void ui_str_combo2(uint64_t obj,
     }
 
 }
-
 
 static char modal_buffer[128] = {};
 
@@ -603,38 +603,35 @@ static bool ui_asset_select_modal(uint64_t modal_id,
     return changed;
 }
 
+
+static void ui_body_begin() {
+    ct_ui_a0->columns(0, 2, true);
+}
+
+static void ui_body_end() {
+    ct_ui_a0->columns_end();
+}
+
 static bool ui_header_begin(const char *name,
                             uint64_t id) {
 //    ct_ui_a0->separator();
 
+    ui_body_end();
     bool open = ct_ui_a0->collapsing_header(&(ct_ui_collapsing_header_t0) {
             .id=id,
             .text=name,
             .flags = CT_TREE_NODE_FLAGS_DefaultOpen});
-
+    if (open) {
+        ct_ui_a0->indent();
+    }
     return open;
 }
 
 static void ui_header_end(bool open,
                           uint64_t id) {
     if (open) {
-
-//        ct_debugui_a0->Unindent(0);
-//        ct_ui_a0->tree_pop();
+        ct_ui_a0->unindent();
     }
-}
-
-static void ui_body_begin(uint64_t id) {
-    char str_id[64];
-    snprintf(str_id, CE_ARRAY_LEN(str_id), "%llx", id);
-//    ct_debugui_a0->Columns(2, str_id, true);
-
-    ct_ui_a0->columns(id, 2, true);
-}
-
-static void ui_body_end(uint64_t id) {
-    ct_ui_a0->columns(id, 1, false);
-//    ct_debugui_a0->Columns(1, NULL, true);
 }
 
 static void ui_asset(uint64_t obj,
@@ -733,7 +730,7 @@ static void ui_asset(uint64_t obj,
         ct_ui_a0->drag_drop_target_end();
     }
 
-    ui_value_end();
+    ui_value_end(obj, &prop, 1);
     if (change) {
         ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), obj);
         ce_cdb_a0->set_ref(w, prop, new_value);
@@ -781,7 +778,7 @@ static void ui_vec3(uint64_t obj,
     }
 
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, prop, 3);
 }
 
 static void ui_vec2(uint64_t obj,
@@ -820,7 +817,7 @@ static void ui_vec2(uint64_t obj,
     }
 
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, prop, 3);
 }
 
 static void ui_vec4(uint64_t obj,
@@ -871,7 +868,7 @@ static void ui_vec4(uint64_t obj,
         ce_cdb_a0->write_commit(w);
     }
     ct_ui_a0->pop_item_width();
-    ui_value_end();
+    ui_value_end(obj, prop, 4);
 }
 
 static void ui_disabled_begin() {
@@ -887,6 +884,7 @@ static void ui_disabled_end() {
 
 static void _draw_object(ce_cdb_t0 db,
                          uint64_t obj,
+                         const char *title,
                          uint64_t context);
 
 static void _draw_property(ce_cdb_t0 db,
@@ -900,7 +898,7 @@ static void _draw_property(ce_cdb_t0 db,
     switch (type) {
         case CE_CDB_TYPE_REF:
             ui_asset(obj, def->name, property,
-                                        def->obj_type, context, obj);
+                     def->obj_type, context, obj);
             break;
         case CE_CDB_TYPE_FLOAT:
             ui_float(obj, def->name, property, (ui_float_p0) {});
@@ -918,20 +916,39 @@ static void _draw_property(ce_cdb_t0 db,
             ui_str(obj, def->name, property, obj);
             break;
         case CE_CDB_TYPE_SUBOBJECT: {
-            if(!recursive) break;
+            if (!recursive) break;
 
             const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
             uint64_t subobj = ce_cdb_a0->read_subobject(r, property, 0);
-            _draw_object(db, subobj, context);
+            uint64_t subobj_type = ce_cdb_a0->obj_type(db, subobj);
+            const char *title = ce_id_a0->str_from_id64(property);
+
+            bool open = true;
+
+            draw_aspect *aspect = ce_cdb_a0->get_aspect(subobj_type, CT_PROPERTY_EDITOR_ASPECT);
+            if (!aspect) {
+                open = ui_header_begin(def->name, _combine_hash(obj, property));
+                ui_body_begin();
+            }
+
+
+            if (open) {
+
+                _draw_object(db, subobj, title, context);
+                ui_body_end();
+            }
+
+            if (!aspect) {
+                ui_header_end(open, _combine_hash(obj, property));
+            }
+
+
             break;
         }
         case CE_CDB_TYPE_SET_SUBOBJECT: {
-            if(!recursive) break;
+            if (!recursive) break;
 
-            bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
-                    .id=_combine_hash(obj, property),
-                    .text=def->name,
-                    .flags = CT_TREE_NODE_FLAGS_DefaultOpen});
+            bool open = ui_header_begin(def->name, _combine_hash(obj, property));
 
             if (open) {
                 const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
@@ -940,10 +957,24 @@ static void _draw_property(ce_cdb_t0 db,
                 ce_cdb_a0->read_objset(r, property, k);
                 for (int j = 0; j < n; ++j) {
                     uint64_t subobj = k[j];
-                    _draw_object(db, subobj, context);
+
+                    const ce_cdb_obj_o0 *sub_r = ce_cdb_a0->read(db, subobj);
+                    const char *name = ce_cdb_a0->read_str(sub_r, ce_id_a0->id64("name"), NULL);
+                    const char *text = name ? name : ce_id_a0->str_from_id64(
+                            ce_cdb_a0->obj_type(db, subobj));
+
+                    bool sub_open = ui_header_begin(text, _combine_hash(subobj, property));
+
+                    if (sub_open) {
+                        ui_body_begin();
+                        _draw_object(db, subobj, text, context);
+                        ui_body_end();
+                    }
+                    ui_header_end(sub_open, _combine_hash(subobj, property));
                 }
-                ct_ui_a0->tree_pop();
+//                ct_ui_a0->tree_pop();
             }
+            ui_header_end(open, _combine_hash(obj, property));
         }
             break;
 
@@ -954,12 +985,13 @@ static void _draw_property(ce_cdb_t0 db,
 
 static void _draw_object(ce_cdb_t0 db,
                          uint64_t obj,
+                         const char *title,
                          uint64_t context) {
     uint64_t type = ce_cdb_a0->obj_type(db, obj);
 
     draw_aspect *aspect = ce_cdb_a0->get_aspect(type, CT_PROPERTY_EDITOR_ASPECT);
     if (aspect) {
-        aspect(db, obj, context);
+        aspect(db, obj, title, context);
         return;
     }
 
@@ -974,14 +1006,43 @@ static void _draw_object(ce_cdb_t0 db,
     for (uint32_t i = 0; i < n; ++i) {
         const ce_cdb_prop_def_t0 *def = &defs[i];
         uint64_t prop_name = ce_id_a0->id64(def->name);
-        _draw_property(db, obj, prop_name, def, context, false);
+        _draw_property(db, obj, prop_name, def, context, true);
     }
 }
 
 static void on_debugui(uint64_t content,
                        uint64_t context,
                        uint64_t selected_object) {
-    _draw_object(ce_cdb_a0->db(), selected_object, context);
+    ui_body_begin();
+    _draw_object(ce_cdb_a0->db(), selected_object, NULL, context);
+    ui_body_end();
+}
+
+static void _ui_vec2(ce_cdb_t0 db,
+                     uint64_t obj,
+                     const char *title,
+                     uint64_t context) {
+    ui_vec2(obj, title,
+            (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y},
+            (ui_vec2_p0) {});
+}
+
+static void _ui_vec3(ce_cdb_t0 db,
+                     uint64_t obj,
+                     const char *title,
+                     uint64_t context) {
+    ui_vec3(obj, title,
+            (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
+            (ui_vec3_p0) {});
+}
+
+static void _ui_vec4(ce_cdb_t0 db,
+                     uint64_t obj,
+                     const char *title,
+                     uint64_t context) {
+    ui_vec4(obj, title,
+            (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z, PROP_VEC_W},
+            (ui_vec4_p0) {});
 }
 
 static const char *dock_title() {
@@ -1038,6 +1099,10 @@ void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
 
     api->add_impl(CT_DOCK_I0_STR, &dock_api, sizeof(dock_api));
     api->add_api(CT_PROP_EDITOR_A0_STR, ct_property_editor_a0, sizeof(ct_property_editor_a0));
+
+    ce_cdb_a0->set_aspect(VEC2_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec2);
+    ce_cdb_a0->set_aspect(VEC3_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec3);
+    ce_cdb_a0->set_aspect(VEC4_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec4);
 
     ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_I0, true);
 

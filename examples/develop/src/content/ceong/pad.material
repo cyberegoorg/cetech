@@ -22,7 +22,10 @@ layers:
         cdb_uuid: 0x3e8302bae4fce294
         cdb_type: material_variable_color
         name: color
-        x: 1.000000
-        y: 0.999990
-        z: 0.999990
-        w: 1.000000
+        value:
+          cdb_uuid: 0x3e8302bae4fce294
+          cdb_type: vec4_t
+          x: 1.000000
+          y: 1.000000
+          z: 1.000000
+          w: 1.000000

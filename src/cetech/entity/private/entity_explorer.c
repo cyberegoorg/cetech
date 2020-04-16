@@ -11,16 +11,13 @@
 
 #include <celib/cdb.h>
 
-#include <cetech/renderer/gfx.h>
 
 #include <cetech/asset/asset.h>
 #include <cetech/ecs/ecs.h>
-#include <cetech/property_editor/property_editor.h>
-#include <cetech/explorer/explorer.h>
-
-#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/editor/selcted_object.h>
 #include <cetech/property_editor/property_editor.h>
+#include <cetech/explorer/explorer.h>
+#include <cetech/ui/icons_font_awesome.h>
 #include <cetech/ui/ui.h>
 
 static void ui_entity_item_end() {
@@ -46,14 +43,11 @@ static void _spawn_to(uint64_t from,
 }
 
 static void _add(uint64_t selected_obj) {
-//    for (int i = 0; i < 10; ++i) {
     uint64_t entity_obj;
     entity_obj = ce_cdb_a0->create_object(ce_cdb_a0->db(), ENTITY_TYPE);
     ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(ce_cdb_a0->db(), selected_obj);
     ce_cdb_a0->objset_add_obj(w, ENTITY_CHILDREN, entity_obj);
     ce_cdb_a0->write_commit(w);
-//    }
-
 }
 
 
@@ -70,11 +64,7 @@ void item_btns(uint64_t context,
     }
 
     ct_ui_a0->same_line(0, 4);
-    snprintf(label, CE_ARRAY_LEN(label),
-             ICON_FA_PLUS
-                     " "
-                     ICON_FA_FOLDER_OPEN
-                     "##add_from%llu", obj);
+    snprintf(label, CE_ARRAY_LEN(label), ICON_FA_PLUS" " ICON_FA_FOLDER_OPEN"##add_from%llu", obj);
 
 
     bool add_from = ct_ui_a0->button(&(ct_ui_button_t0) {.text=label});

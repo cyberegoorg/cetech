@@ -139,6 +139,7 @@ set(SOURCE_FILES
         src/cetech/metrics/private/metrics.c
 
         src/cetech/ui_imgui/private/ui_imgui.cpp
+        src/cetech/cdb_types/private/cdb_types.c
 
         #        src/cetech/mono/private/mono.c
         )

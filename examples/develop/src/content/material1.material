@@ -31,16 +31,22 @@ layers:
         cdb_uuid: "0x3e8302bae4fce293"
         name: u_vec4
         cdb_type: material_variable_color
-        x: 1.000000
-        y: 1.000000
-        z: 1.000000
-        w: 1.000000
+        value:
+          cdb_uuid: 0x3e8301bae4fce293
+          cdb_type: vec4_t
+          x: 1.000000
+          y: 1.000000
+          z: 1.000000
+          w: 1.000000
 
       0xe66d5daf1a451dbf:
         cdb_uuid: "0xe66d5daf1a451dbf"
         name: u_vec42
         cdb_type: material_variable_vec4
-        x: 1.000000
-        y: 1.000000
-        z: 1.000000
-        w: 1.000000
+        value:
+          cdb_uuid: 0xe36d5daf1a451dbf
+          cdb_type: vec4_t
+          x: 1.000000
+          y: 1.000000
+          z: 1.000000
+          w: 1.000000

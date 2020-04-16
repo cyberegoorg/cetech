@@ -339,9 +339,6 @@ struct ct_ui_a0 {
                       float spacing_w);
 
     //
-    void (*next_column)();
-
-    //
     bool (*begin_main_menu_bar)();
 
     void (*end_main_menu_bar)();
@@ -386,9 +383,19 @@ struct ct_ui_a0 {
     void (*set_next_window_size)(ce_vec2_t size);
 
     //
+    //
+
     void (*columns)(uint64_t id,
                     uint32_t count,
                     bool border);
+
+    void (*columns_end)();
+
+    void (*next_column)();
+
+    void (*indent)();
+    void (*unindent)();
+
 
     //
     bool (*is_item_hovered)(enum ct_ui_hovered_flag_e0 flags);

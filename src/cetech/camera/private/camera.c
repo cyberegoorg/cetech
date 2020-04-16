@@ -106,6 +106,7 @@ static struct ct_ecs_component_i0 ct_active_camera_component = {
 ///
 static void _draw_camera_property(ce_cdb_t0 db,
                                   uint64_t obj,
+                                  const char* title,
                                   uint64_t context) {
 
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);

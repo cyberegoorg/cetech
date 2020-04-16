@@ -24,6 +24,7 @@
 #include <cetech/renderer/renderer.h>
 
 #include <cetech/parent/parent.h>
+#include <cetech/cdb_types/cdb_types.h>
 
 #define LOG_WHERE "transform"
 
@@ -92,17 +93,6 @@ static const ce_cdb_prop_def_t0 position_c_prop[] = {
         },
 };
 
-static void _position_property_editor(ce_cdb_t0 db,
-                                      uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_POSITION, 0);
-
-    ct_property_editor_a0->ui_vec3(pos, "Position",
-                                   (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                                   (ui_vec3_p0) {});
-}
 
 //
 // Rot COMP
@@ -138,18 +128,6 @@ static const ce_cdb_prop_def_t0 rotation_c_prop[] = {
         },
 };
 
-static void _rotation_property_editor(ce_cdb_t0 db,
-                                      uint64_t obj,
-                                      uint64_t context,
-                                      const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_ROTATION, 0);
-
-    ct_property_editor_a0->ui_vec3(pos, "Rotation",
-                                   (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                                   (ui_vec3_p0) {});
-}
-
 //
 // SCALE COMP
 static void _scale_on_spawn(ct_world_t0 world,
@@ -176,19 +154,6 @@ static const ce_cdb_prop_def_t0 scale_c_prop[] = {
                 .flags = CE_CDB_PROP_FLAG_UNPACK,
         },
 };
-
-
-static void _scale_property_editor(ce_cdb_t0 db,
-                                   uint64_t obj,
-                                   uint64_t context,
-                                   const char *filter) {
-    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
-    uint64_t pos = ce_cdb_a0->read_subobject(r, PROP_SCALE, 0);
-
-    ct_property_editor_a0->ui_vec3(pos, "Scale",
-                                   (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z},
-                                   (ui_vec3_p0) {});
-}
 
 //
 
@@ -387,18 +352,6 @@ static struct ct_system_i0 transform_system_i0 = {
 static const ce_cdb_prop_def_t0 local_to_world_prop[] = {
 };
 
-static const ce_cdb_prop_def_t0 vec3_prop[] = {
-        {.name = "x", .type = CE_CDB_TYPE_FLOAT},
-        {.name = "y", .type = CE_CDB_TYPE_FLOAT},
-        {.name = "z", .type = CE_CDB_TYPE_FLOAT},
-};
-
-static const ce_cdb_prop_def_t0 vec2_prop[] = {
-        {.name = "x", .type = CE_CDB_TYPE_FLOAT},
-        {.name = "y", .type = CE_CDB_TYPE_FLOAT},
-};
-
-
 void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
                                int reload) {
     CE_UNUSED(reload);
@@ -438,20 +391,8 @@ void CE_MODULE_LOAD(transform)(struct ce_api_a0 *api,
     api->add_impl(CT_ECS_COMPONENT_I0_STR, &scale_c_api, sizeof(scale_c_api));
 
     ce_cdb_a0->reg_obj_type(POSITION_COMPONENT, position_c_prop, CE_ARRAY_LEN(position_c_prop));
-    ce_cdb_a0->set_aspect(POSITION_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _position_property_editor);
-
     ce_cdb_a0->reg_obj_type(ROTATION_COMPONENT, rotation_c_prop, CE_ARRAY_LEN(rotation_c_prop));
-    ce_cdb_a0->set_aspect(ROTATION_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _rotation_property_editor);
-
     ce_cdb_a0->reg_obj_type(SCALE_COMPONENT, scale_c_prop, CE_ARRAY_LEN(scale_c_prop));
-    ce_cdb_a0->set_aspect(SCALE_COMPONENT, CT_PROPERTY_EDITOR_ASPECT, _scale_property_editor);
-    ///
-
-    ce_cdb_a0->reg_obj_type(VEC2_CDB_TYPE,
-                            vec2_prop, CE_ARRAY_LEN(vec2_prop));
-
-    ce_cdb_a0->reg_obj_type(VEC3_CDB_TYPE,
-                            vec3_prop, CE_ARRAY_LEN(vec3_prop));
 
     ce_cdb_a0->reg_obj_type(LOCAL_TO_WORLD_COMPONENT,
                             local_to_world_prop, CE_ARRAY_LEN(local_to_world_prop));

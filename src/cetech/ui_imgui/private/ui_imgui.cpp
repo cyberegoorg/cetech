@@ -157,6 +157,10 @@ void columns(uint64_t id,
     ImGui::Columns(count, label, border);
 }
 
+void columns_end() {
+    ImGui::Columns(1);
+}
+
 bool input_text(const ct_ui_input_text_t0 *input,
                 char *buf,
                 size_t buf_size) {
@@ -594,6 +598,14 @@ static void _set_clipboard_text(void *data,
 }
 
 
+void indent(){
+    ImGui::Indent();
+}
+
+void unindent() {
+    ImGui::Unindent();
+}
+
 static struct ct_ui_a0 ui_api = {
         .render = imguiEndFrame,
         .generate_id = generate_id,
@@ -644,6 +656,7 @@ static struct ct_ui_a0 ui_api = {
         .get_window_size = get_window_size,
 
         .columns = columns,
+        .columns_end = columns_end,
 
         .tooltip_begin = tooltip_begin,
         .tooltip_end = tooltip_end,
@@ -682,6 +695,9 @@ static struct ct_ui_a0 ui_api = {
 
         .push_id = push_id,
         .pop_id = pop_id,
+
+        .indent = indent,
+        .unindent = unindent
 };
 
 struct ct_ui_a0 *ct_ui_a0 = &ui_api;

@@ -3,6 +3,7 @@
 //==============================================================================
 
 void init_static_modules() {
+    CE_ADD_STATIC_MODULE(cdb_types);
     CE_ADD_STATIC_MODULE(metrics);
     CE_ADD_STATIC_MODULE(machine);
 

@@ -61,6 +61,7 @@ uint64_t draw_ui_generic(uint64_t obj,
     const uint64_t *keys = ce_cdb_a0->prop_keys(rs_reader);
 
     uint64_t new_selected = 0;
+
     for (uint32_t i = 0; i < n; ++i) {
         ce_cdb_type_e0 type = ce_cdb_a0->prop_type(rs_reader, keys[i]);
 
@@ -108,11 +109,13 @@ uint64_t draw_ui_generic(uint64_t obj,
                     bool is_lef = _is_leaf(ce_cdb_a0->db(), sub_obj);
                     enum ct_ui_tree_node_flag flag = is_lef ? CT_TREE_NODE_FLAGS_Leaf : 0;
 
+                    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(ce_cdb_a0->db(), sub_obj);
+                    const char *name = ce_cdb_a0->read_str(r, ce_id_a0->id64("name"), NULL);
 
                     const bool sub_open = ct_ui_a0->tree_node_ex(
                             &(ct_ui_tree_node_ex_t0) {
                                     .id=sub_obj,
-                                    .text=ce_id_a0->str_from_id64(sub_obj_type),
+                                    .text= name ? name : ce_id_a0->str_from_id64(sub_obj_type),
                                     .flags = flag});
 
                     if (ct_ui_a0->is_item_clicked(0)) {
@@ -137,18 +140,45 @@ uint64_t draw_ui_generic(uint64_t obj,
     return new_selected;
 }
 
-static uint64_t draw(uint64_t selected_obj,
+static uint64_t draw(ce_cdb_t0 db,
+                     uint64_t selected_obj,
                      uint64_t context) {
-    const uint64_t root_obj = ce_cdb_a0->find_root(ce_cdb_a0->db(), selected_obj);
-    const uint64_t root_obj_type = ce_cdb_a0->obj_type(ce_cdb_a0->db(), root_obj);
+    const uint64_t root_obj = ce_cdb_a0->find_root(db, selected_obj);
+    const uint64_t root_obj_type = ce_cdb_a0->obj_type(db, root_obj);
     ct_explorer_draw_ui_t *draw_ui = _get_explorer_by_type(root_obj_type);
 
     if (draw_ui) {
         return draw_ui(root_obj, selected_obj, context);
     }
 
+    bool is_lef = _is_leaf(db, root_obj);
 
-    return draw_ui_generic(root_obj, selected_obj, context);
+    enum ct_ui_tree_node_flag flag = (is_lef ? CT_TREE_NODE_FLAGS_Leaf : 0)
+                                     | (!is_lef ? CT_TREE_NODE_FLAGS_DefaultOpen : 0);
+
+
+    const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, root_obj);
+    const char *name = ce_cdb_a0->read_str(r, ce_id_a0->id64("name"), NULL);
+    const char *text = name ? name : ce_id_a0->str_from_id64(ce_cdb_a0->obj_type(db, root_obj));
+
+    const bool open = ct_ui_a0->tree_node_ex(&(ct_ui_tree_node_ex_t0) {
+            .id=root_obj,
+            .text= text,
+            .flags = flag,
+    });
+
+    uint64_t new_selected = 0;
+
+    if (ct_ui_a0->is_item_clicked(0)) {
+        new_selected = root_obj;
+    }
+
+    if (open) {
+        new_selected = draw_ui_generic(root_obj, selected_obj, context);
+        ct_ui_a0->tree_pop();
+    }
+
+    return new_selected;
 }
 
 static void on_debugui(uint64_t content,
@@ -160,7 +190,7 @@ static void on_debugui(uint64_t content,
 
     ct_ui_a0->separator();
 
-    uint64_t new_selected_object = draw(selected_object, context);
+    uint64_t new_selected_object = draw(ce_cdb_a0->db(), selected_object, context);
     if (new_selected_object) {
         ct_selected_object_a0->set_selected_object(context, new_selected_object);
     }
