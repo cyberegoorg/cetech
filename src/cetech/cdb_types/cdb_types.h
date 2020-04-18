@@ -28,6 +28,21 @@ extern "C" {
 #define PROP_VEC_W \
     CE_ID64_0("w", 0x22727cb14c3bb41dULL)
 
+#define COLOR4_CDB_TYPE \
+    CE_ID64_0("color4_t", 0x683d352f1c973c7cULL)
+
+#define PROP_COLOR_R \
+    CE_ID64_0("r", 0xeb9e71988f8c8e3dULL)
+
+#define PROP_COLOR_G \
+    CE_ID64_0("g", 0xb5f2c769562d9a23ULL)
+
+#define PROP_COLOR_B \
+    CE_ID64_0("B", 0x2126f15befc9a06ULL)
+
+#define PROP_COLOR_A \
+    CE_ID64_0("a", 0x71717d2d36b6b11ULL)
+
 #ifdef __cplusplus
 };
 #endif

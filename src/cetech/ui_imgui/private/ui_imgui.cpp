@@ -434,7 +434,12 @@ bool color_edit(const ct_ui_color_edit_t0 *color,
     char id[128];
     snprintf(id, CE_ARRAY_LEN(id), "###%llx", color->id);
 
-    return ImGui::ColorEdit4(id, &c->x);
+    push_item_width(-1);
+    bool ret = ImGui::ColorEdit4(id, &c->x, ImGuiColorEditFlags_NoInputs
+                                        | ImGuiColorEditFlags_NoLabel);
+    pop_item_width();
+
+    return ret;
 }
 
 bool tree_node_ex(const ct_ui_tree_node_ex_t0 *node) {
@@ -598,7 +603,7 @@ static void _set_clipboard_text(void *data,
 }
 
 
-void indent(){
+void indent() {
     ImGui::Indent();
 }
 
@@ -768,7 +773,11 @@ void CE_MODULE_LOAD(ui_imgui)(struct ce_api_a0 *api,
     io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
-    ImVec4 *colors = ImGui::GetStyle().Colors;
+    ImGuiStyle &style = ImGui::GetStyle();
+
+    style.IndentSpacing = 4;
+
+    ImVec4 *colors = style.Colors;
     colors[ImGuiCol_Text] = ImVec4(0.00f, 1.00f, 0.00f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.00f, 0.36f, 0.00f, 1.00f);
     colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.15f, 0.00f, 1.00f);

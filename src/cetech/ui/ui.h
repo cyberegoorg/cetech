@@ -394,6 +394,7 @@ struct ct_ui_a0 {
     void (*next_column)();
 
     void (*indent)();
+
     void (*unindent)();
 
 

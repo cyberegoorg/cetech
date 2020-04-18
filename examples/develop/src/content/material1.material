@@ -33,11 +33,11 @@ layers:
         cdb_type: material_variable_color
         value:
           cdb_uuid: 0x3e8301bae4fce293
-          cdb_type: vec4_t
-          x: 1.000000
-          y: 1.000000
-          z: 1.000000
-          w: 1.000000
+          cdb_type: color4_t
+          r: 1.000000
+          g: 1.000000
+          b: 1.000000
+          a: 1.000000
 
       0xe66d5daf1a451dbf:
         cdb_uuid: "0xe66d5daf1a451dbf"

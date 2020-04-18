@@ -24,8 +24,8 @@ layers:
         name: color
         value:
           cdb_uuid: 0x3e8302bae4fce294
-          cdb_type: vec4_t
-          x: 1.000000
-          y: 1.000000
-          z: 1.000000
-          w: 1.000000
+          cdb_type: color4_t
+          r: 1.000000
+          g: 1.000000
+          b: 1.000000
+          a: 1.000000

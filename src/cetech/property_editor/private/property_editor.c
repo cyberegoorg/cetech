@@ -1013,8 +1013,14 @@ static void _draw_object(ce_cdb_t0 db,
 static void on_debugui(uint64_t content,
                        uint64_t context,
                        uint64_t selected_object) {
+    ce_cdb_t0 db = ce_cdb_a0->db();
+    const ce_cdb_obj_o0 *sub_r = ce_cdb_a0->read(db, selected_object);
+    const char *name = ce_cdb_a0->read_str(sub_r, ce_id_a0->id64("name"), NULL);
+    const char *text = name ? name : ce_id_a0->str_from_id64(
+            ce_cdb_a0->obj_type(db, selected_object));
+
     ui_body_begin();
-    _draw_object(ce_cdb_a0->db(), selected_object, NULL, context);
+    _draw_object(db, selected_object, text, context);
     ui_body_end();
 }
 
@@ -1043,6 +1049,15 @@ static void _ui_vec4(ce_cdb_t0 db,
     ui_vec4(obj, title,
             (uint64_t[]) {PROP_VEC_X, PROP_VEC_Y, PROP_VEC_Z, PROP_VEC_W},
             (ui_vec4_p0) {});
+}
+
+static void _ui_color4(ce_cdb_t0 db,
+                       uint64_t obj,
+                       const char *title,
+                       uint64_t context) {
+    ui_vec4(obj, title,
+            (uint64_t[]) {PROP_COLOR_R, PROP_COLOR_G, PROP_COLOR_B, PROP_COLOR_A},
+            (ui_vec4_p0) {.color = true});
 }
 
 static const char *dock_title() {
@@ -1103,6 +1118,7 @@ void CE_MODULE_LOAD(property_inspector)(struct ce_api_a0 *api,
     ce_cdb_a0->set_aspect(VEC2_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec2);
     ce_cdb_a0->set_aspect(VEC3_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec3);
     ce_cdb_a0->set_aspect(VEC4_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_vec4);
+    ce_cdb_a0->set_aspect(COLOR4_CDB_TYPE, CT_PROPERTY_EDITOR_ASPECT, _ui_color4);
 
     ct_dock_a0->create_dock(CT_PROPERTY_EDITOR_I0, true);
 
