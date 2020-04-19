@@ -60,11 +60,12 @@ typedef struct ct_asset_dcc_io_i0 {
 
 struct ct_asset_io_a0 {
     ct_asset_io_i0 *(*find_asset_io)(const char *extension);
-    ct_asset_dcc_io_i0 *(*find_asset_dcc_io)(const char *extension, uint64_t group);
+
+    ct_asset_dcc_io_i0 *(*find_asset_dcc_io)(const char *extension,
+                                             uint64_t group);
 
     void (*create_import_group)(uint64_t name,
                                 float order);
-
 
 
 };

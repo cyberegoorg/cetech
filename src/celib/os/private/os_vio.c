@@ -81,7 +81,7 @@ struct ce_vio_t0 *vio_from_file(const char *path,
 
 
     if (!rwops) {
-        if(mode == VIO_OPEN_WRITE){
+        if (mode == VIO_OPEN_WRITE) {
             ce_log_a0->debug(LOG_WHERE_OS, "OEEEERRROOOR %s", SDL_GetError());
         }
 

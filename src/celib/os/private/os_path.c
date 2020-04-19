@@ -317,7 +317,7 @@ void path_dirname(char *out,
     char *ch = strrchr(buffer, DIR_DELIM_CH);
 
     if (ch != NULL) {
-        strncpy(out, path, ch-buffer);
+        strncpy(out, path, ch - buffer);
     } else {
         strcpy(out, buffer);
     }

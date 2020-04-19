@@ -55,7 +55,7 @@ struct ce_api_a0 {
 
     int (*exist)(const char *name);
 
-    void *(*get)(const char* name);
+    void *(*get)(const char *name);
 
     ce_api_entry_t0 (*first)(uint64_t name);
 

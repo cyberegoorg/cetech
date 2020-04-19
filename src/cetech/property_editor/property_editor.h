@@ -51,7 +51,7 @@ typedef struct ui_uint64_p0 {
 struct ct_property_editor_a0 {
     void (*draw_object)(ce_cdb_t0 db,
                         uint64_t obj,
-                        const char* title,
+                        const char *title,
                         uint64_t context);
 
     void (*ui_float)(uint64_t obj,

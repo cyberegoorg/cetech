@@ -29,15 +29,6 @@ extern "C" {
 #define CT_DCC_ASSET_UID_PROP \
     CE_ID64_0("uuid", 0x35eab629587df71fULL)
 
-#define CDB_UID_PROP \
-     CE_ID64_0("cdb_uuid", 0x958a636d68e82bd7ULL)
-
-#define CDB_OBJSET \
-     CE_ID64_0("cdb_objset", 0x2b66a0c3813b3490ULL)
-
-#define CDB_TYPE_PROP \
-     CE_ID64_0("cdb_type", 0xfe5986c682be99e0ULL)
-
 #define CONFIG_COMPILE \
      CE_ID64_0("compile", 0x3c797c340e1e5467ULL)
 
@@ -104,9 +95,6 @@ struct ct_asset_a0 {
     const char *(*asset_filename)(struct ce_cdb_uuid_t0 uid);
 
     struct ce_cdb_uuid_t0 (*filename_asset)(const char *filename);
-    void (*save_to_cdb)(ce_cdb_t0 db,
-                        uint64_t obj,
-                        const char *filename);
 
     bool (*save_to_file)(ce_cdb_t0 db,
                          uint64_t obj,

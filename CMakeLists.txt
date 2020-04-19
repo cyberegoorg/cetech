@@ -71,7 +71,7 @@ set(CORELIB_SOURCE_FILES
         src/celib/os/private/os_window_sdl2.c
         src/celib/os/private/os_input_sdl.c
         src/celib/private/fs.c
-        src/celib/private/yaml_cdb.c
+        src/celib/private/cdb_yaml.c
         src/celib/private/cdb.c
         src/celib/private/core.c
         )

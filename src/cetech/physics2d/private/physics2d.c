@@ -196,7 +196,7 @@ static uint64_t _idx_to_shape(int id) {
 
 static void _collider_property_editor(ce_cdb_t0 db,
                                       uint64_t obj,
-                                      const char* title,
+                                      const char *title,
                                       uint64_t context) {
     const ce_cdb_obj_o0 *r = ce_cdb_a0->read(db, obj);
     uint64_t shape = ce_cdb_a0->read_subobject(r, PHYSICS_COLLIDER2D_SHAPE_PROP, 0);

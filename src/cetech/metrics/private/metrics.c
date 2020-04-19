@@ -20,9 +20,9 @@ static struct _G {
 
     uint32_t values_n;
     ce_hash_t value_idx;
-    float** values;
+    float **values;
 
-    float* curent_values;
+    float *curent_values;
 } _G = {};
 
 void add_float_metric(const char *name) {
@@ -52,7 +52,7 @@ void record_float(uint64_t name,
                   float value) {
 
     uint64_t idx = ce_hash_lookup(&_G.value_idx, name, UINT64_MAX);
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return;
     }
 
@@ -61,16 +61,16 @@ void record_float(uint64_t name,
 
 float get_float(uint64_t name) {
     uint64_t idx = ce_hash_lookup(&_G.value_idx, name, UINT64_MAX);
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return 0;
     }
 
     return _G.curent_values[idx];
 }
 
-const float* get_recorded_floats(uint64_t name) {
+const float *get_recorded_floats(uint64_t name) {
     uint64_t idx = ce_hash_lookup(&_G.value_idx, name, UINT64_MAX);
-    if(idx == UINT64_MAX) {
+    if (idx == UINT64_MAX) {
         return NULL;
     }
 
@@ -122,7 +122,7 @@ static struct ct_metrics_a0 profiler_api = {
 struct ct_metrics_a0 *ct_metrics_a0 = &profiler_api;
 
 void CE_MODULE_LOAD(metrics)(struct ce_api_a0 *api,
-                              int reload) {
+                             int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
@@ -136,7 +136,7 @@ void CE_MODULE_LOAD(metrics)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD(metrics)(struct ce_api_a0 *api,
-                                int reload) {
+                               int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);

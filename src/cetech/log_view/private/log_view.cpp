@@ -14,7 +14,6 @@
 #include <cetech/editor/dock.h>
 
 
-
 #include <cetech/ui_imgui/private/ocornut-imgui/imgui.h>
 #include <celib/os/thread.h>
 #include <cetech/ui/ui.h>

@@ -37,8 +37,8 @@ typedef struct ct_asset_preview_i0 {
 
 struct ct_asset_preview_a0 {
     void (*asset_tooltip)(ce_cdb_uuid_t0 assetid,
-                             const char *path,
-                             ce_vec2_t size);
+                          const char *path,
+                          ce_vec2_t size);
 };
 
 CE_MODULE(ct_asset_preview_a0);

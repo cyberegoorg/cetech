@@ -13,11 +13,9 @@
 #endif
 
 
-
 #include <stdio.h>
 
 #include "celib/log.h"
-
 
 
 #define LOG_WHERE "object"

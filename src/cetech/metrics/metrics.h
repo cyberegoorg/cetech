@@ -19,8 +19,11 @@ struct ct_metrics_a0 {
     void (*reg_float_metric)(const char *name);
 
     void (*clear_record)();
+
     void (*start_record)();
+
     void (*stop_record)();
+
     bool (*is_recording)();
 
     uint32_t (*recorded_frames_num)();

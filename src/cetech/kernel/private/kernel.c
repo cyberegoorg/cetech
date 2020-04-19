@@ -70,6 +70,12 @@ int init_config(int argc,
         return 0;
     }
 
+    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE, "core");
+    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
+
+    ce_fs_a0->map_root_dir(SOURCE_ROOT, core_dir, true);
+    ce_fs_a0->map_root_dir(SOURCE_ROOT, source_dir, true);
+
     const char *source_dir_str = ce_config_a0->read_str(CONFIG_SRC, "");
     char *source_config = NULL;
     ce_os_path_a0->join(&source_config, _G.allocator, 2, source_dir_str, "global.yml");

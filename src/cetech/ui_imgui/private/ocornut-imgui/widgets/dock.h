@@ -2,7 +2,7 @@
 #include <celib/memory/allocator.h>
 #include <celib/macros.h>
 #include <celib/containers/buffer.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/cdb.h>
 
 namespace ImGui {
@@ -31,8 +31,8 @@ namespace ImGui {
     IMGUI_API void saveToYaml(char** buffer, ce_alloc_t0* alloc);
 
     IMGUI_API void loadFromYaml(const char *file,
-                                struct ce_yaml_cdb_a0 *ydb,
-                                struct ce_yaml_cdb_a0 *yng,
+                                struct ce_cdb_yaml_a0 *ydb,
+                                struct ce_cdb_yaml_a0 *yng,
                                         struct ce_cdb_a0* cdb);
 
 } // namespace ImGui

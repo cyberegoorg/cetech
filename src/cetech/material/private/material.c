@@ -428,7 +428,7 @@ static void submit(uint64_t material,
                 }
                     break;
 
-                case MAT_VAR_COLOR4:{
+                case MAT_VAR_COLOR4: {
                     uint64_t t = ce_cdb_a0->read_uint64(var_reader, MATERIAL_VAR_VALUE_PROP, 0);
                     const ce_cdb_obj_o0 *value_r = ce_cdb_a0->read(ce_cdb_a0->db(), t);
                     float v[4] = {

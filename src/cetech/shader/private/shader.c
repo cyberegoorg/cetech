@@ -127,7 +127,7 @@ static bool _compile(ce_cdb_t0 db,
     ce_os_path_a0->join(&input_path, a, 2, source_dir, vs_input);
 
     ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path), platform,
-                                 vs_input, NULL);
+                              vs_input, NULL);
 
     int result = _shaderc(input_path, output_path, include_dir, "vertex",
                           shadrc_platform, vs_profile);
@@ -165,7 +165,7 @@ static bool _compile(ce_cdb_t0 db,
     ce_os_path_a0->join(&input_path, a, 2, source_dir, fs_input);
 
     ct_asset_a0->gen_tmp_file(output_path, CE_ARRAY_LEN(output_path),
-                                 platform, fs_input, NULL);
+                              platform, fs_input, NULL);
 
     result = _shaderc(input_path, output_path,
                       include_dir, "fragment",

@@ -142,7 +142,7 @@ static inline void ce_hash_add(ce_hash_t *hash,
                                const struct ce_alloc_t0 *allocator) {
     CE_ASSERT("ce_hash", k != EMPTY_SLOT);
     CE_ASSERT("ce_hash", k != DELETE_SLOT);
-    
+
     if (!hash->n) {
         hash->n = 16;
         ce_array_set_capacity(hash->keys, hash->n, allocator);

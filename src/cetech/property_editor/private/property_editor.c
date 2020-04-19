@@ -5,7 +5,7 @@
 #include "celib/api.h"
 #include "celib/module.h"
 #include "celib/memory/allocator.h"
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/cdb.h>
 #include <celib/config.h>
 
@@ -995,16 +995,14 @@ static void _draw_object(ce_cdb_t0 db,
         return;
     }
 
-    ce_cdb_prop_def_t0 *defs = NULL;
-    uint32_t n = 0;
-    ce_cdb_a0->obj_type_def(type, &defs, &n);
+    ct_cdb_type_def_t0 defs = ce_cdb_a0->obj_type_def(type);
 
-    if (!defs) {
+    if (!defs.n) {
         return;
     }
 
-    for (uint32_t i = 0; i < n; ++i) {
-        const ce_cdb_prop_def_t0 *def = &defs[i];
+    for (uint32_t i = 0; i < defs.n; ++i) {
+        const ce_cdb_prop_def_t0 *def = &defs.props[i];
         uint64_t prop_name = ce_id_a0->id64(def->name);
         _draw_property(db, obj, prop_name, def, context, true);
     }

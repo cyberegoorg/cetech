@@ -1058,8 +1058,8 @@ namespace ImGui {
         }
 
         void loadFromYaml(const char *path,
-                          struct ce_yaml_cdb_a0 *ydb,
-                          struct ce_yaml_cdb_a0 *yng,
+                          struct ce_cdb_yaml_a0 *ydb,
+                          struct ce_cdb_yaml_a0 *yng,
                           struct ce_cdb_a0 *cdb) {
             const uint32_t size = m_docks.size();
             for (uint32_t i = 0; i < size; ++i) {
@@ -1068,7 +1068,7 @@ namespace ImGui {
             }
             m_docks.clear();
 
-            uint64_t obj = ydb->get_obj(path);
+            uint64_t obj = ydb->load_from_file(path);
             const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(ce_cdb_a0->db(),obj);
 
             uint64_t n = ce_cdb_a0->read_objset_num(reader, DOCK_DOCKS);
@@ -1165,8 +1165,8 @@ namespace ImGui {
     }
 
     IMGUI_API void loadFromYaml(const char *path,
-                                struct ce_yaml_cdb_a0 *ydb,
-                                struct ce_yaml_cdb_a0 *yng,
+                                struct ce_cdb_yaml_a0 *ydb,
+                                struct ce_cdb_yaml_a0 *yng,
                                 struct ce_cdb_a0 *cdb) {
         s_dock->loadFromYaml(path, ydb, yng, cdb);
     }

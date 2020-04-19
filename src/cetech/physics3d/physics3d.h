@@ -86,7 +86,7 @@ typedef struct ct_mass3d_c {
     float mass;
 } ct_mass3d_c;
 
-typedef union ct_collider3d_shape_t{
+typedef union ct_collider3d_shape_t {
     struct {
         ce_vec3_t half_size;
     } box;

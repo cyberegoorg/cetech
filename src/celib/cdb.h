@@ -15,6 +15,15 @@ extern "C" {
 #define CDB_INSTANCE_PROP \
     CE_ID64_0("cdb_instance", 0xb0f74f1d9d7c645dULL)
 
+#define CDB_UID_PROP \
+     CE_ID64_0("cdb_uuid", 0x958a636d68e82bd7ULL)
+
+#define CDB_TYPE_PROP \
+     CE_ID64_0("cdb_type", 0xfe5986c682be99e0ULL)
+
+#define CDB_OBJSET \
+     CE_ID64_0("cdb_objset", 0x2b66a0c3813b3490ULL)
+
 #define CE_CDB_PROP_CHANGE_EVENT \
     CE_ID64_0("change", 0x8694ed4881bfb631ULL)
 
@@ -112,22 +121,22 @@ typedef struct cdb_binobj_header {
     uint64_t blob_buffer_size;
 } cdb_binobj_header;
 
-typedef enum cnode_e {
-    CNODE_INVALID = 0,
-    CNODE_FLOAT,
-    CNODE_UINT,
-    CNODE_REF,
-    CNODE_STRING,
-    CNODE_BOOL,
-    CNODE_BLOB,
-    CNODE_OBJ_BEGIN,
-    CNODE_OBJ_END,
-    CNODE_OBJSET,
-    CNODE_OBJSET_END,
-} cnode_e;
+typedef enum ct_cdb_node_type_e0 {
+    CT_CDB_NODE_INVALID = 0,
+    CT_CDB_NODE_FLOAT,
+    CT_CDB_NODE_UINT,
+    CT_CDB_NODE_REF,
+    CT_CDB_NODE_STRING,
+    CT_CDB_NODE_BOOL,
+    CT_CDB_NODE_BLOB,
+    CT_CDB_NODE_OBJ_BEGIN,
+    CT_CDB_NODE_OBJ_END,
+    CT_CDB_NODE_OBJSET,
+    CT_CDB_NODE_OBJSET_END,
+} ct_cdb_node_type_e0;
 
-typedef struct cnode_t {
-    cnode_e type;
+typedef struct ct_cdb_node_t {
+    ct_cdb_node_type_e0 type;
 
     uint64_t key;
     union {
@@ -146,7 +155,7 @@ typedef struct cnode_t {
 
         ce_cdb_value_u0 value;
     };
-} cnode_t;
+} ct_cdb_node_t;
 
 typedef uint64_t (*ct_cdb_obj_loader_t0)(ce_cdb_t0 db,
                                          ce_cdb_uuid_t0 uuid);
@@ -158,6 +167,11 @@ typedef struct ce_cdb_prop_def_t0 {
     uint64_t obj_type;
     uint64_t flags;
 } ce_cdb_prop_def_t0;
+
+typedef struct ct_cdb_type_def_t0 {
+    const ce_cdb_prop_def_t0 *props;
+    uint32_t n;
+} ct_cdb_type_def_t0;
 
 struct ce_cdb_a0 {
     void (*set_loader)(ct_cdb_obj_loader_t0 loader);
@@ -173,9 +187,7 @@ struct ce_cdb_a0 {
                          const ce_cdb_prop_def_t0 *prop_def,
                          uint32_t n);
 
-    void (*obj_type_def)(uint64_t type,
-                         ce_cdb_prop_def_t0 **props,
-                         uint32_t *n);
+    ct_cdb_type_def_t0 (*obj_type_def)(uint64_t type);
 
     ce_cdb_uuid_t0 (*gen_uid)(ce_cdb_t0 db);
 
@@ -373,10 +385,10 @@ struct ce_cdb_a0 {
     ce_cdb_uuid_t0 (*obj_uid)(ce_cdb_t0 db,
                               uint64_t obj);
 
-    uint64_t (*load_from_cnodes)(const cnode_t *cnodes,
+    uint64_t (*load_from_cnodes)(const ct_cdb_node_t *cnodes,
                                  ce_cdb_t0 tmp_db);
 
-    void (*dump_cnodes)(const cnode_t *cnodes,
+    void (*dump_cnodes)(const ct_cdb_node_t *cnodes,
                         char **outputs);
 
     void *(*get_aspect)(uint64_t type,

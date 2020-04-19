@@ -15,7 +15,7 @@
 #include <celib/module.h>
 #include <celib/cdb.h>
 #include <celib/macros.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/os/vio.h>
 #include <celib/containers/hash.h>
 
@@ -136,11 +136,10 @@ static void _cvar_from_str(const char *name,
 static int load_from_yaml_file(ce_cdb_t0 db,
                                const char *path,
                                struct ce_alloc_t0 *alloc) {
-
     ce_vio_t0 *f = ce_os_vio_a0->from_file(path, VIO_OPEN_READ);
 
-    cnode_t *nodes = NULL;
-    ce_yaml_cdb_a0->cnodes_from_vio(f, &nodes, alloc);
+    ct_cdb_node_t *nodes = NULL;
+    ce_cdb_yaml_a0->load_to_nodes(f, &nodes, alloc);
     uint64_t obj = ce_cdb_a0->load_from_cnodes(nodes, db);
     ce_os_vio_a0->close(f);
     ce_array_free(nodes, alloc);

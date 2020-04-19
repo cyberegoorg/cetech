@@ -244,9 +244,6 @@ static bool _import(ce_cdb_t0 db,
     char texture_filename[512];
     snprintf(texture_filename, CE_ARRAY_LEN(texture_filename), "%s.texture", input);
 
-//    int64_t mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, texture_filename);
-//    ct_assetdb_a0->put_file(texture_filename, mtime);
-    ct_asset_a0->save_to_cdb(db, obj, texture_filename);
     return true;
 }
 
@@ -272,8 +269,8 @@ static ct_asset_dcc_io_i0 texture_io = {
 ////
 static void draw_property(ce_cdb_t0 db,
                           uint64_t obj,
-                          const char* title,
-                          uint64_t context){
+                          const char *title,
+                          uint64_t context) {
     ct_property_editor_a0->ui_filename(obj, "Input", TEXTURE_INPUT, "png,tga,bmp", 0);
     ct_property_editor_a0->ui_bool(obj, "Gen mipmaps", TEXTURE_GEN_MIPMAPS);
     ct_property_editor_a0->ui_bool(obj, "Is normalmap", TEXTURE_IS_NORMALMAP);

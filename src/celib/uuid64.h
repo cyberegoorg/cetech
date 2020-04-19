@@ -23,7 +23,7 @@ static inline ce_uuid64_t0 ce_uuid64_generate() {
 }
 
 static inline bool ce_uuid64_try_parse(ce_uuid64_t0 *guid,
-                                     const char *str) {
+                                       const char *str) {
     CE_ASSERT("UUID", NULL != str);
 
     int num = sscanf(str, "0x%llx", &guid->u);
@@ -31,8 +31,8 @@ static inline bool ce_uuid64_try_parse(ce_uuid64_t0 *guid,
 }
 
 static inline void ce_uuid64_to_string(char *buf,
-                                     uint32_t len,
-                                     const ce_uuid64_t0 *guid) {
+                                       uint32_t len,
+                                       const ce_uuid64_t0 *guid) {
     snprintf(buf, len, "0x%llx", guid->u);
 }
 

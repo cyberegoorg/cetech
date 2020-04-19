@@ -78,14 +78,14 @@ static bgfx_vertex_layout_t pt_decl;
 
 static void init_decl() {
     ct_gfx_a0->bgfx_vertex_layout_begin(&pt_decl,
-                                      ct_gfx_a0->bgfx_get_renderer_type());
+                                        ct_gfx_a0->bgfx_get_renderer_type());
     ct_gfx_a0->bgfx_vertex_layout_add(&pt_decl,
-                                    BGFX_ATTRIB_POSITION, 3,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_POSITION, 3,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_add(&pt_decl,
-                                    BGFX_ATTRIB_TEXCOORD0, 2,
-                                    BGFX_ATTRIB_TYPE_FLOAT, false, false);
+                                      BGFX_ATTRIB_TEXCOORD0, 2,
+                                      BGFX_ATTRIB_TYPE_FLOAT, false, false);
 
     ct_gfx_a0->bgfx_vertex_layout_end(&pt_decl);
 }
@@ -196,7 +196,7 @@ void CE_MODULE_UNLOAD(render_graph)(struct ce_api_a0 *api,
 
     uint32_t builder_inst_n = ce_array_size(_G.builder_inst_free);
     for (int i = 0; i < builder_inst_n; ++i) {
-        _free_render_graph_builder_inst(_G.builder_inst_free[i],  _G.alloc);
+        _free_render_graph_builder_inst(_G.builder_inst_free[i], _G.alloc);
     }
 
     ce_array_free(_G.module_free, _G.alloc);

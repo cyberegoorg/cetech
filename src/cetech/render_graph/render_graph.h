@@ -101,6 +101,7 @@ struct ct_rg_a0 {
     void (*destroy_module)(ct_rg_module_t0 *module);
 
     ct_rg_builder_t0 *(*create_builder)();
+
     void (*destroy_builder)(ct_rg_builder_t0 *builder);
 
     void (*screenspace_quad)(float texture_width,

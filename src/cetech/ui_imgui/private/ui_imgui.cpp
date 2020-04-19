@@ -327,7 +327,7 @@ void dock_save(struct ce_vio_t0 *output) {
 }
 
 void dock_load(const char *path) {
-    ImGui::loadFromYaml(path, ce_yaml_cdb_a0, ce_yaml_cdb_a0, ce_cdb_a0);
+    ImGui::loadFromYaml(path, ce_cdb_yaml_a0, ce_cdb_yaml_a0, ce_cdb_a0);
 }
 
 void separator() {

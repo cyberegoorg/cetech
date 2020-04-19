@@ -6,7 +6,7 @@
 #include <celib/api.h>
 #include <celib/module.h>
 #include <celib/cdb.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 
 #include <celib/macros.h>
 

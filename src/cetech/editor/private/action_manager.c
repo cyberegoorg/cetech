@@ -16,9 +16,9 @@ typedef void (*action_fce_t)();
 union modifiactor {
     uint8_t u;
     struct {
-        uint8_t ctrl:1;
-        uint8_t alt:1;
-        uint8_t shift:1;
+        uint8_t ctrl: 1;
+        uint8_t alt: 1;
+        uint8_t shift: 1;
     } flags;
 };
 

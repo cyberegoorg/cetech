@@ -42,7 +42,7 @@ static struct ce_memory_a0 _api = {
 
 struct ce_memory_a0 *ce_memory_a0 = &_api;
 
-const struct ce_memory_a0* ce_memory_a0_get() {
+const struct ce_memory_a0 *ce_memory_a0_get() {
     return &_api;
 }
 

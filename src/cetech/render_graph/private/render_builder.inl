@@ -4,7 +4,7 @@
      CE_ID64_0("default", 0xf27605035974b5ecULL)
 
 static void _free_render_graph_builder_inst(render_graph_builder_inst *inst,
-                                           const ce_alloc_t0 *alloc) {
+                                            const ce_alloc_t0 *alloc) {
     ce_array_free(inst->pass, alloc);
     ce_hash_free(&inst->texture_map, alloc);
     ce_hash_free(&inst->layer_map, alloc);

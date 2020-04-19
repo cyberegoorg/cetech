@@ -2,7 +2,7 @@
 
 #include <celib/memory/allocator.h>
 #include <celib/cdb.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/macros.h>
 #include "celib/id.h"
 #include "celib/memory/memory.h"

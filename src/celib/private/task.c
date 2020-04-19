@@ -103,7 +103,8 @@ static uint32_t _new_counter_task(uint32_t value) {
     return idx;
 }
 
-static void _push_task(queue_mpmc *q, task_id_t t) {
+static void _push_task(queue_mpmc *q,
+                       task_id_t t) {
     queue_task_push(q, t.id);
 }
 

@@ -68,7 +68,7 @@ static void api_register_api(const char *name,
 
 }
 
-static void *get_api(const char* name) {
+static void *get_api(const char *name) {
     uint64_t name_id = ce_id_a0->id64(name);
     void *mem = (void *) ce_hash_lookup(&_G.api_map, name_id, 0);
 

@@ -17,31 +17,32 @@ extern "C" {
     CE_ID64_0("ct_gfx_a0", 0x945b4a9e424eaecULL)
 
 struct ct_gfx_a0 {
-    void (*bgfx_vertex_layout_begin)(bgfx_vertex_layout_t* _this, bgfx_renderer_type_t _rendererType);
+    void (*bgfx_vertex_layout_begin)(bgfx_vertex_layout_t *_this,
+                                     bgfx_renderer_type_t _rendererType);
 
     void (*bgfx_vertex_layout_add)(bgfx_vertex_layout_t *_decl,
-                                 bgfx_attrib_t _attrib,
-                                 uint8_t _num,
-                                 bgfx_attrib_type_t _type,
-                                 bool _normalized,
-                                 bool _asInt);
+                                   bgfx_attrib_t _attrib,
+                                   uint8_t _num,
+                                   bgfx_attrib_type_t _type,
+                                   bool _normalized,
+                                   bool _asInt);
 
     void (*bgfx_vertex_layout_decode)(const bgfx_vertex_layout_t *_decl,
-                                    bgfx_attrib_t _attrib,
-                                    uint8_t *_num,
-                                    bgfx_attrib_type_t *_type,
-                                    bool *_normalized,
-                                    bool *_asInt);
+                                      bgfx_attrib_t _attrib,
+                                      uint8_t *_num,
+                                      bgfx_attrib_type_t *_type,
+                                      bool *_normalized,
+                                      bool *_asInt);
 
     bool (*bgfx_vertex_layout_has)(const bgfx_vertex_layout_t *_decl,
-                                 bgfx_attrib_t _attrib);
+                                   bgfx_attrib_t _attrib);
 
     void (*bgfx_vertex_layout_skip)(bgfx_vertex_layout_t *_decl,
-                                  uint8_t _num);
+                                    uint8_t _num);
 
     void (*bgfx_vertex_layout_end)(bgfx_vertex_layout_t *_decl);
 
-    void (* bgfx_vertex_pack)(const float _input[4],
+    void (*bgfx_vertex_pack)(const float _input[4],
                              bool _inputNormalized,
                              bgfx_attrib_t _attr,
                              const bgfx_vertex_layout_t *_decl,

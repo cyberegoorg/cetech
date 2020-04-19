@@ -39,7 +39,7 @@ static struct _G {
 //==============================================================================
 
 static void _on_api_add(uint64_t name,
-                              void *api) {
+                        void *api) {
 
     if (name == CT_CONTROLERS_I0) {
         ct_controler_i0 *controlers_i = api;

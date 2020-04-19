@@ -70,17 +70,17 @@ static void draw_dock(uint64_t content,
             .flags = CT_TREE_NODE_FLAGS_DefaultOpen})) {
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("dt"));
 
-        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
-            .id=content,
-            .overlay_text="dt",
-            .values=float_buffer,
-            .values_count=frames_n,
-            .graph_size = plot_size,
-            .scale_min=FLT_MAX,
-            .scale_max=FLT_MAX});
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0) {
+                .id=content,
+                .overlay_text="dt",
+                .values=float_buffer,
+                .values_count=frames_n,
+                .graph_size = plot_size,
+                .scale_min=FLT_MAX,
+                .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("memory.system"));
-        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0) {
                 .id=content,
                 .overlay_text="memory",
                 .values=float_buffer,
@@ -97,7 +97,7 @@ static void draw_dock(uint64_t content,
             .text="Renderer",
             .flags = CT_TREE_NODE_FLAGS_DefaultOpen})) {
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_submit"));
-        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0) {
                 .id=content,
                 .overlay_text="wait_submit",
                 .values=float_buffer,
@@ -107,7 +107,7 @@ static void draw_dock(uint64_t content,
                 .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.wait_render"));
-        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0) {
                 .id=content,
                 .overlay_text="wait_render",
                 .values=float_buffer,
@@ -117,7 +117,7 @@ static void draw_dock(uint64_t content,
                 .scale_max=FLT_MAX});
 
         float_buffer = ct_metrics_a0->get_recorded_floats(ce_id_a0->id64("renderer.num_draw"));
-        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0){
+        ct_ui_a0->plot_lines(&(ct_ui_plot_lines_t0) {
                 .id=content,
                 .overlay_text="num_draw",
                 .values=float_buffer,

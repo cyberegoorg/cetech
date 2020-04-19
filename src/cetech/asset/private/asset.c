@@ -21,7 +21,7 @@
 #include <cetech/kernel/kernel.h>
 #include <cetech/asset_io/asset_io.h>
 #include <celib/uuid64.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/os/path.h>
 #include <celib/os/thread.h>
 #include <celib/task.h>
@@ -83,29 +83,10 @@ static struct ct_asset_i0 *asset_get_interface(uint64_t type) {
 }
 
 
-void _save_to_cdb(ce_cdb_t0 db,
-                  uint64_t obj,
-                  const char *filename) {
-//    const char *type_str = ce_id_a0->str_from_id64(ce_cdb_a0->obj_type(db, obj));
-//    CE_ASSERT(LOG_WHERE, type_str);
-}
-
 static bool _save_to_file(ce_cdb_t0 db,
                           uint64_t obj,
                           const char *filename) {
-    ce_vio_t0 *file = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
-
-    if (!file) {
-        return false;
-    }
-
-    char *blob = NULL;
-    ce_yaml_cdb_a0->dump_str(db, &blob, obj, 0);
-    file->vt->write(file->inst, blob, ce_array_size(blob), 1);
-    ce_fs_a0->close(file);
-    ce_array_free(blob, _G.allocator);
-
-    return true;
+    return ce_cdb_yaml_a0->save_to_file(db, filename, obj, SOURCE_ROOT);
 }
 
 void unload(ce_cdb_t0 db,
@@ -166,10 +147,7 @@ static uint64_t cdb_loader(ce_cdb_t0 db,
         return 0;
     }
 
-    cnode_t *cnodes = NULL;
-    ce_yaml_cdb_a0->cnodes_from_vio(input, &cnodes, _G.allocator);
-    uint64_t obj = ce_cdb_a0->load_from_cnodes(cnodes, ce_cdb_a0->db());
-    ce_array_free(cnodes, _G.allocator);
+    uint64_t obj = ce_cdb_yaml_a0->load_from_file(filename);
 
     if (!obj) {
         char uuid_str[64] = {};
@@ -207,14 +185,7 @@ static bool save(uint64_t uuid) {
     const char *filename = cdb_filename(r);
 
     if (filename) {
-        char *buf = NULL;
-        ce_yaml_cdb_a0->dump_str(ce_cdb_a0->db(), &buf, uuid, 0);
-
-        struct ce_vio_t0 *f = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_WRITE);
-        f->vt->write(f->inst, buf, ce_buffer_size(buf), 1);
-        ce_fs_a0->close(f);
-        ce_buffer_free(buf, _G.allocator);
-
+        ce_cdb_yaml_a0->save_to_file(ce_cdb_a0->db(), filename, uuid, SOURCE_ROOT);
         return true;
     }
 
@@ -232,11 +203,11 @@ static int list_assets_from_dirs(const char *dir,
                       alloc);
     for (int i = 0; i < files_count; ++i) {
         const char *fn = files[i];
-        const char* type = ce_os_path_a0->extension(fn);
+        const char *type = ce_os_path_a0->extension(fn);
 
         ct_asset_i0 *asset_i = ct_asset_a0->get_interface(ce_id_a0->id64(type));
         if (asset_i) {
-            char* file = ce_memory_a0->str_dup(files[i], alloc);
+            char *file = ce_memory_a0->str_dup(files[i], alloc);
             ce_array_push(*filename, file, alloc);
         }
     }
@@ -265,7 +236,7 @@ int list_assets_by_type(const char *name,
     for (int i = 0; i < files_count; ++i) {
         ct_asset_i0 *asset_i = ct_asset_a0->get_interface(ce_id_a0->id64(type));
         if (asset_i) {
-            char* file = ce_memory_a0->str_dup(files[i], alloc);
+            char *file = ce_memory_a0->str_dup(files[i], alloc);
             ce_array_push(*filename, file, alloc);
         }
     }
@@ -340,7 +311,6 @@ char *asset_external_join(ce_alloc_t0 *alocator,
 }
 
 
-
 typedef struct import_asset_data_t {
     ce_cdb_t0 db;
     const char *filename;
@@ -354,22 +324,22 @@ static void _import_asset_task(void *data) {
 //    ct_assetdb_a0->put_file(i_data->filename, sourcefile_mtime);
 
     ce_vio_t0 *vio = ce_fs_a0->open(SOURCE_ROOT, i_data->filename, FS_OPEN_READ);
-    cnode_t *cnodes = NULL;
+    ct_cdb_node_t *cnodes = NULL;
     char *outputs = NULL;
-    ce_yaml_cdb_a0->cnodes_from_vio(vio, &cnodes, _G.allocator);
+    ce_cdb_yaml_a0->load_to_nodes(vio, &cnodes, _G.allocator);
     ce_fs_a0->close(vio);
 
     uint64_t filename_hash = ce_id_a0->id64(i_data->filename);
     uint64_t n = ce_array_size(cnodes);
     for (int i = 0; i < n; ++i) {
-        cnode_t node = cnodes[i];
+        ct_cdb_node_t node = cnodes[i];
 
         switch (node.type) {
             default:
-            case CNODE_INVALID:
+            case CT_CDB_NODE_INVALID:
                 break;
 
-            case CNODE_OBJ_BEGIN: {
+            case CT_CDB_NODE_OBJ_BEGIN: {
                 ce_os_thread_a0->spin_lock(&_G.uid_2_file_lock);
                 ce_hash_add(&_G.uid_2_file, node.uuid.id, filename_hash, _G.allocator);
                 ce_os_thread_a0->spin_unlock(&_G.uid_2_file_lock);
@@ -471,7 +441,6 @@ void _generate_dcc_files(ce_cdb_t0 db) {
             ce_cdb_a0->set_str(w, CT_DCC_FILENAME_PROP, filename);
             ce_cdb_a0->write_commit(w);
 
-            _save_to_cdb(db, dcc_asset_obj, dcc_asset_path);
             _save_to_file(db, dcc_asset_obj, dcc_asset_path);
         }
     }
@@ -518,7 +487,6 @@ static struct ct_asset_a0 asset_api = {
         .compile_all = asset_compiler_import_all,
         .asset_filename = cdb_filename,
         .filename_asset = filename_cdb,
-        .save_to_cdb = _save_to_cdb,
         .save_to_file = _save_to_file,
 };
 
@@ -565,7 +533,7 @@ char *asset_get_dir(ce_alloc_t0 *a,
 
 
 void CE_MODULE_LOAD(asset)(struct ce_api_a0 *api,
-                                 int reload) {
+                           int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_config_a0);
@@ -597,16 +565,10 @@ void CE_MODULE_LOAD(asset)(struct ce_api_a0 *api,
     ce_buffer_free(tmp_dir_full, _G.allocator);
     ce_buffer_free(build_dir_full, _G.allocator);
 
-    const char *core_dir = ce_config_a0->read_str(CONFIG_CORE, "");
-    const char *source_dir = ce_config_a0->read_str(CONFIG_SRC, "");
-
-    ce_fs_a0->map_root_dir(SOURCE_ROOT, core_dir, true);
-    ce_fs_a0->map_root_dir(SOURCE_ROOT, source_dir, true);
-
 }
 
 void CE_MODULE_UNLOAD(asset)(struct ce_api_a0 *api,
-                                   int reload) {
+                             int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);

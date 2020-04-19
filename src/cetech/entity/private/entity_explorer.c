@@ -6,7 +6,7 @@
 #include <celib/id.h>
 #include <celib/memory/memory.h>
 #include <celib/api.h>
-#include <celib/yaml_cdb.h>
+#include <celib/cdb_yaml.h>
 #include <celib/module.h>
 
 #include <celib/cdb.h>
@@ -298,7 +298,7 @@ void CE_MODULE_LOAD(entity_explorer)(struct ce_api_a0 *api,
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ce_id_a0);
     CE_INIT_API(api, ct_asset_a0);
-    CE_INIT_API(api, ce_yaml_cdb_a0);
+    CE_INIT_API(api, ce_cdb_yaml_a0);
     CE_INIT_API(api, ct_ecs_a0);
     CE_INIT_API(api, ce_cdb_a0);
 
