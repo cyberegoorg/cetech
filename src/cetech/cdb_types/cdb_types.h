@@ -38,7 +38,7 @@ extern "C" {
     CE_ID64_0("g", 0xb5f2c769562d9a23ULL)
 
 #define PROP_COLOR_B \
-    CE_ID64_0("B", 0x2126f15befc9a06ULL)
+    CE_ID64_0("b", 0xea8bfc7d922a2a37ULL)
 
 #define PROP_COLOR_A \
     CE_ID64_0("a", 0x71717d2d36b6b11ULL)

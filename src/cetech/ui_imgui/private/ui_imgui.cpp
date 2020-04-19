@@ -436,7 +436,7 @@ bool color_edit(const ct_ui_color_edit_t0 *color,
 
     push_item_width(-1);
     bool ret = ImGui::ColorEdit4(id, &c->x, ImGuiColorEditFlags_NoInputs
-                                        | ImGuiColorEditFlags_NoLabel);
+                                            | ImGuiColorEditFlags_NoLabel);
     pop_item_width();
 
     return ret;
