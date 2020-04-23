@@ -73,8 +73,7 @@ static void _asset_api_add(uint64_t name,
         ct_asset_i0 *ct_asset_i = api;
         CE_ASSERT(LOG_WHERE, ct_asset_i->name);
 
-        ce_hash_add(&_G.type_map, ct_asset_i->cdb_type(), (uint64_t) api,
-                    _G.allocator);
+        ce_hash_add(&_G.type_map, ct_asset_i->cdb_type, (uint64_t) api, _G.allocator);
     }
 }
 
@@ -436,7 +435,7 @@ void _generate_dcc_files(ce_cdb_t0 db) {
 
         if (!ce_fs_a0->exist(SOURCE_ROOT, dcc_asset_path)) {
 
-            uint64_t dcc_asset_obj = ce_cdb_a0->create_object(db, CT_DCC_ASSET);
+            uint64_t dcc_asset_obj = ce_cdb_a0->create_object(db, CT_DCC_ASSET_TYPE);
             ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(db, dcc_asset_obj);
             ce_cdb_a0->set_str(w, CT_DCC_FILENAME_PROP, filename);
             ce_cdb_a0->write_commit(w);

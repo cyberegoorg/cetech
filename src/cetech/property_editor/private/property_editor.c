@@ -673,7 +673,7 @@ static void ui_asset(uint64_t obj,
                                    asset_type, &new_value);
 
 
-    const char *icon = ri && ri->display_icon ? ri->display_icon() : NULL;
+    const char *icon = ri && ri->display_icon ? ri->display_icon : NULL;
     if (icon) {
         snprintf(labelid, CE_ARRAY_LEN(labelid), "%s %s", icon, label);
     } else {

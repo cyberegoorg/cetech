@@ -250,6 +250,12 @@ static struct ct_asset_io_a0 asset_compiler_api = {
 struct ct_asset_io_a0 *ct_asset_io_a0 = &asset_compiler_api;
 
 
+
+static struct ct_asset_i0 ct_asset_api = {
+        .cdb_type = CT_DCC_ASSET,
+        .name = "dcc_asset"
+};
+
 void CE_MODULE_LOAD(asset_io)(struct ce_api_a0 *api,
                               int reload) {
     CE_UNUSED(reload);
@@ -272,8 +278,10 @@ void CE_MODULE_LOAD(asset_io)(struct ce_api_a0 *api,
             .allocator = ce_memory_a0->system,
     };
 
-    ce_cdb_a0->reg_obj_type(CT_DCC_ASSET, dcc_asset_prop, CE_ARRAY_LEN(dcc_asset_prop));
+    ce_cdb_a0->reg_obj_type(CT_DCC_ASSET_TYPE, dcc_asset_prop, CE_ARRAY_LEN(dcc_asset_prop));
 
+
+    api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
 
     api->add_api(CT_ASSET_IO_A0_STR,
                  &asset_compiler_api,

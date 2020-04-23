@@ -172,11 +172,6 @@ static bool _compile(ce_cdb_t0 db,
     return true;
 }
 
-static uint64_t cdb_type() {
-    return TEXTURE_TYPE;
-}
-
-
 ////
 static bool _import(ce_cdb_t0 db,
                     uint64_t dcc_obj) {
@@ -310,19 +305,10 @@ static struct ct_asset_preview_i0 ct_asset_preview_api = {
 };
 
 
-static const char *display_icon() {
-    return ICON_FA_PICTURE_O;
-}
-
-static const char *name() {
-    return "texture";
-}
-
-
 static struct ct_asset_i0 ct_asset_api = {
-        .name = name,
-        .cdb_type = cdb_type,
-        .display_icon = display_icon,
+        .name = "texture",
+        .cdb_type = TEXTURE_TYPE,
+        .display_icon = ICON_FA_PICTURE_O,
         .online =_texture_asset_online,
         .offline =_texture_asset_offline,
 };

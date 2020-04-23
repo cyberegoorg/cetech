@@ -1488,10 +1488,6 @@ static void destroy(ct_world_t0 world,
     }
 }
 
-static uint64_t cdb_type() {
-    return ENTITY_TYPE;
-}
-
 static struct ct_entity_t0 spawn_entity(ct_world_t0 world,
                                         uint64_t name);
 
@@ -1516,18 +1512,10 @@ void *asset_get_interface(uint64_t type) {
     return NULL;
 }
 
-static const char *display_icon() {
-    return ICON_FA_CUBES;
-}
-
-static const char *name() {
-    return "entity";
-}
-
 static struct ct_asset_i0 ct_asset_api = {
-        .name = name,
-        .cdb_type = cdb_type,
-        .display_icon = display_icon,
+        .name = "entity",
+        .cdb_type = ENTITY_TYPE,
+        .display_icon = ICON_FA_CUBES,
 };
 
 static bool supported_extension(const char *extension) {

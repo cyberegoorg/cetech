@@ -41,15 +41,6 @@ static void create_new(uint64_t obj) {
     ce_cdb_a0->write_commit(w);
 }
 
-static const char *display_icon() {
-    return ICON_FA_CUBES;
-}
-
-static uint64_t cdb_type() {
-    return CT_NODE_GRAPH_ASSET;
-}
-
-
 void draw_raw(uint64_t obj,
               ce_vec2_t size) {
     ct_node_graph_editor_a0->draw_ng_editor(obj, 0);
@@ -60,15 +51,10 @@ static struct ct_asset_preview_i0 asset_preview_i0 = {
 };
 
 
-static const char *name() {
-    return "node_graph";
-}
-
-
 static struct ct_asset_i0 ct_asset_api = {
-        .name = name,
-        .cdb_type = cdb_type,
-        .display_icon = display_icon,
+        .name = "node_graph",
+        .cdb_type = CT_NODE_GRAPH_ASSET,
+        .display_icon = ICON_FA_CUBES,
         .create_new = create_new,
 };
 

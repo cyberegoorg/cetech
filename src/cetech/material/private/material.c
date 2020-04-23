@@ -140,9 +140,6 @@ static void offline(ce_cdb_t0 db,
     CE_UNUSED(db, obj);
 }
 
-static uint64_t cdb_type() {
-    return MATERIAL_TYPE;
-}
 
 static struct ct_entity_t0 load(uint64_t asset,
                                 ct_world_t0 world) {
@@ -182,19 +179,10 @@ static struct ct_asset_preview_i0 ct_asset_preview_api = {
 };
 
 
-static const char *display_icon() {
-    return ICON_FA_FILE_IMAGE_O;
-}
-
-
-static const char *name() {
-    return "material";
-}
-
 static struct ct_asset_i0 ct_asset_api = {
-        .cdb_type = cdb_type,
-        .name = name,
-        .display_icon = display_icon,
+        .cdb_type = MATERIAL_TYPE,
+        .name = "material",
+        .display_icon = ICON_FA_FILE_IMAGE_O,
         .online = online,
         .offline = offline,
 };

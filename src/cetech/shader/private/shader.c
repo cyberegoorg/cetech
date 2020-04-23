@@ -239,23 +239,10 @@ static void offline(ce_cdb_t0 db,
 }
 
 
-static uint64_t cdb_type() {
-    return SHADER_TYPE;
-}
-
-static const char *display_icon() {
-    return ICON_FA_COG;
-}
-
-static const char *name() {
-    return "shader";
-}
-
-
 static struct ct_asset_i0 ct_asset_api = {
-        .name = name,
-        .cdb_type = cdb_type,
-        .display_icon = display_icon,
+        .name = "shader",
+        .cdb_type = SHADER_TYPE,
+        .display_icon = ICON_FA_COG,
         .online = online,
         .offline = offline,
 };

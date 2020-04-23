@@ -15,6 +15,9 @@ extern "C" {
    CCE_ID64_0("ct_asset_a0", 0x3f2865d0ba1003cULL)
 
 #define CT_DCC_ASSET \
+    CE_ID64_0("dcc_asset", 0x3fc2605c12929c1cULL)
+
+#define CT_DCC_ASSET_TYPE \
     CE_ID64_0("ct_dcc_asset", 0xed663d9986dbea5eULL)
 
 #define CT_DCC_FILENAME_PROP \
@@ -44,11 +47,11 @@ typedef struct ce_cdb_uuid_t0 ce_cdb_uuid_t0;
 
 //! Asset interface
 typedef struct ct_asset_i0 {
-    const char *(*name)();
+    const char *name;
 
-    uint64_t (*cdb_type)();
+    uint64_t cdb_type;
 
-    const char *(*display_icon)();
+    const char *display_icon;
 
     void (*online)(ce_cdb_t0 db,
                    uint64_t obj);

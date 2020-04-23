@@ -130,12 +130,12 @@ static void _create_from_modal(uint64_t modal_id) {
         while (it.api) {
             struct ct_asset_i0 *i = (ct_asset_i0 *) (it.api);
 
-            if (i->cdb_type() == type) {
+            if (i->cdb_type == type) {
                 cur_type_idx = idx - 1;
             }
 
-            const char *type = ce_id_a0->str_from_id64(i->cdb_type());
-            ce_hash_add(&type_hash, idx, i->cdb_type(), _G.allocator);
+            const char *type = ce_id_a0->str_from_id64(i->cdb_type);
+            ce_hash_add(&type_hash, idx, i->cdb_type, _G.allocator);
 
             ce_array_push_n(buffer, type, strlen(type) + 1, _G.allocator);
 
@@ -264,7 +264,7 @@ static void _create_from_modal(uint64_t modal_id) {
                 continue;
             }
 
-            const char *type = ri->name();
+            const char *type = ri->name;
 
             char name[256] = {};
             snprintf(name, CE_ARRAY_LEN(name), "%s", path);
@@ -272,8 +272,7 @@ static void _create_from_modal(uint64_t modal_id) {
             char label[128];
 
 
-            const char *icon =
-                    ri && ri->display_icon ? ri->display_icon() : NULL;
+            const char *icon = ri && ri->display_icon ? ri->display_icon : NULL;
 
             if (icon) {
                 sprintf(label, "%s %s##modal_type_item_%s", icon, path, path);
@@ -356,9 +355,9 @@ static void _select_type_popup(uint64_t modal_id) {
             struct ct_asset_i0 *i = (ct_asset_i0 *) (it.api);
 
 
-            const char *type = ce_id_a0->str_from_id64(i->cdb_type());
+            const char *type = ce_id_a0->str_from_id64(i->cdb_type);
 
-            const char *icon = i->display_icon ? i->display_icon() : NULL;
+            const char *icon = i->display_icon ? i->display_icon : NULL;
 
             if (0 != fnmatch(filter, type, FNM_CASEFOLD)) {
                 it = ce_api_a0->next(it);
@@ -423,7 +422,7 @@ static void ui_asset_menu(uint64_t context) {
 
     if (ri && ri->display_icon) {
         snprintf(title, CE_ARRAY_LEN(title),
-                 "T: %s##select_type_%llx", ri->display_icon(), 1ULL);
+                "T: %s##select_type_%llx", ri->display_icon, 1ULL);
     } else {
         if (_selected_type[0]) {
             snprintf(title, CE_ARRAY_LEN(title),
@@ -492,11 +491,9 @@ static void ui_asset_list(uint64_t context) {
             ct_asset_i0 *ri = ct_asset_a0->get_interface(rtype);
 
             if (ri && ri->display_icon) {
-                snprintf(label, CE_ARRAY_LEN(label),
-                         "%s %s", ri->display_icon(), path);
+                snprintf(label, CE_ARRAY_LEN(label), "%s %s", ri->display_icon, path);
             } else {
-                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s",
-                         path);
+                snprintf(label, CE_ARRAY_LEN(label), ICON_FA_FILE " %s", path);
             }
 
 

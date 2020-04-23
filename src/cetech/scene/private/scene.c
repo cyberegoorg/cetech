@@ -128,14 +128,6 @@ static void offline(ce_cdb_t0 db,
     CE_UNUSED(db, obj);
 }
 
-static uint64_t cdb_type() {
-    return SCENE_TYPE;
-}
-
-
-static const char *display_icon() {
-    return ICON_FA_SHARE_ALT_SQUARE;
-}
 
 static struct ct_entity_t0 load(uint64_t asset,
                                 ct_world_t0 world) {
@@ -204,15 +196,10 @@ static struct ct_asset_preview_i0 ct_asset_preview_api = {
         .load = load,
 };
 
-static const char *name() {
-    return "scene";
-}
-
-
 static struct ct_asset_i0 ct_asset_api = {
-        .name = name,
-        .cdb_type = cdb_type,
-        .display_icon = display_icon,
+        .name = "scene",
+        .cdb_type = SCENE_TYPE,
+        .display_icon = ICON_FA_SHARE_ALT_SQUARE,
         .online = online,
         .offline = offline,
 //        .compilator = scene_compiler,
