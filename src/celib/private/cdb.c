@@ -613,6 +613,22 @@ ct_cdb_type_def_t0 _get_prop_def(uint64_t type) {
     };
 }
 
+ce_cdb_prop_def_t0 _obj_type_prop_def(uint64_t type, uint64_t prop) {
+    ct_cdb_type_def_t0 def = _get_prop_def(type);
+
+    for (int i = 0; i < def.n; ++i) {
+        uint64_t name_hash = ce_id_a0->id64(def.props[i].name);
+
+        if(name_hash != prop) {
+            continue;
+        }
+
+        return def.props[i];
+    }
+
+    return (ce_cdb_prop_def_t0){};
+}
+
 
 type_def_t0 *_get_type_def(uint64_t type) {
     uint32_t idx = ce_hash_lookup(&_G.type_defs.def_map, type, UINT32_MAX);
@@ -3058,6 +3074,12 @@ uint64_t _load_from_cnodes(const ct_cdb_node_t *cnodes,
                 set_bool(state->writer, node.key, node.value.b);
             }
                 break;
+
+            case CT_CDB_NODE_BLOB: {
+                struct state_t *state = &states[state_top];
+                set_blob(state->writer, node.key, node.blob.data, node.blob.size);
+            }
+                break;
             case CT_CDB_NODE_OBJ_BEGIN: {
                 uint64_t obj;
                 ce_cdb_uuid_t0 uuid = node.obj.uuid;
@@ -3237,6 +3259,7 @@ static struct ce_cdb_a0 cdb_api = {
 
         .reg_obj_type = reg_obj_type,
         .obj_type_def = _get_prop_def,
+        .obj_type_prop_def = _obj_type_prop_def,
         .gen_uid = gen_uid,
         .set_loader = set_loader,
         .db  = global_db,

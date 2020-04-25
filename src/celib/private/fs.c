@@ -164,6 +164,10 @@ static struct ce_vio_t0 *open(uint64_t root,
     char *full_path = get_full_path(root, _G.allocator, path,
                                     mode == FS_OPEN_WRITE);
 
+    if(!full_path){
+        return NULL;
+    }
+
     ce_vio_t0 *file = ce_os_vio_a0->from_file(full_path,
                                               (enum ce_vio_open_mode) mode);
 

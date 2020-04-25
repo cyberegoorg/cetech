@@ -200,9 +200,16 @@ static void online(ce_cdb_t0 db,
                    uint64_t obj) {
 //    ce_cdb_a0->register_notify(obj, _on_obj_change, NULL);
 
-    _compile(db, obj);
-
     const ce_cdb_obj_o0 *reader = ce_cdb_a0->read(db, obj);
+
+    uint64_t size = 0;
+    ce_cdb_a0->read_blob(reader, SHADER_FS_DATA, &size, NULL);
+
+    if (!size) {
+        _compile(db, obj);
+    }
+
+    reader = ce_cdb_a0->read(db, obj);
 
     uint64_t fs_blob_size = 0;
     void *fs_blob;
@@ -286,19 +293,22 @@ static const ce_cdb_prop_def_t0 shader_type_def[] = {
         {
                 .name = "vs_data",
                 .type = CE_CDB_TYPE_BLOB,
+//                .flags = CE_CDB_PROP_FLAG_RUNTIME,
         },
         {
                 .name = "fs_data",
                 .type = CE_CDB_TYPE_BLOB,
+//                .flags = CE_CDB_PROP_FLAG_RUNTIME,
         },
         {
                 .name = "shader",
                 .type = CE_CDB_TYPE_UINT64,
+                .flags = CE_CDB_PROP_FLAG_RUNTIME,
         },
 };
 
 void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
-                            int reload) {
+                           int reload) {
     CE_UNUSED(reload);
     CE_INIT_API(api, ce_memory_a0);
     CE_INIT_API(api, ct_asset_a0);
@@ -317,7 +327,7 @@ void CE_MODULE_LOAD(shader)(struct ce_api_a0 *api,
 }
 
 void CE_MODULE_UNLOAD(shader)(struct ce_api_a0 *api,
-                              int reload) {
+                             int reload) {
 
     CE_UNUSED(reload);
     CE_UNUSED(api);

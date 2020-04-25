@@ -65,6 +65,7 @@ typedef enum ce_cdb_type_e0 {
 typedef enum ce_cdb_prop_flag_e0 {
     CE_CDB_PROP_FLAG_NONE = 0,
     CE_CDB_PROP_FLAG_UNPACK = 1 << 0,
+    CE_CDB_PROP_FLAG_RUNTIME = 1 << 1,
 } ce_cdb_flag_e0;
 
 typedef struct ce_cdb_obj_o0 ce_cdb_obj_o0;
@@ -188,6 +189,7 @@ struct ce_cdb_a0 {
                          uint32_t n);
 
     ct_cdb_type_def_t0 (*obj_type_def)(uint64_t type);
+    ce_cdb_prop_def_t0 (*obj_type_prop_def)(uint64_t type, uint64_t prop);
 
     ce_cdb_uuid_t0 (*gen_uid)(ce_cdb_t0 db);
 

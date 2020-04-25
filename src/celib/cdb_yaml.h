@@ -24,11 +24,12 @@ struct ce_cdb_yaml_a0 {
     uint64_t (*load_from_file)(const char *path);
 
     bool (*save_to_file)(ce_cdb_t0 db,
+                         uint64_t fs_root,
                          const char *path,
-                         uint64_t obj,
-                         uint64_t fs_root);
+                         uint64_t obj);
 
-    ce_cdb_uuid_t0 (*load_to_nodes)(ce_vio_t0 *vio,
+    ce_cdb_uuid_t0 (*load_to_nodes)(const char *path,
+                                    ce_vio_t0 *vio,
                                     ct_cdb_node_t **nodes,
                                     ce_alloc_t0 *alloc);
 };

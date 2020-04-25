@@ -85,7 +85,7 @@ static struct ct_asset_i0 *asset_get_interface(uint64_t type) {
 static bool _save_to_file(ce_cdb_t0 db,
                           uint64_t obj,
                           const char *filename) {
-    return ce_cdb_yaml_a0->save_to_file(db, filename, obj, SOURCE_ROOT);
+    return ce_cdb_yaml_a0->save_to_file(db, SOURCE_ROOT, filename, obj);
 }
 
 void unload(ce_cdb_t0 db,
@@ -180,11 +180,11 @@ static uint64_t cdb_loader(ce_cdb_t0 db,
 static bool save(uint64_t uuid) {
     uint64_t root = ce_cdb_a0->find_root(ce_cdb_a0->db(), uuid);
 
-    ce_cdb_uuid_t0 r = {.id=root};
+    ce_cdb_uuid_t0 r = ce_cdb_a0->obj_uid(ce_cdb_a0->db(), root);
     const char *filename = cdb_filename(r);
 
     if (filename) {
-        ce_cdb_yaml_a0->save_to_file(ce_cdb_a0->db(), filename, uuid, SOURCE_ROOT);
+        ce_cdb_yaml_a0->save_to_file(ce_cdb_a0->db(), SOURCE_ROOT, filename, uuid);
         return true;
     }
 
@@ -325,7 +325,7 @@ static void _import_asset_task(void *data) {
     ce_vio_t0 *vio = ce_fs_a0->open(SOURCE_ROOT, i_data->filename, FS_OPEN_READ);
     ct_cdb_node_t *cnodes = NULL;
     char *outputs = NULL;
-    ce_cdb_yaml_a0->load_to_nodes(vio, &cnodes, _G.allocator);
+    ce_cdb_yaml_a0->load_to_nodes(i_data->filename, vio, &cnodes, _G.allocator);
     ce_fs_a0->close(vio);
 
     uint64_t filename_hash = ce_id_a0->id64(i_data->filename);

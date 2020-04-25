@@ -1003,6 +1003,11 @@ static void _draw_object(ce_cdb_t0 db,
 
     for (uint32_t i = 0; i < defs.n; ++i) {
         const ce_cdb_prop_def_t0 *def = &defs.props[i];
+
+        if (def->flags & CE_CDB_PROP_FLAG_RUNTIME) {
+            continue;
+        }
+
         uint64_t prop_name = ce_id_a0->id64(def->name);
         _draw_property(db, obj, prop_name, def, context, true);
     }
