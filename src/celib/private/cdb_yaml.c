@@ -267,9 +267,9 @@ ce_cdb_uuid_t0 cnodes_from_vio(const char *path,
                         ce_vio_t0 *blob_file = ce_fs_a0->open(SOURCE_ROOT, blob_path, FS_OPEN_READ);
 
                         if (blob_file) {
-                            uint32_t blob_size = vio->vt->size(vio->inst);
+                            uint32_t blob_size = blob_file->vt->size(blob_file->inst);
                             char *blob_data = CE_ALLOC(alloc, char, blob_size);
-                            vio->vt->read(vio->inst, blob_data, sizeof(char), blob_size);
+                            blob_file->vt->read(blob_file->inst, blob_data, sizeof(char), blob_size);
 
                             _push_cnode(cnodes, (ct_cdb_node_t) {
                                     .type = CT_CDB_NODE_BLOB,

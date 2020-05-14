@@ -111,109 +111,107 @@ static const ce_cdb_prop_def_t0 dcc_asset_prop[] = {
 //==============================================================================
 
 
-//void _import_dcc_asset(ce_cdb_t0 compile_db,
-//                       char **files,
-//                       uint32_t files_count) {
-//    uint32_t group_count = ce_array_size(_G.import_group_ordered);
-//
-//    typedef struct dcc_group_t {
-//        const char **files;
-//        uint64_t group;
-//    } dcc_group_t;
-//
-//    dcc_group_t *groups = NULL;
-//    for (int g = 0; g < group_count; ++g) {
-//        if (_G.import_group_ordered[g] == CT_CORE_IMPORT_GROUP) {
-//            continue;
-//        }
-//
-//        ce_array_push(groups, (dcc_group_t) {.group=_G.import_group_ordered[g]}, _G.allocator);
-//
-//        dcc_group_t *group = &ce_array_back(groups);
-//
-//        for (int j = 0; j < files_count; ++j) {
-//            const char *filename = files[j];
-//            const char *extenison = ce_os_path_a0->extension(filename);
-//
-//            if (strcmp(extenison, "dcc_asset") != 0) {
-//                continue;
-//            }
-//
-////            int64_t sourcefile_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
-////            ct_assetdb_a0->put_file(filename, sourcefile_mtime);
-//
-//            ce_vio_t0 *vio = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_READ);
-//            ct_cdb_node_t *cnodes = NULL;
-//            char *outputs = NULL;
-//            ce_cdb_yaml_a0->load_to_nodes(vio, &cnodes, _G.allocator);
-//            ce_fs_a0->close(vio);
-//            ce_cdb_a0->dump_cnodes(cnodes, &outputs);
-//
-//            ce_cdb_uuid_t0 dcc_obj_uid = cnodes[0].obj.uuid;
-//
-//            ce_array_free(outputs, _G.allocator);
-//            ce_array_free(cnodes, _G.allocator);
-//
-//            uint64_t dcc_obj = ce_cdb_a0->obj_from_uid(compile_db, dcc_obj_uid);
-//
-//            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(compile_db, dcc_obj);
-//            const char *dcc_file = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, "");
-//            int64_t dcc_file_mtime = ce_cdb_a0->read_uint64(r, CT_DCC_FILE_MTIME_PROP, 0);
-//            const char *dcc_ext = ce_os_path_a0->extension(dcc_file);
-//
-//            ct_asset_dcc_io_i0 *rio = _find_dcc_asset_io(dcc_ext, _G.import_group_ordered[g]);
-//            if (!rio || !rio->import_dcc) {
-//                continue;
-//            }
-//
-//            int64_t filemtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dcc_file);
-//
-//            if (dcc_file_mtime && (filemtime <= dcc_file_mtime)) {
-//                continue;
-//            }
-//
-//            ce_array_push(group->files, filename, _G.allocator);
-//        }
-//    }
-//
-//    uint32_t group_n = ce_array_size(groups);
-//    for (int i = 0; i < group_n; ++i) {
-//        dcc_group_t *group = &groups[i];
-//
-//        uint32_t importfiles_count = ce_array_size(group->files);
-//        for (int j = 0; j < importfiles_count; ++j) {
-//            ce_cdb_uuid_t0 dcc_obj_uid = ct_asset_io_a0->filename_asset(group->files[j]);
-//
-//            uint64_t dcc_obj = ce_cdb_a0->obj_from_uid(compile_db, dcc_obj_uid);
-//
-//            if (!dcc_obj) {
-//                continue;
-//            }
-//
-//            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(compile_db, dcc_obj);
-//            const char *dcc_file = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, "");
-//            const char *dcc_ext = ce_os_path_a0->extension(dcc_file);
-//
-//            ct_asset_dcc_io_i0 *rio = _find_dcc_asset_io(dcc_ext, group->group);
-//
-//            if (!rio->import_dcc(compile_db, dcc_obj)) {
-//                continue;
-//            }
-//
-//            int64_t dcc_file_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dcc_file);
-//            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(compile_db, dcc_obj);
-//            ce_cdb_a0->set_uint64(w, CT_DCC_FILE_MTIME_PROP, dcc_file_mtime);
-//            ce_cdb_a0->write_commit(w);
-//
-//            _save_to_file(compile_db, dcc_obj, group->files[j]);
-//            _save_to_cdb(compile_db, dcc_obj, group->files[j]);
-//        }
-//        ce_array_free(group->files, _G.allocator);
-//    }
-//
-//    ce_array_free(groups, _G.allocator);
-//}
+void _import_dcc_asset(ce_cdb_t0 compile_db,
+                       char **files,
+                       uint32_t files_count) {
+    uint32_t group_count = ce_array_size(_G.import_group_ordered);
 
+    typedef struct dcc_group_t {
+        const char **files;
+        uint64_t group;
+    } dcc_group_t;
+
+    dcc_group_t *groups = NULL;
+    for (int g = 0; g < group_count; ++g) {
+        if (_G.import_group_ordered[g] == CT_CORE_IMPORT_GROUP) {
+            continue;
+        }
+
+        ce_array_push(groups, (dcc_group_t) {.group=_G.import_group_ordered[g]}, _G.allocator);
+
+        dcc_group_t *group = &ce_array_back(groups);
+
+        for (int j = 0; j < files_count; ++j) {
+            const char *filename = files[j];
+            const char *extenison = ce_os_path_a0->extension(filename);
+
+            if (strcmp(extenison, "dcc_asset") != 0) {
+                continue;
+            }
+
+//            int64_t sourcefile_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, filename);
+//            ct_assetdb_a0->put_file(filename, sourcefile_mtime);
+
+            ce_vio_t0 *vio = ce_fs_a0->open(SOURCE_ROOT, filename, FS_OPEN_READ);
+            ct_cdb_node_t *cnodes = NULL;
+            char *outputs = NULL;
+            ce_cdb_yaml_a0->load_to_nodes(filename, vio, &cnodes, _G.allocator);
+            ce_fs_a0->close(vio);
+            ce_cdb_a0->dump_cnodes(cnodes, &outputs);
+
+            ce_cdb_uuid_t0 dcc_obj_uid = cnodes[0].obj.uuid;
+
+            ce_array_free(outputs, _G.allocator);
+            ce_array_free(cnodes, _G.allocator);
+
+            uint64_t dcc_obj = ce_cdb_a0->obj_from_uid(compile_db, dcc_obj_uid);
+
+            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(compile_db, dcc_obj);
+            const char *dcc_file = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, "");
+            int64_t dcc_file_mtime = ce_cdb_a0->read_uint64(r, CT_DCC_FILE_MTIME_PROP, 0);
+            const char *dcc_ext = ce_os_path_a0->extension(dcc_file);
+
+            ct_asset_dcc_io_i0 *rio = _find_dcc_asset_io(dcc_ext, _G.import_group_ordered[g]);
+            if (!rio || !rio->import_dcc) {
+                continue;
+            }
+
+            int64_t filemtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dcc_file);
+
+            if (dcc_file_mtime && (filemtime <= dcc_file_mtime)) {
+                continue;
+            }
+
+            ce_array_push(group->files, filename, _G.allocator);
+        }
+    }
+
+    uint32_t group_n = ce_array_size(groups);
+    for (int i = 0; i < group_n; ++i) {
+        dcc_group_t *group = &groups[i];
+
+        uint32_t importfiles_count = ce_array_size(group->files);
+        for (int j = 0; j < importfiles_count; ++j) {
+            ce_cdb_uuid_t0 dcc_obj_uid = ct_asset_a0->filename_asset(group->files[j]);
+
+            uint64_t dcc_obj = ce_cdb_a0->obj_from_uid(compile_db, dcc_obj_uid);
+
+            if (!dcc_obj) {
+                continue;
+            }
+
+            const ce_cdb_obj_o0 *r = ce_cdb_a0->read(compile_db, dcc_obj);
+            const char *dcc_file = ce_cdb_a0->read_str(r, CT_DCC_FILENAME_PROP, "");
+            const char *dcc_ext = ce_os_path_a0->extension(dcc_file);
+
+            ct_asset_dcc_io_i0 *rio = _find_dcc_asset_io(dcc_ext, group->group);
+
+            if (!rio->import_dcc(compile_db, dcc_obj)) {
+                continue;
+            }
+
+            int64_t dcc_file_mtime = ce_fs_a0->file_mtime(SOURCE_ROOT, dcc_file);
+            ce_cdb_obj_o0 *w = ce_cdb_a0->write_begin(compile_db, dcc_obj);
+            ce_cdb_a0->set_uint64(w, CT_DCC_FILE_MTIME_PROP, dcc_file_mtime);
+            ce_cdb_a0->write_commit(w);
+
+            ct_asset_a0->save_to_file(compile_db, dcc_obj, group->files[j]);
+        }
+        ce_array_free(group->files, _G.allocator);
+    }
+
+    ce_array_free(groups, _G.allocator);
+}
 
 
 
@@ -242,8 +240,8 @@ void create_import_group(uint64_t name,
 static struct ct_asset_io_a0 asset_compiler_api = {
         .find_asset_io = _find_asset_io,
         .find_asset_dcc_io = _find_dcc_asset_io,
-
         .create_import_group = create_import_group,
+        .import_dcc_asset = _import_dcc_asset,
 };
 
 

@@ -68,6 +68,10 @@ struct ct_asset_io_a0 {
                                 float order);
 
 
+    void (*import_dcc_asset)(ce_cdb_t0 compile_db,
+                           char **files,
+                           uint32_t files_count);
+
 };
 
 CE_MODULE(ct_asset_io_a0);

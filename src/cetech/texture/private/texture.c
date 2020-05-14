@@ -239,6 +239,8 @@ static bool _import(ce_cdb_t0 db,
     char texture_filename[512];
     snprintf(texture_filename, CE_ARRAY_LEN(texture_filename), "%s.texture", input);
 
+    ct_asset_a0->save_to_file(db, obj, texture_filename);
+
     return true;
 }
 
@@ -413,7 +415,7 @@ void CE_MODULE_LOAD(texture)(struct ce_api_a0 *api,
     api->add_api(CT_TEXTURE_A0_STR, &texture_api, sizeof(texture_api));
 
     api->add_impl(CT_KERNEL_TASK_I0_STR,
-                  &texture_compile_watch_task, sizeof(texture_compile_watch_task));
+            &texture_compile_watch_task, sizeof(texture_compile_watch_task));
 
     api->add_impl(CT_ASSET_I0_STR, &ct_asset_api, sizeof(ct_asset_api));
 

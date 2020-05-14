@@ -401,6 +401,8 @@ struct ce_cdb_a0 {
                        void *aspect);
 };
 
+extern void foo();
+
 CE_MODULE(ce_cdb_a0);
 
 #ifdef __cplusplus

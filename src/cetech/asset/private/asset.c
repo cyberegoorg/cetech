@@ -365,9 +365,9 @@ static void _import_asset_task(void *data) {
 //    }
 }
 
-void _import_assets(ce_cdb_t0 db,
-                    char **files,
-                    uint32_t files_count) {
+void _make_filename_uid_map(ce_cdb_t0 db,
+                            char **files,
+                            uint32_t files_count) {
     import_asset_data_t *import_data = NULL;
     ce_array_set_capacity(import_data, files_count, _G.allocator);
 
@@ -378,9 +378,12 @@ void _import_assets(ce_cdb_t0 db,
         const char *extenison = ce_os_path_a0->extension(filename);
 
         ct_asset_io_i0 *asset_io = 0;
+        ct_asset_i0 *asset = 0;
         if (0 != strcmp(extenison, "dcc_asset")) {
             asset_io = ct_asset_io_a0->find_asset_io(extenison);
-            if (!asset_io) {
+            asset = asset_get_interface(ce_id_a0->id64(extenison));
+
+            if (!asset_io && !asset) {
                 continue;
             }
         }
@@ -450,7 +453,7 @@ void _generate_dcc_files(ce_cdb_t0 db) {
 void asset_compiler_import_all() {
     uint32_t start_ticks = ce_os_time_a0->ticks();
 
-    ce_cdb_t0 compile_db = ce_cdb_a0->create_db(1000000);
+    ce_cdb_t0 compile_db = ce_cdb_a0->db();
 
     _generate_dcc_files(compile_db);
 
@@ -462,11 +465,11 @@ void asset_compiler_import_all() {
                       "", glob_patern, false, true, &files, &files_count,
                       _G.allocator);
 
-    _import_assets(ce_cdb_a0->db(), files, files_count);
-//    _import_dcc_asset(compile_db, files, files_count);
+    _make_filename_uid_map(ce_cdb_a0->db(), files, files_count);
+    ct_asset_io_a0->import_dcc_asset(compile_db, files, files_count);
 
     ce_fs_a0->listdir_free(files, files_count, _G.allocator);
-    ce_cdb_a0->destroy_db(compile_db);
+//    ce_cdb_a0->destroy_db(compile_db);
 
     uint32_t now_ticks = ce_os_time_a0->ticks();
     uint32_t dt = now_ticks - start_ticks;
